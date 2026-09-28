@@ -245,7 +245,7 @@ CSP sengaja tanpa nonce: nonce per request memaksa semua halaman dirender dinami
 - `app/sitemap.ts`: 6 URL (home, work, privacy × 2 bahasa), masing-masing dengan `alternates.languages`, `lastModified`.
 - `app/robots.ts`: allow `/`, disallow `/admin` dan `/api`, `sitemap: SITE_URL/sitemap.xml`. Tidak ada blok khusus crawler AI (diizinkan).
 - Admin: `metadata.robots = { index: false, follow: false }` + header dari proxy.
-- Gambar: `next/image` + loader Cloudinary, `sizes` diisi sesuai grid (`(min-width:1200px) 33vw, (min-width:768px) 50vw, 100vw`). `priority` hanya untuk: slide pertama HeroProofPanel di S-01 (`sizes="(min-width:1024px) 560px, 100vw"`) dan kartu pertama di S-02. Slide panel ke-2 dan ke-3 dirender dengan `loading="lazy"` + `fetchPriority="low"` dan elemen `<img>`-nya baru dipasang setelah `requestIdleCallback` (fallback `setTimeout` 2 s), paling lambat sebelum rotasi pertama.
+- Gambar: `next/image` + loader Cloudinary, `sizes` diisi sesuai grid (`(min-width:1200px) 33vw, (min-width:768px) 50vw, 100vw`). Gambar prioritas (`loading="eager"` + `fetchPriority="high"`; prop `priority` sudah deprecated di Next.js 16) hanya untuk: slide pertama HeroProofPanel di S-01 (`sizes="(min-width:1024px) 560px, 100vw"`) dan kartu pertama di S-02. Slide panel ke-2 dan ke-3 dirender dengan `loading="lazy"` + `fetchPriority="low"` dan elemen `<img>`-nya baru dipasang setelah `requestIdleCallback` (fallback `setTimeout` 2 s), paling lambat sebelum rotasi pertama.
 
 ### Analytics & consent (implementasi F8)
 
@@ -456,7 +456,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 - [x] **T-07** Layout publik: Navbar (responsif), Footer (CTA email + Copy), skip link.
 - [x] **T-08** S-01 Hero kolom kiri (BylineBadge dengan inisial fallback, H1 dengan `richText`, MetaRow + `site-config`) + tekstur grid + SectionHeader + ServiceTile dua tier + ProcessSteps + About (lead, `<mark>`, AboutFacts) + FooterCta, copy dari kamus.
 - [x] **T-09** `getPublishedProjects()` + turunan `selectHomepageProjects()` (featured maks. 3, grid maks. 6 + total) + ProjectCard + Selected work + EmptyState + HeroProofPanel (rotasi, kontrol, E-21 s.d. E-24, pemuatan gambar bertahap); loader Cloudinary.
-- [ ] **T-10** S-02 Work, S-03 Privacy, S-04 not-found per locale.
+- [x] **T-10** S-02 Work, S-03 Privacy, S-04 not-found per locale.
 - [ ] **T-11** O-01 toggle + O-02 banner saran bahasa + cookie `lang_pref`.
 - [ ] **T-12** SEO: `buildMetadata`, JSON-LD, `sitemap.ts`, `robots.ts`, gambar OG.
 

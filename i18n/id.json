@@ -112,6 +112,40 @@
     "cookies": "Pengaturan cookie",
     "linkedinAria": "LinkedIn (buka di tab baru)"
   },
+  "privacy": {
+    "title": "Privasi",
+    "updated": "Terakhir diperbarui: 29 September 2026",
+    "intro": "Situs ini dibuat sederhana: tanpa akun, tanpa formulir kontak, dan tanpa analytics kecuali kamu mengizinkannya.",
+    "collectTitle": "Data yang dikumpulkan",
+    "collectBody": "Jika kamu menekan Terima di banner cookie, Google Analytics 4 mencatat data penggunaan anonim: halaman yang dibuka, perkiraan wilayah dan jenis perangkat, serta klik pada tombol email dan link project. Data ini tidak memberi tahu saya siapa kamu. Jika kamu menekan Tolak atau mengabaikan banner, Google Analytics tidak berjalan dan tidak memasang cookie.",
+    "cookiesTitle": "Cookie",
+    "cookieName": "Cookie",
+    "cookiePurpose": "Kegunaan",
+    "cookieDuration": "Masa berlaku",
+    "cookies": [
+      {
+        "name": "lang_pref",
+        "purpose": "Mengingat pilihan bahasamu (Inggris atau Indonesia).",
+        "duration": "1 tahun"
+      },
+      {
+        "name": "consent",
+        "purpose": "Mengingat apakah kamu menerima atau menolak analytics.",
+        "duration": "6 bulan"
+      },
+      {
+        "name": "_ga, _ga_*",
+        "purpose": "Google Analytics, hanya dipasang setelah kamu menekan Terima.",
+        "duration": "Hingga 2 tahun (diatur Google)"
+      }
+    ],
+    "changeTitle": "Mengubah pilihan",
+    "changeBody": "Gunakan “Pengaturan cookie” di bagian bawah setiap halaman untuk mengubah pilihanmu kapan saja. Beralih ke Tolak juga menghapus cookie Google Analytics.",
+    "emailTitle": "Saat kamu mengirim email",
+    "emailBody": "Pesanmu hanya dipakai untuk membalas dan membahas project-mu. Pesan itu tidak dimasukkan ke mailing list dan tidak dibagikan ke siapa pun.",
+    "contactTitle": "Pertanyaan",
+    "contactBody": "Kirim email ke {email} untuk pertanyaan apa pun tentang halaman ini."
+  },
   "notFound": {
     "title": "Halaman ini tidak ada",
     "body": "Tautannya mungkin rusak, atau halamannya sudah dipindah.",

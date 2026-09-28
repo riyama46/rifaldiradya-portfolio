@@ -39,7 +39,10 @@ export function ProjectThumbnail({
       height={thumbnail.height}
       alt={thumbnail.alt}
       sizes={sizes}
-      priority={priority}
+      // Next.js 16 deprecates `priority`; eager + high fetch priority is the documented choice for
+      // images that are the LCP element only on some viewports (hero panel: desktop yes, mobile no).
+      loading={priority ? "eager" : "lazy"}
+      fetchPriority={priority ? "high" : undefined}
       onError={() => setFailed(true)}
       className={className ?? "size-full object-cover"}
     />
