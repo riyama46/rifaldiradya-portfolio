@@ -9,8 +9,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
-    "start": "node scripts/migrate.mts && next start",
-    "start:app": "next start",
+    "start": "next start",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node scripts/migrate.mts --strict",
     "lint": "eslint",

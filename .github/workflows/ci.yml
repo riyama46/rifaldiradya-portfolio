@@ -88,11 +88,23 @@ jobs:
 
       - run: npm ci
 
-      - name: Apply migrations
-        run: npm run db:migrate
+      # Several server processes may start at once on Hostinger; the named lock must serialize them.
+      - name: Apply migrations from two processes at once (must not race)
+        run: |
+          node scripts/migrate.mts --strict & first=$!
+          node scripts/migrate.mts --strict & second=$!
+          wait "$first"
+          wait "$second"
 
       - name: Apply migrations again (must be idempotent)
         run: npm run db:migrate
+
+      - name: Each migration is recorded exactly once
+        run: |
+          count=$(mysql -h 127.0.0.1 -u portfolio -p"$DATABASE_PASSWORD" portfolio -N -B -e "SELECT COUNT(*) FROM __drizzle_migrations")
+          files=$(ls drizzle/*.sql | wc -l)
+          echo "recorded=$count files=$files"
+          [ "$count" -eq "$files" ] || { echo "::error::Migration history does not match /drizzle"; exit 1; }
 
       - name: Verify tables and collation
         run: |
