@@ -8,6 +8,14 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # Majors that the stack does not support yet (docs/DECISIONS.md, 2026-09-28).
+      - dependency-name: typescript # TS 7 is out of scope for v1 (SDD section 2)
+        update-types: ["version-update:semver-major"]
+      - dependency-name: eslint # eslint-config-next 16.3 does not support ESLint 10
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/node" # must match the Node 24 runtime
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /
