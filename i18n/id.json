@@ -1,0 +1,120 @@
+{
+  "nav": {
+    "work": "Hasil Kerja",
+    "email": "Email saya",
+    "skip": "Langsung ke konten"
+  },
+  "language": {
+    "label": "Bahasa"
+  },
+  "hero": {
+    "title": "Landing Page Siap Pakai dalam Hitungan <hl>Hari</hl>, <dim>Bukan Minggu</dim>",
+    "subtitle": "Saya bikin landing page dari brief sampai live, cepat dan rapi. Butuh dashboard atau web app yang lebih kompleks? Saya juga bisa bantu.",
+    "ctaPrimary": "Lihat Hasil Kerja",
+    "ctaSecondary": "Kirim Brief via Email",
+    "proofLabel": "Karya terbaru",
+    "proofAria": "Lihat {title} (buka di tab baru)"
+  },
+  "meta": {
+    "available": "Menerima project baru",
+    "location": "Berbasis di Indonesia",
+    "remote": "Kerja remote"
+  },
+  "slider": {
+    "pause": "Jeda slideshow",
+    "play": "Putar slideshow"
+  },
+  "label": {
+    "services": "Layanan",
+    "work": "Hasil Kerja",
+    "about": "Tentang",
+    "contact": "Kontak"
+  },
+  "services": {
+    "title": "Yang saya kerjakan",
+    "primary": {
+      "badge": "Fokus utama",
+      "title": "Landing Page Development",
+      "desc": "Cepat, fokus konversi, siap tayang dalam hitungan hari."
+    },
+    "secondary": {
+      "badge": "Untuk proyek lebih besar",
+      "title": "Web App & Dashboard",
+      "desc": "Untuk kebutuhan yang lebih kompleks dari sekadar landing page."
+    }
+  },
+  "steps": {
+    "1": "Brief",
+    "1d": "Kamu kirim tujuannya",
+    "2": "Pengerjaan",
+    "2d": "Saya desain dan coding",
+    "3": "Live",
+    "3d": "Online, siap dibagikan"
+  },
+  "work": {
+    "featuredTitle": "Karya pilihan",
+    "viewAll": "Lihat semua karya",
+    "viewAllCount": "Lihat semua karya ({n})",
+    "empty": "Karya baru sedang disiapkan. Sementara itu, ceritakan kebutuhanmu."
+  },
+  "workPage": {
+    "title": "Hasil Kerja",
+    "intro": "Landing page yang sudah live. Klik dan lihat situs aslinya.",
+    "cta": "Suka dengan hasilnya?"
+  },
+  "card": {
+    "live": "Live",
+    "visit": "Lihat situs",
+    "visitShort": "Lihat",
+    "visitAria": "Lihat {title} (buka di tab baru)"
+  },
+  "about": {
+    "title": "Siapa yang akan bekerja denganmu",
+    "lead": "Saya Rifaldi, web developer yang <mark>sehari-hari bekerja full-time membangun website</mark>, dan menerima project landing page freelance untuk founder dan bisnis kecil.",
+    "body": "Cara kerja saya sederhana: terima brief, ubah jadi <strong>halaman yang cepat dan rapi</strong>, lalu <mark>tayang dalam hitungan hari, bukan minggu</mark>. Kamu berurusan dengan satu orang dari pesan pertama sampai launch, jadi tidak ada yang hilang di antara desainer, developer, dan project manager."
+  },
+  "facts": {
+    "basedLabel": "Berbasis di",
+    "based": "Indonesia ({timezone})",
+    "workLabel": "Bekerja dengan",
+    "work": "Klien dari mana saja, secara remote",
+    "focusLabel": "Fokus",
+    "focus": "Landing page, web app & dashboard",
+    "langLabel": "Bahasa",
+    "lang": "Indonesia, Inggris",
+    "stackLabel": "Stack"
+  },
+  "cta": {
+    "title": "Punya halaman yang mau <hl>diluncurkan</hl>?",
+    "sub": "Kirim brief singkat: halamannya untuk apa dan kapan dibutuhkan. Saya akan balas dengan langkah selanjutnya.",
+    "button": "Kirim brief via email",
+    "or": "atau salin"
+  },
+  "email": {
+    "subject": "Tanya project dari rifaldiradya.com",
+    "copy": "Salin email",
+    "copied": "Tersalin",
+    "copyFallback": "Tekan Ctrl/Cmd+C untuk menyalin"
+  },
+  "langBanner": {
+    "text": "Also available in Indonesian.",
+    "action": "Lihat versi Indonesia",
+    "dismiss": "Dismiss"
+  },
+  "consent": {
+    "body": "Saya memakai Google Analytics untuk melihat halaman mana yang berguna. Hanya aktif jika kamu izinkan.",
+    "accept": "Terima",
+    "reject": "Tolak"
+  },
+  "footer": {
+    "privacy": "Privasi",
+    "cookies": "Pengaturan cookie",
+    "linkedinAria": "LinkedIn (buka di tab baru)"
+  },
+  "notFound": {
+    "title": "Halaman ini tidak ada",
+    "body": "Tautannya mungkin rusak, atau halamannya sudah dipindah.",
+    "home": "Kembali ke beranda",
+    "work": "Lihat hasil kerja"
+  }
+}

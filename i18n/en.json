@@ -1,0 +1,120 @@
+{
+  "nav": {
+    "work": "Work",
+    "email": "Email me",
+    "skip": "Skip to content"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "hero": {
+    "title": "Landing Pages That Launch in <hl>Days</hl>, <dim>Not Weeks</dim>",
+    "subtitle": "I'm Rifaldi, a web developer who turns a brief into a live site, fast. Need something bigger, like a dashboard or web app? I build those too. Based in Indonesia, working with clients worldwide.",
+    "ctaPrimary": "See the Work",
+    "ctaSecondary": "Email Me About Your Project",
+    "proofLabel": "Latest work",
+    "proofAria": "Visit {title} (opens in new tab)"
+  },
+  "meta": {
+    "available": "Available for new projects",
+    "location": "Based in Indonesia",
+    "remote": "Works remotely"
+  },
+  "slider": {
+    "pause": "Pause slideshow",
+    "play": "Play slideshow"
+  },
+  "label": {
+    "services": "Services",
+    "work": "Work",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "services": {
+    "title": "What I build",
+    "primary": {
+      "badge": "Main focus",
+      "title": "Landing Page Development",
+      "desc": "Fast, conversion-focused pages, ready to go live in days."
+    },
+    "secondary": {
+      "badge": "For bigger projects",
+      "title": "Web Apps & Dashboards",
+      "desc": "For needs that go beyond a single page."
+    }
+  },
+  "steps": {
+    "1": "Brief",
+    "1d": "You send the goal",
+    "2": "Build",
+    "2d": "I design and code",
+    "3": "Live",
+    "3d": "Online, ready to share"
+  },
+  "work": {
+    "featuredTitle": "Selected work",
+    "viewAll": "View all work",
+    "viewAllCount": "View all work ({n})",
+    "empty": "New work is on the way. Meanwhile, tell me what you need."
+  },
+  "workPage": {
+    "title": "Work",
+    "intro": "Live landing pages I've built. Click through to see the real, working sites.",
+    "cta": "Like what you see?"
+  },
+  "card": {
+    "live": "Live",
+    "visit": "Visit live site",
+    "visitShort": "Visit",
+    "visitAria": "Visit {title} (opens in new tab)"
+  },
+  "about": {
+    "title": "Who you'll work with",
+    "lead": "I'm Rifaldi, a web developer who <mark>builds websites professionally as a full-time job</mark>, and takes on freelance landing pages for founders and small businesses.",
+    "body": "My approach is simple: take your brief, turn it into <strong>a fast, clean page</strong>, and <mark>get it live in days, not weeks</mark>. You get one person from first message to launch, so nothing gets lost between a designer, a developer, and a project manager."
+  },
+  "facts": {
+    "basedLabel": "Based in",
+    "based": "Indonesia ({timezone})",
+    "workLabel": "Works with",
+    "work": "Clients worldwide, remotely",
+    "focusLabel": "Focus",
+    "focus": "Landing pages, web apps & dashboards",
+    "langLabel": "Languages",
+    "lang": "English, Indonesian",
+    "stackLabel": "Stack"
+  },
+  "cta": {
+    "title": "Have a page to <hl>launch</hl>?",
+    "sub": "Send a short brief: what the page is for and when you need it. I'll reply with the next steps.",
+    "button": "Email me about your project",
+    "or": "or copy"
+  },
+  "email": {
+    "subject": "Project inquiry from rifaldiradya.com",
+    "copy": "Copy email",
+    "copied": "Copied",
+    "copyFallback": "Press Ctrl/Cmd+C to copy"
+  },
+  "langBanner": {
+    "text": "Also available in Indonesian.",
+    "action": "Lihat versi Indonesia",
+    "dismiss": "Dismiss"
+  },
+  "consent": {
+    "body": "I use Google Analytics to see which pages are useful. It only runs if you allow it.",
+    "accept": "Accept",
+    "reject": "Reject"
+  },
+  "footer": {
+    "privacy": "Privacy",
+    "cookies": "Cookie settings",
+    "linkedinAria": "LinkedIn (opens in new tab)"
+  },
+  "notFound": {
+    "title": "This page doesn't exist",
+    "body": "The link may be broken, or the page may have moved.",
+    "home": "Back to home",
+    "work": "See the work"
+  }
+}
