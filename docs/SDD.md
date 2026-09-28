@@ -449,13 +449,13 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 - [x] **T-03** Struktur `app/[lang]` + `proxy.ts` (rewrite, 301, guard admin) + `i18n/` (kamus, `localePath`, `altPath`) + unit test routing.
 - [x] **T-04** `lib/env.ts` + koneksi Drizzle ke MySQL + skema 3 tabel + migrasi + `scripts/migrate`; Docker MySQL untuk lokal.
 - [ ] **T-05** GitHub Actions CI (lint, typecheck, unit, build tanpa DB).
-- [ ] **T-06** Deploy pertama ke subdomain uji di Hostinger (bagian 10); catat hasil di `docs/DECISIONS.md`, termasuk apakah build bisa menjangkau DB.
+- [x] **T-06** Deploy pertama ke subdomain uji di Hostinger (bagian 10); catat hasil di `docs/DECISIONS.md`, termasuk apakah build bisa menjangkau DB.
 
 ### Fase 2 — Halaman publik
 
 - [x] **T-07** Layout publik: Navbar (responsif), Footer (CTA email + Copy), skip link.
 - [x] **T-08** S-01 Hero kolom kiri (BylineBadge dengan inisial fallback, H1 dengan `richText`, MetaRow + `site-config`) + tekstur grid + SectionHeader + ServiceTile dua tier + ProcessSteps + About (lead, `<mark>`, AboutFacts) + FooterCta, copy dari kamus.
-- [ ] **T-09** `getPublishedProjects()` + turunan `selectHomepageProjects()` (featured maks. 3, grid maks. 6 + total) + ProjectCard + Selected work + EmptyState + HeroProofPanel (rotasi, kontrol, E-21 s.d. E-24, pemuatan gambar bertahap); loader Cloudinary.
+- [x] **T-09** `getPublishedProjects()` + turunan `selectHomepageProjects()` (featured maks. 3, grid maks. 6 + total) + ProjectCard + Selected work + EmptyState + HeroProofPanel (rotasi, kontrol, E-21 s.d. E-24, pemuatan gambar bertahap); loader Cloudinary.
 - [ ] **T-10** S-02 Work, S-03 Privacy, S-04 not-found per locale.
 - [ ] **T-11** O-01 toggle + O-02 banner saran bahasa + cookie `lang_pref`.
 - [ ] **T-12** SEO: `buildMetadata`, JSON-LD, `sitemap.ts`, `robots.ts`, gambar OG.
