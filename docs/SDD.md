@@ -176,7 +176,7 @@ Tidak ada logika yang membaca `Accept-Language`, IP, atau `lang_pref` di proxy (
 
 | Route | Mode | Detail |
 | --- | --- | --- |
-| `/[lang]`, `/[lang]/work` | Statis (ISR) | Data dari `getPublishedProjects()`; homepage memakai `getFeaturedProjects()` sekali untuk HeroProofPanel dan section Featured work (hasil yang sama diteruskan ke keduanya); `export const revalidate = 300` sebagai jaring pengaman + revalidasi on-demand saat admin menyimpan |
+| `/[lang]`, `/[lang]/work` | Statis (ISR) | Data dari `getPublishedProjects()`; homepage memanggil `getPublishedProjects()` sekali (tabel kecil, sudah terurut) lalu menurunkan dua daftar di memori: `featured` (maks. 3) untuk HeroProofPanel dan 6 teratas + jumlah total untuk section Selected work; `export const revalidate = 300` sebagai jaring pengaman + revalidasi on-demand saat admin menyimpan |
 | `/[lang]/privacy`, not-found | Statis penuh | Tanpa data |
 | `sitemap.ts`, `robots.ts` | Statis (ISR 300 s) | `lastmod` dari `max(updated_at)` |
 | `/admin/*` | Dinamis | Selalu baca sesi dan data terbaru; tidak pernah di-cache |
@@ -442,7 +442,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 
 - [ ] **T-07** Layout publik: Navbar (responsif), Footer (CTA email + Copy), skip link.
 - [ ] **T-08** S-01 Hero kolom kiri (BylineBadge dengan inisial fallback, H1 dengan `richText`, MetaRow + `site-config`) + tekstur grid + SectionHeader + ServiceTile dua tier + ProcessSteps + About (lead, `<mark>`, AboutFacts) + FooterCta, copy dari kamus.
-- [ ] **T-09** `getPublishedProjects()`/`getFeaturedProjects()` + ProjectCard + Featured work + EmptyState + HeroProofPanel (rotasi, kontrol, E-21 s.d. E-24, pemuatan gambar bertahap); loader Cloudinary.
+- [ ] **T-09** `getPublishedProjects()` + turunan `selectHomepageProjects()` (featured maks. 3, grid maks. 6 + total) + ProjectCard + Selected work + EmptyState + HeroProofPanel (rotasi, kontrol, E-21 s.d. E-24, pemuatan gambar bertahap); loader Cloudinary.
 - [ ] **T-10** S-02 Work, S-03 Privacy, S-04 not-found per locale.
 - [ ] **T-11** O-01 toggle + O-02 banner saran bahasa + cookie `lang_pref`.
 - [ ] **T-12** SEO: `buildMetadata`, JSON-LD, `sitemap.ts`, `robots.ts`, gambar OG.
@@ -502,7 +502,7 @@ Kalau semuanya tidak menjawab: BERHENTI dan tanya. Jangan mengarang.
 
 ### Pola prompt per task
 
-> Kerjakan **T-09** dari docs/SDD.md bagian 12. Rujukan: App Flow S-01 (Featured work), ProjectCard, E-01, E-03, E-05; SDD bagian 3 (loader Cloudinary). Tulis rencana dulu, tunggu persetujuan, lalu implementasi. Jangan ubah file di luar `components/site`, `lib/projects`, `lib/images`, `app/[lang]/page.tsx`.
+> Kerjakan **T-09** dari docs/SDD.md bagian 12. Rujukan: App Flow S-01 (Selected work), ProjectCard, E-01, E-03, E-05; SDD bagian 3 (loader Cloudinary). Tulis rencana dulu, tunggu persetujuan, lalu implementasi. Jangan ubah file di luar `components/site`, `lib/projects`, `lib/images`, `app/[lang]/page.tsx`.
 
 ### Definisi selesai (per task)
 

@@ -93,7 +93,7 @@ Urutan section tetap; tidak boleh ada section tambahan. Section 2–5 diawali Se
 | --- | --- | --- | --- |
 | 1 | Hero `#top` | **Kolom kiri:** BylineBadge (avatar 64/72 px + "Rifaldi Radya Pratama" + "Web Developer") → H1 `[hero.title]` (highlighter amber pada "Days"/"Hari", "Not Weeks"/"Bukan Minggu" warna muted) → subheadline `[hero.subtitle]` → tombol primer `[hero.ctaPrimary]` "See the Work" → link sekunder `[hero.ctaSecondary]` "Email Me About Your Project" → MetaRow (`[meta.available]` dengan StatusDot jika flag aktif · `[meta.location]` · `[meta.remote]` · "EN / ID"). **Kolom kanan:** HeroProofPanel (lihat spesifikasi di bawah). | Rata kiri. Dua kolom di ≥ 1024 px, satu kolom di bawahnya (panel di bawah MetaRow). Tombol primer scroll halus ke `#work` dan memindahkan fokus ke heading `#work`. Avatar: foto jika aset ada, jika tidak inisial "RR" di lingkaran `--color-accent-soft`. Di 375 × 667, H1 + tombol primer harus terlihat tanpa scroll walau O-03 tampil. Latar hero bertekstur grid (dekoratif, `aria-hidden`). |
 | 2 | Services `#services` | SectionHeader `01` + H2 `[services.title]` "What I build" → ServiceTile utama (badge `[services.primary.badge]` "Main focus", judul, deskripsi, ProcessSteps `[steps.1–3]` + keterangan `[steps.1d–3d]`) → ServiceTile sekunder (badge "For bigger projects", judul, deskripsi) | Tile utama lebih besar/menonjol (border aksen); di ≥ 768 px dua tile berdampingan rasio 3:2, di mobile menumpuk. Tile tidak bisa diklik. ProcessSteps berupa `<ol>` 3 kolom; langkah terakhir memakai StatusDot hijau. |
-| 3 | Featured work `#work` | SectionHeader `02` + H2 `[work.featuredTitle]` "Selected work" → grid ProjectCard (0–3 item) → tombol `[work.viewAll]` "View all work" + ikon → ke S-02 locale aktif | Data: `published=true AND featured=true`, urut `sort_order` asc, lalu `created_at` desc, limit 3 (data yang sama dipakai HeroProofPanel). Jika 0 item → section tetap tampil dengan EmptyState (E-01). |
+| 3 | Selected work `#work` | SectionHeader `02` + H2 `[work.featuredTitle]` "Selected work" → grid ProjectCard (0–6 item) → tombol `[work.viewAll]` "View all work" (atau `[work.viewAllCount]` "View all work ({n})" jika total published > 6) + ikon → ke S-02 locale aktif | Data: `published=true`, urut `sort_order` asc, lalu `created_at` desc, limit 6 (tidak bergantung pada `featured`). Grid ke bawah sama dengan S-02: 1 kolom < 768 px, 2 kolom ≥ 768 px, 3 kolom ≥ 1200 px, gap 24 px; tanpa scroll horizontal dan tanpa animasi geser otomatis. Kartu muncul dengan reveal saat scroll (kartu kedua dst. sedikit tertunda). Jika 0 item → section tetap tampil dengan EmptyState (E-01). |
 | 4 | About `#about` | SectionHeader `03` + H2 `[about.title]` "Who you'll work with" → lead `[about.lead]` → body `[about.body]` → AboutFacts (`<dl>`: `[facts.based*]`, `[facts.work*]`, `[facts.focus*]`, `[facts.lang*]`, Stack sebagai tag teks) | Grid 1:2 di ≥ 1024 px. Lead dan body boleh berisi penanda `<mark>` (maks. 2 per section) dan `<strong>` lewat rich-text i18n (SDD bagian 5). Maks lebar teks 62ch. Stack = teks, bukan logo. |
 | 5 | CTA akhir (bagian footer) | Label `[label.contact]` → H2 `[cta.title]` "Have a page to launch?" (highlighter pada "launch"/"diluncurkan") → `[cta.sub]` → tombol mailto `[cta.button]` + ikon → → `[cta.or]` + alamat email teks + tombol Copy | Rata tengah, padding vertikal 112 px (mobile) / 176 px (desktop). Lihat perilaku email di UF-03. |
 
@@ -101,7 +101,7 @@ Urutan section tetap; tidak boleh ada section tambahan. Section 2–5 diawali Se
 
 | Elemen | Sumber | Aturan |
 | --- | --- | --- |
-| Data | project `featured=true AND published=true`, urutan sama dengan Featured work, maks. 3 | Satu query dipakai bersama section 3. 0 item → panel tidak dirender (E-21); 1 item → statis tanpa kontrol (E-22). |
+| Data | project `featured=true AND published=true`, urut `sort_order` asc lalu `created_at` desc, maks. 3 | Diturunkan dari hasil query published yang sama dengan section 3 (satu query per render). 0 item → panel tidak dirender (E-21); 1 item → statis tanpa kontrol (E-22). |
 | Frame | statis | Bar: 3 titik dekoratif, URL `live_url` tanpa `https://`, StatusDot + "Live". Isi: thumbnail rasio 16:10, `alt_{locale}`. Kartu bayangan di belakang frame (dekoratif). Seluruh frame adalah satu `<a>` ke `live_url` (`target=_blank`, `rel="noopener noreferrer"`, `aria-label` = `[hero.proofAria]`). |
 | Caption | `title_{locale}` | `[hero.proofLabel]` "Latest work" · judul project aktif · link `[card.visitShort]` "Visit" + ikon ↗ ke `live_url` (tab baru). |
 | Kontrol | statis | Tombol `01`, `02`, `03` (`aria-pressed` = aktif) masing-masing dengan progress bar; tombol pause/play ikon dengan `aria-label` `[slider.pause]` / `[slider.play]`. Kontrol berada di luar elemen `<a>`. |
@@ -188,7 +188,7 @@ Tidak ada link "forgot password" dan "sign up". Reset password dilakukan manual 
 - Header halaman: "Projects" + jumlah ("2 projects") + tombol primer "New project" → S-12.
 - Daftar baris (desktop: tabel; mobile: kartu bertumpuk), urut `sort_order` asc lalu `created_at` desc. Tiap baris: thumbnail 64 × 40 · judul EN (link ke S-13) · badge status "Published" / "Draft" · badge "Featured" jika true · angka urutan · tanggal update relatif ("2 days ago") · tombol "Edit".
 - Tidak ada inline toggle, drag-and-drop, atau bulk action di v1; semua perubahan lewat S-13.
-- Info kecil di bawah header: "Featured on homepage: {n}/3". Jika n > 3, tampilkan peringatan kuning "Only the first 3 featured projects appear on the homepage." (E-08).
+- Info kecil di bawah header: "Featured in homepage hero: {n}/3". Jika n > 3, tampilkan peringatan kuning "Only the first 3 featured projects appear in the homepage hero." (E-08). Info kedua: "Shown on homepage grid: first 6 published projects by sort order."
 - Empty state (0 project): "No projects yet. Add your first one to show it on the site." + tombol "New project".
 - Toast sukses dari aksi sebelumnya ("Project created", "Changes saved", "Project deleted") tampil 4 detik, `role=status`.
 
@@ -208,7 +208,7 @@ Form yang sama. S-13 terisi data dan punya zona hapus.
 | 8 | Thumbnail alt (EN) | text | wajib jika ada thumbnail, 1–140 | Deskripsikan isi gambar |
 | 9 | Thumbnail alt (ID) | text | wajib jika ada thumbnail, 1–140 | — |
 | 10 | Sort order | number | integer 0–999, default 100 | "Lower shows first" |
-| 11 | Featured | switch | — | "Show on homepage (max 3)" |
+| 11 | Featured | switch | — | "Show in homepage hero (max 3)" |
 | 12 | Published | switch | Publish butuh field 1–5, 7–9 valid | Off = draft, tidak tampil di situs |
 
 - Layout: field EN dan ID berdampingan di ≥ 1024 px, bertumpuk (EN dulu) di bawahnya. Tidak memakai tab bahasa supaya kedua versi terlihat bersamaan.
@@ -295,9 +295,9 @@ Setiap edge case di bawah wajib ditangani persis seperti kolom "Perilaku"; tidak
 
 | ID | Layar | Kondisi | Perilaku |
 | --- | --- | --- | --- |
-| E-01 | S-01, S-02 | 0 project published (atau 0 featured di S-01) | S-01: section Work tetap ada, teks "New work is on the way. Meanwhile, tell me what you need." + tombol email; tombol View all disembunyikan. S-02: teks serupa + tombol email. |
+| E-01 | S-01, S-02 | 0 project published | S-01: section Work tetap ada, teks "New work is on the way. Meanwhile, tell me what you need." + tombol email; tombol View all disembunyikan. S-02: teks serupa + tombol email. |
 | E-02 | S-01, S-02 | Database tidak bisa diakses saat revalidasi | Halaman statis terakhir tetap disajikan; error dicatat di log server. Build pertama tanpa DB → render E-01, bukan gagal build. |
-| E-03 | S-01 | Featured > 3 | Tampilkan 3 teratas menurut urutan; sisanya hanya di S-02. |
+| E-03 | S-01 | Featured > 3, atau published > 6 | Panel hero: 3 featured teratas menurut urutan. Grid Selected work: 6 published teratas + tombol "View all work ({n})". Sisanya tetap tampil di S-02. |
 | E-04 | S-01, S-02 | Hanya 1 project | Grid tetap rata kiri, kartu tidak melar selebar layar (lebar maks = 1 kolom grid). |
 | E-05 | ProjectCard | Thumbnail gagal dimuat | Placeholder `--color-surface` + judul; tombol tetap berfungsi. |
 | E-06 | ProjectCard | Situs live sedang down | Di luar kendali situs; tidak ada pengecekan otomatis di v1. Pal menonaktifkan Published secara manual jika perlu. |
@@ -459,6 +459,7 @@ Semua label UI tinggal di dua file kamus (`en`, `id`) dengan key yang sama. Copy
 | `steps.3` / `steps.3d` | Live / Online, ready to share | Live / Online, siap dibagikan |
 | `work.featuredTitle` | Selected work | Karya pilihan |
 | `work.viewAll` | View all work (+ ikon →) | Lihat semua karya (+ ikon →) |
+| `work.viewAllCount` | View all work ({n}) (+ ikon →) | Lihat semua karya ({n}) (+ ikon →) |
 | `work.empty` | New work is on the way. Meanwhile, tell me what you need. | Karya baru sedang disiapkan. Sementara itu, ceritakan kebutuhanmu. |
 | `workPage.title` | Work | Hasil Kerja |
 | `card.live` | Live | Live |

@@ -124,7 +124,7 @@ Setiap halaman EN berpasangan dengan versi ID lewat hreflang dan toggle bahasa. 
 
 Di luar diagram ada 2 halaman utilitas: kebijakan privasi `/privacy` dan `/id/privacy` (dibutuhkan F8), ditautkan dari footer.
 
-**Urutan section homepage (EN dan ID identik):** Navbar (logo/nama, link Work, toggle EN|ID, tombol Email) → Hero (kolom kiri: byline badge, headline, subheadline, CTA, baris meta; kolom kanan: panel bukti project featured) → `01` Service block dua tier + alur Brief → Build → Live → `02` Featured work (maksimal 3 project dengan flag featured) → `03` About (lead, body, blok fakta) → `04` CTA akhir (dipusatkan, ruang lega) → footer bawah (Privacy, Cookie settings, LinkedIn, copyright).
+**Urutan section homepage (EN dan ID identik):** Navbar (logo/nama, link Work, toggle EN|ID, tombol Email) → Hero (kolom kiri: byline badge, headline, subheadline, CTA, baris meta; kolom kanan: panel bukti project featured) → `01` Service block dua tier + alur Brief → Build → Live → `02` Selected work (maksimal 6 project published, grid ke bawah; tombol "View all work" ke `/work`) → `03` About (lead, body, blok fakta) → `04` CTA akhir (dipusatkan, ruang lega) → footer bawah (Privacy, Cookie settings, LinkedIn, copyright).
 
 Setiap section setelah hero diawali label bernomor kecil (`01 Services`, `02 Work`, `03 About`, `04 Contact`) di atas garis tipis. Label ini bagian dari header section, bukan section baru.
 
@@ -149,12 +149,13 @@ MVP = 9 fitur. Semuanya must-have; kalau satu dicabut, portfolio gagal membuktik
 **Story:** Sebagai klien Upwork, saya mau langsung paham apa yang ditawarkan dan melihat bukti kerja tanpa scroll jauh, supaya bisa memutuskan menghubungi atau tidak.
 
 - [ ] Urutan section sesuai bagian 5; headline + CTA primer terlihat di atas fold pada layar 375 × 667 px, termasuk saat banner cookie tampil.
-- [ ] CTA "See the Work" scroll halus ke section Featured work (bukan pindah halaman).
-- [ ] Featured work menampilkan project dengan `featured = true` dan `published = true`, urut `sort_order` naik, maksimal 3.
+- [ ] CTA "See the Work" scroll halus ke section Selected work (bukan pindah halaman).
+- [ ] Selected work menampilkan project `published = true`, urut `sort_order` naik, maksimal 6, dalam grid ke bawah (1 / 2 / 3 kolom seperti halaman Work), tanpa scroll ke samping dan tanpa animasi geser otomatis. Jika total project published > 6, tombol berbunyi "View all work ({total})".
+- [ ] Flag `featured` hanya menentukan project di panel hero (maks. 3); tidak memengaruhi isi grid Selected work.
 - [ ] Tombol "View all work" di bawah featured menuju `/work` (atau `/id/work`).
 - [ ] Foto profil tampil sebagai badge kecil (64–80 px) di samping nama; kalau foto belum ada, tampil inisial "RR" di lingkaran aksen.
 - [ ] Konten dibaca dari database saat build/revalidate, bukan hardcode, kecuali copy statis hero/service/about.
-- [ ] Panel bukti di hero menampilkan project featured yang sama dengan section Featured work (urutan sama, maks. 3) dalam frame browser: URL, status "Live", thumbnail 16:10, caption "Latest work · {judul} · Visit ↗". Frame dan link "Visit" membuka `live_url` di tab baru.
+- [ ] Panel bukti di hero menampilkan project `featured = true` dan `published = true` (urut `sort_order`, maks. 3) dalam frame browser: URL, status "Live", thumbnail 16:10, caption "Latest work · {judul} · Visit ↗". Frame dan link "Visit" membuka `live_url` di tab baru.
 - [ ] Jika ada ≥ 2 project featured, panel berganti otomatis tiap 6 detik (crossfade), dengan tombol 01/02/03 berprogress bar dan tombol pause/play. Rotasi berhenti sementara saat panel di-hover atau mendapat fokus keyboard, dan tidak berjalan sama sekali jika `prefers-reduced-motion: reduce`.
 - [ ] Jika hanya 1 project featured, panel statis tanpa kontrol; jika 0, panel disembunyikan dan hero menjadi satu kolom.
 - [ ] Section About memuat lead, body dengan maks. 2 kalimat kunci ber-highlight, dan blok fakta (lokasi + zona waktu, cara kerja, fokus, bahasa, stack sebagai tag teks).
@@ -455,7 +456,7 @@ Portfolio gagal kalau kodenya jadi tapi isinya kosong. Semua item ini tanggung j
 - [ ] Teks cookie consent banner EN + ID.
 - [ ] Foto profil (opsional untuk launch; v1 pakai inisial).
 - [ ] Akun Google Analytics 4 + Google Search Console atas nama sendiri.
-- [ ] Konfigurasi email hello@rifaldiradya.com aktif dan lolos SPF/DKIM/DMARC, supaya balasan ke klien tidak masuk spam.
+- [x] Konfigurasi email hello@rifaldiradya.com aktif dan lolos SPF/DKIM/DMARC, supaya balasan ke klien tidak masuk spam (dicek 28 Sep 2026; DMARC masih `p=none`).
 
 ## 13. Risiko, asumsi & open questions
 
