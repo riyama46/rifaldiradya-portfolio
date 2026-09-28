@@ -22,21 +22,27 @@ Buka http://localhost:3000.
 | `npm run start`                   | Jalankan hasil build                |
 | `npm run lint`                    | ESLint                              |
 | `npm run typecheck`               | Cek tipe TypeScript                 |
+| `npm test` / `test:watch`         | Unit test (Vitest)                  |
 | `npm run format` / `format:check` | Format / cek format dengan Prettier |
 
-Script test dan database ditambahkan di task yang membutuhkannya (SDD bagian 12).
+Script database dan e2e ditambahkan di task yang membutuhkannya (SDD bagian 12).
 
 ## Struktur folder
 
 ```text
-app/          Route Next.js (publik di app/[lang], admin di app/admin, API di app/api/admin)
+app/          Route Next.js: publik di app/[lang] (en | id), 404 di app/global-not-found.tsx
+components/   ui/ (primitif: Button, Badge, StatusDot, ArrowIcon); site/, overlays/, admin/ menyusul
+i18n/         Kamus en.json + id.json, helper locale (index.ts), richText (rich.tsx)
+lib/          Helper bersama (fonts, cn, header locale); db, auth, projects menyusul
 styles/       globals.css: token desain, Tailwind, motion
+tests/unit/   Unit test Vitest (i18n, richText, proxy)
 docs/         PRD, App Flow, SDD, DECISIONS, dan mockup desain
   design/     homepage-mockup.html (referensi visual); archive/ berisi versi lama
+proxy.ts      Routing: www → non-www, /en → /, locale rewrite, guard admin
 AGENTS.md     Aturan untuk coding AI (dibaca di setiap sesi)
 ```
 
-Folder lain (`components/`, `i18n/`, `lib/`, `drizzle/`, `scripts/`, `tests/`) dibuat saat task yang membutuhkannya dikerjakan, mengikuti SDD bagian 4.
+URL: bahasa Inggris tanpa prefix (`/`, `/work`), bahasa Indonesia di `/id` (`/id`, `/id/work`). Folder lain (`drizzle/`, `scripts/`, `tests/e2e/`) dibuat saat task yang membutuhkannya dikerjakan, mengikuti SDD bagian 4.
 
 ## Dokumen
 

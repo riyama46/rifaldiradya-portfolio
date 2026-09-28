@@ -92,9 +92,8 @@ Repo GitHub private `rifaldiradya-portfolio`, satu branch produksi `main`. Struk
 │  │  ├─ layout.tsx            # <html lang={lang}>, navbar, footer, overlay
 │  │  ├─ page.tsx              # S-01
 │  │  ├─ work/page.tsx         # S-02
-│  │  ├─ privacy/page.tsx      # S-03
-│  │  ├─ [...rest]/page.tsx    # memanggil notFound() untuk path tak dikenal
-│  │  └─ not-found.tsx         # S-04 (per locale)
+│  │  └─ privacy/page.tsx      # S-03
+│  ├─ global-not-found.tsx     # S-04 untuk semua path tak dikenal; locale dari header x-locale (proxy)
 │  ├─ admin/                   # root layout admin (G3), terpisah
 │  │  ├─ layout.tsx
 │  │  ├─ login/page.tsx        # S-10
@@ -115,7 +114,8 @@ Repo GitHub private `rifaldiradya-portfolio`, satu branch produksi `main`. Struk
 ├─ i18n/
 │  ├─ en.json
 │  ├─ id.json
-│  ├─ index.ts                 # getDictionary(lang), localePath(path, lang), altPath()
+│  ├─ index.ts                 # getDictionary(lang), localePath(path, lang), altPath(), interpolate()
+│  ├─ server.ts                # resolveLocale(params) untuk page/layout (notFound jika bukan en/id)
 │  └─ rich.tsx                 # richText(str): <hl>/<dim>/<mark>/<strong> → elemen React
 ├─ lib/
 │  ├─ db/ (client.ts, schema.ts)
@@ -125,13 +125,15 @@ Repo GitHub private `rifaldiradya-portfolio`, satu branch produksi `main`. Struk
 │  ├─ seo/ (metadata.ts, jsonld.ts)
 │  ├─ analytics/ (events.ts)
 │  ├─ revalidate.ts
+│  ├─ locale-header.ts         # nama header x-locale (dipakai proxy.ts dan global-not-found)
+│  ├─ cn.ts, fonts.ts          # helper class + next/font
 │  └─ site-config.ts           # availableForWork, timezoneLabel (konfigurasi non-secret)
 ├─ styles/globals.css          # tokens (CSS variables) + Tailwind + keyframes & motion
 ├─ drizzle/                    # file migrasi SQL
 ├─ scripts/ (hash-password.ts, migrate.ts)
-├─ tests/ (unit/, e2e/)
+├─ tests/ (unit/, e2e/)        # unit: Vitest (vitest.config.mts), e2e: Playwright
 ├─ docs/ (PRD.md, APP_FLOW.md, SDD.md, DECISIONS.md, design/homepage-mockup.html)
-├─ proxy.ts                    # Next.js 16 (pengganti middleware): rewrite locale, 301, guard /admin
+├─ proxy.ts                    # Next.js 16 (pengganti middleware): rewrite locale, 301, guard /admin, header x-locale
 ├─ AGENTS.md                   # aturan untuk coding AI (bagian 13)
 ├─ .env.example
 └─ package.json
@@ -152,9 +154,11 @@ URL publik tetap seperti App Flow (`/`, `/work`, `/id`, `/id/work`), tapi di dal
 
 ### proxy.ts — aturan lengkap (urut)
 
-1. Host `www.rifaldiradya.com` (hanya di produksi) → 301 ke `https://rifaldiradya.com` dengan path dan query yang sama. Berlaku untuk semua path, termasuk file statis dan `/api/*`.
-2. Lewati `/_next/*`, `/api/*`, file statis (`favicon.ico`, `robots.txt`, `sitemap.xml`, `*.png`, dll.).
-3. Path berakhiran `/` (kecuali root) → 301 ke versi tanpa slash.
+Matcher: semua path kecuali `/_next/static` dan `/_next/image`.
+
+1. Host `www.rifaldiradya.com` → 301 ke `https://rifaldiradya.com` dengan path dan query yang sama. Berlaku untuk semua path yang lewat matcher, termasuk file statis dan `/api/*`. (Hostinger juga sudah me-redirect www di level server; aturan ini jaring pengaman.)
+2. Lewati `/api/*` dan file statis (path berakhiran ekstensi: `favicon.ico`, `robots.txt`, `sitemap.xml`, `*.png`, dll.).
+3. Path berakhiran `/` (kecuali root) → redirect permanen ke versi tanpa slash. Ditangani bawaan Next.js **sebelum** proxy berjalan, dengan status 308 (bukan 301); keduanya permanen dan diperlakukan sama oleh Google.
 4. `/en` atau `/en/*` → 301 ke path tanpa `/en`.
 5. `/admin/*` kecuali `/admin/login`: tidak ada cookie `admin_session` → 302 ke `/admin/login?next=<path>`. (Ini hanya filter cepat; validasi sesi sebenarnya tetap di server layout admin dan tiap API.)
 6. `/admin*` → lanjut tanpa rewrite, tambahkan header `X-Robots-Tag: noindex, nofollow`.
@@ -404,7 +408,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 
 | Level | Tool | Cakupan wajib | Kapan jalan |
 | --- | --- | --- | --- |
-| Unit | Vitest | Skema Zod project (semua aturan App Flow bagian 6 & 9), `slugify` + penanganan bentrok, `localePath`/`altPath` untuk semua route, aturan `proxy.ts` (www → non-www, trailing slash, `/en`), kesamaan key `en.json` vs `id.json`, `richText` (tag yang diizinkan, tag seimbang, tag asing jadi teks), rate-limit window, builder metadata (canonical + hreflang) | Setiap PR (CI) |
+| Unit | Vitest | Skema Zod project (semua aturan App Flow bagian 6 & 9), `slugify` + penanganan bentrok, `localePath`/`altPath` untuk semua route, aturan `proxy.ts` (matcher, www → non-www, `/en`, guard admin, rewrite locale, header `x-locale`; memakai helper `next/experimental/testing/server`), kesamaan key `en.json` vs `id.json`, `richText` (tag yang diizinkan, tag seimbang, tag asing jadi teks), rate-limit window, builder metadata (canonical + hreflang) | Setiap PR (CI) |
 | Integrasi | Vitest + MySQL Docker | Query publik hanya mengembalikan `published=true` dengan urutan benar; create/update/delete project; sesi login/expired/logout | Setiap PR (CI, service MySQL) |
 | E2E smoke | Playwright (Chromium + WebKit mobile 375 px) | UF-01, UF-02, UF-04, UF-05, UF-06, UF-07 (dengan Cloudinary di-mock), UF-09; HeroProofPanel (berganti setelah 6 s, klik 02 pindah slide, pause menghentikan rotasi, `reducedMotion: 'reduce'` tidak berotasi, 0/1 featured sesuai E-21/E-22); axe accessibility scan di S-01 dan S-02 | Sebelum merge fitur besar + sebelum launch |
 | Build | `next build` | Build sukses tanpa koneksi DB | Setiap PR (CI) |
@@ -433,7 +437,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 
 - [x] **T-01** Init Next.js 16.3 + TypeScript strict + Tailwind v4 + ESLint/Prettier; `engines` Node 24; commit `docs/` (PRD, App Flow, SDD, `design/homepage-mockup.html`) dan `AGENTS.md`.
 - [x] **T-02** `styles/globals.css` token + keyframes/motion (bagian 8) + font via `next/font` + komponen `ui/*` dasar (Button, Badge, StatusDot, ArrowIcon) dengan semua state.
-- [ ] **T-03** Struktur `app/[lang]` + `proxy.ts` (rewrite, 301, guard admin) + `i18n/` (kamus, `localePath`, `altPath`) + unit test routing.
+- [x] **T-03** Struktur `app/[lang]` + `proxy.ts` (rewrite, 301, guard admin) + `i18n/` (kamus, `localePath`, `altPath`) + unit test routing.
 - [ ] **T-04** `lib/env.ts` + koneksi Drizzle ke MySQL + skema 3 tabel + migrasi + `scripts/migrate`; Docker MySQL untuk lokal.
 - [ ] **T-05** GitHub Actions CI (lint, typecheck, unit, build tanpa DB).
 - [ ] **T-06** Deploy pertama ke subdomain uji di Hostinger (bagian 10); catat hasil di `docs/DECISIONS.md`, termasuk apakah build bisa menjangkau DB.

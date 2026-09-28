@@ -62,7 +62,7 @@ Aturan route tambahan:
 
 - `www.rifaldiradya.com/*` → redirect 301 ke `https://rifaldiradya.com/*` (path dan query sama); versi non-www adalah kanonik.
 - `/en` dan `/en/*` → redirect 301 ke path tanpa prefix (mis. `/en/work` → `/work`), supaya tidak ada duplikat.
-- Trailing slash dihapus dengan 301 (`/work/` → `/work`).
+- Trailing slash dihapus dengan redirect permanen (`/work/` → `/work`); bawaan Next.js memakai 308.
 - Semua `/admin/*` kecuali `/admin/login` tanpa sesi valid → redirect 302 ke `/admin/login?next=<path>`.
 - `/admin/login` dengan sesi valid → redirect ke `/admin`.
 - `/admin/projects/[id]` dengan id tidak ada → S-11 dengan toast "Project not found".
