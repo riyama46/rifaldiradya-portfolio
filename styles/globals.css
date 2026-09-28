@@ -211,6 +211,59 @@
     mask-image: radial-gradient(ellipse 90% 75% at 70% 35%, #000 20%, transparent 75%);
   }
 
+  /* HeroProofPanel (App Flow S-01): stacked back card, crossfading slides, CSS-timed progress. */
+  .proof-stack::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translate(10px, -10px);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+  }
+
+  .proof-slide {
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.015);
+    transition:
+      opacity 450ms var(--ease-out),
+      transform 600ms var(--ease-out),
+      visibility 0s 450ms;
+  }
+
+  .proof-slide.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition:
+      opacity 450ms var(--ease-out),
+      transform 600ms var(--ease-out),
+      visibility 0s;
+  }
+
+  .proof-fill {
+    transform: scaleX(0);
+    transform-origin: left center;
+    animation: proof-fill var(--slide-ms) linear forwards;
+  }
+
+  .hero-proof:hover .proof-fill,
+  .hero-proof:focus-within .proof-fill,
+  .hero-proof.is-paused .proof-fill {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .proof-fill {
+      transform: scaleX(1);
+    }
+  }
+
+  .fade-in {
+    animation: fade-in 200ms var(--ease-out);
+  }
+
   /* Pulsing ring for StatusDot; transform/opacity only so it stays on the compositor. */
   .status-dot::after {
     content: "";
@@ -262,6 +315,27 @@
   }
 }
 
+@keyframes proof-fill {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes stack-drift {
+  from {
+    transform: translate(10px, -10px);
+  }
+  to {
+    transform: translate(10px, 22px);
+  }
+}
+
 @keyframes drift-down {
   to {
     transform: translateY(96px);
@@ -300,6 +374,14 @@
       animation: drift-down linear both;
       animation-timeline: scroll(root);
       animation-range: 0 100vh;
+    }
+
+    @media (min-width: 64rem) {
+      .proof-stack::before {
+        animation: stack-drift linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0 100vh;
+      }
     }
 
     .reveal {
