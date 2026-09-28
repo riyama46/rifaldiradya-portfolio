@@ -2,7 +2,8 @@
   "nav": {
     "work": "Work",
     "email": "Email me",
-    "skip": "Skip to content"
+    "skip": "Skip to content",
+    "label": "Main"
   },
   "language": {
     "label": "Language"

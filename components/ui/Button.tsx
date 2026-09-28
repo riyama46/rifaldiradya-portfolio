@@ -3,7 +3,7 @@ import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 type Variant = "primary" | "secondary" | "ghost";
-type Size = "sm" | "md" | "lg";
+type Size = "icon" | "sm" | "md" | "lg";
 
 type CommonProps = {
   variant?: Variant;
@@ -39,12 +39,14 @@ const variants: Record<Variant, string> = {
 };
 
 const heights: Record<Size, string> = {
+  icon: "size-11 text-base",
   sm: "min-h-11 text-[0.9375rem]",
   md: "min-h-12 text-base",
   lg: "min-h-13 text-[1.0625rem]",
 };
 
 const paddings: Record<Size, string> = {
+  icon: "px-0",
   sm: "px-3.5",
   md: "px-5",
   lg: "px-7",

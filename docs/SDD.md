@@ -452,7 +452,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 
 ### Fase 2 — Halaman publik
 
-- [ ] **T-07** Layout publik: Navbar (responsif), Footer (CTA email + Copy), skip link.
+- [x] **T-07** Layout publik: Navbar (responsif), Footer (CTA email + Copy), skip link.
 - [ ] **T-08** S-01 Hero kolom kiri (BylineBadge dengan inisial fallback, H1 dengan `richText`, MetaRow + `site-config`) + tekstur grid + SectionHeader + ServiceTile dua tier + ProcessSteps + About (lead, `<mark>`, AboutFacts) + FooterCta, copy dari kamus.
 - [ ] **T-09** `getPublishedProjects()` + turunan `selectHomepageProjects()` (featured maks. 3, grid maks. 6 + total) + ProjectCard + Selected work + EmptyState + HeroProofPanel (rotasi, kontrol, E-21 s.d. E-24, pemuatan gambar bertahap); loader Cloudinary.
 - [ ] **T-10** S-02 Work, S-03 Privacy, S-04 not-found per locale.

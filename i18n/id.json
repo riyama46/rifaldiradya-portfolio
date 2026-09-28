@@ -2,7 +2,8 @@
   "nav": {
     "work": "Hasil Kerja",
     "email": "Email saya",
-    "skip": "Langsung ke konten"
+    "skip": "Langsung ke konten",
+    "label": "Utama"
   },
   "language": {
     "label": "Bahasa"
