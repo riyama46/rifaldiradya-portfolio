@@ -30,7 +30,7 @@ Stack dipilih dengan satu kriteria utama: **sedikit bagian bergerak, tanpa build
 | Lapisan | Pilihan | Versi | Alasan |
 | --- | --- | --- | --- |
 | Runtime | Node.js | 24 LTS (`engines: ">=24 <25"`) | Didukung Hostinger (18/20/22/24); jalur LTS terpanjang |
-| Framework | Next.js App Router | 16.3.x, patch terbaru | Rilis stabil saat ini; ada security release terjadwal 16.3.7 pada 30 Sep 2026, langsung pakai begitu keluar |
+| Framework | Next.js App Router | 16.3.x, patch terbaru | Rilis stabil saat ini; ada security release terjadwal 16.3.7 pada 30 Sep 2026, langsung pakai begitu keluar. Build produksi `next build --webpack` (Turbopack gagal memproses CSS di server build Hostinger, lihat DECISIONS); `next dev` tetap Turbopack. |
 | UI | React | 19.x (ikut Next.js) | — |
 | Bahasa | TypeScript strict | 5.x | Stabil; TypeScript 7 belum dipakai di v1 |
 | Styling | Tailwind CSS v4 + CSS variables | 4.x | Token warna/spacing dari PRD bagian 8 langsung jadi CSS variables |
@@ -386,10 +386,10 @@ Alurnya: kode di GitHub → Hostinger menarik repo → install, build, start oto
 
 1. hPanel → Websites → Add Website → Node.js web app → Import Git repository → Connect with GitHub → pilih repo, branch `main`.
 2. Periksa setting yang dideteksi otomatis: framework Next.js, Node 24, build `npm run build`, start `npm run start`, root directory `/`.
-3. Pakai domain/subdomain sementara (mis. `new.rifaldiradya.com` atau subdomain gratis Hostinger).
-4. Isi semua environment variable (bagian 9), lalu Deploy.
-5. Pantau build log. Jika gagal: cek versi Node, script `package.json`, dan dependency native (App Flow melarang yang native).
-6. Verifikasi: halaman publik tampil, `/admin/login` bisa login, migrasi membuat 3 tabel, upload ke Cloudinary berhasil, revalidasi bekerja.
+3. Pakai subdomain uji: **`devstaging.rifaldiradya.com`** (dipilih 28 Sep 2026), dengan `SITE_URL=https://devstaging.rifaldiradya.com`.
+4. Isi environment variable kelompok yang sudah wajib (`REQUIRED_AT_START`, bagian 9), lalu Deploy. Output directory `.next`, package manager npm.
+5. Pantau build log. Jika gagal: cek versi Node, script `package.json`, dan dependency native (App Flow melarang yang native). `TurbopackInternalError … node process exited` = build berjalan dengan Turbopack; pastikan script `build` masih `next build --webpack`.
+6. Verifikasi (bertahap sesuai fitur yang sudah ada): halaman publik tampil, migrasi membuat 3 tabel; nanti `/admin/login` bisa login (T-13), upload ke Cloudinary berhasil (T-16), revalidasi bekerja (T-15).
 
 ### Pindah ke domain utama (Fase 4)
 

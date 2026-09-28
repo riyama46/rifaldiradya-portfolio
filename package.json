@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "node scripts/migrate.mts && next start",
     "start:app": "next start",
     "db:generate": "drizzle-kit generate",
