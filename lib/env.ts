@@ -82,15 +82,27 @@ export const adminEnv = cached(() => parseAdminEnv(process.env));
 export const cloudinaryEnv = cached(() => parseCloudinaryEnv(process.env));
 export const analyticsEnv = cached(() => parseAnalyticsEnv(process.env));
 
+const groupParsers = {
+  site: parseSiteEnv,
+  database: parseDatabaseEnv,
+  admin: parseAdminEnv,
+  cloudinary: parseCloudinaryEnv,
+  analytics: parseAnalyticsEnv,
+};
+
+export type EnvGroup = keyof typeof groupParsers;
+
+// Groups whose features exist in the code. Add "admin" in T-13 and "cloudinary" in T-16, so a
+// deploy never has to invent values for features that are not built yet. Analytics is optional
+// (empty = off) but a wrong ID is still rejected.
+export const REQUIRED_AT_START: readonly EnvGroup[] = ["site", "database", "analytics"];
+
 /** Throws one error listing every missing/invalid group. Used at production server start. */
-export function assertServerEnv(source: Source = process.env): void {
-  const checks = [
-    parseSiteEnv,
-    parseDatabaseEnv,
-    parseAdminEnv,
-    parseCloudinaryEnv,
-    parseAnalyticsEnv,
-  ];
+export function assertServerEnv(
+  source: Source = process.env,
+  groups: readonly EnvGroup[] = REQUIRED_AT_START,
+): void {
+  const checks = groups.map((group) => groupParsers[group]);
   const errors = checks.flatMap((check) => {
     try {
       check(source);

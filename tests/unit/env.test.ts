@@ -6,6 +6,7 @@ import {
   parseCloudinaryEnv,
   parseDatabaseEnv,
   parseSiteEnv,
+  REQUIRED_AT_START,
 } from "@/lib/env";
 
 const BCRYPT = "$2b$12$" + "a".repeat(53);
@@ -107,20 +108,45 @@ describe("analytics env", () => {
 });
 
 describe("assertServerEnv", () => {
+  const siteAndDatabaseOnly = {
+    SITE_URL: valid.SITE_URL,
+    DATABASE_HOST: valid.DATABASE_HOST,
+    DATABASE_NAME: valid.DATABASE_NAME,
+    DATABASE_USER: valid.DATABASE_USER,
+    DATABASE_PASSWORD: valid.DATABASE_PASSWORD,
+  };
+
   it("passes with a complete environment", () => {
     expect(() => assertServerEnv(valid)).not.toThrow();
   });
 
-  it("reports every broken group at once", () => {
-    expect(() => assertServerEnv({ ...valid, SITE_URL: "", CLOUDINARY_API_KEY: "" })).toThrow(
-      /site[\s\S]*Cloudinary/,
+  it("only requires groups whose features exist (site + database for now)", () => {
+    expect(REQUIRED_AT_START).toEqual(["site", "database", "analytics"]);
+    expect(() => assertServerEnv(siteAndDatabaseOnly)).not.toThrow();
+  });
+
+  it("still rejects a malformed optional analytics ID", () => {
+    expect(() =>
+      assertServerEnv({ ...siteAndDatabaseOnly, NEXT_PUBLIC_GA_MEASUREMENT_ID: "UA-1" }),
+    ).toThrow(/analytics/);
+  });
+
+  it("reports every broken required group at once", () => {
+    expect(() => assertServerEnv({ ...valid, SITE_URL: "", DATABASE_NAME: "" })).toThrow(
+      /site[\s\S]*database/,
     );
+  });
+
+  it("can check groups that are not required yet when asked", () => {
+    expect(() =>
+      assertServerEnv(siteAndDatabaseOnly, ["site", "database", "admin", "cloudinary"]),
+    ).toThrow(/admin[\s\S]*Cloudinary/);
   });
 
   it("never includes secret values in error messages", () => {
     const broken = { ...valid, SITE_URL: "", ADMIN_PASSWORD_HASH: "plain-secret-value" };
     try {
-      assertServerEnv(broken);
+      assertServerEnv(broken, ["site", "database", "admin", "cloudinary", "analytics"]);
       expect.unreachable();
     } catch (error) {
       const message = (error as Error).message;

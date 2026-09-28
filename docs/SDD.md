@@ -347,7 +347,7 @@ Semua motion mengikuti tabel Motion di PRD bagian 8. Keyframes dan aturan motion
 
 ## 9. Environment variables & konfigurasi
 
-Semua variabel divalidasi oleh `lib/env.ts` (Zod) dalam 5 kelompok: site, database, admin, Cloudinary, analytics. Setiap kelompok dicek saat pertama dipakai (`databaseEnv()`, `adminEnv()`, dst.), supaya `next build` di CI dan development lokal tetap jalan tanpa semua secret. Di server produksi, `instrumentation.ts` memanggil `assertServerEnv()` saat start: variabel wajib yang hilang membuat app gagal start dengan pesan jelas yang menyebut semua variabel bermasalah per kelompok (tanpa menampilkan nilainya), bukan error acak saat runtime. `SKIP_ENV_VALIDATION=1` hanya untuk mencoba build produksi di lokal; jangan pernah diset di Hostinger.
+Semua variabel divalidasi oleh `lib/env.ts` (Zod) dalam 5 kelompok: site, database, admin, Cloudinary, analytics. Setiap kelompok dicek saat pertama dipakai (`databaseEnv()`, `adminEnv()`, dst.), supaya `next build` di CI dan development lokal tetap jalan tanpa semua secret. Di server produksi, `instrumentation.ts` memanggil `assertServerEnv()` saat start untuk kelompok di `REQUIRED_AT_START`: variabel wajib yang hilang membuat app gagal start dengan pesan jelas yang menyebut semua variabel bermasalah per kelompok (tanpa menampilkan nilainya), bukan error acak saat runtime. `REQUIRED_AT_START` hanya berisi kelompok yang fiturnya sudah dibangun: saat ini `site`, `database`, `analytics` (opsional, tapi ID yang salah format ditolak); `admin` ditambahkan di T-13 dan `cloudinary` di T-16. Jadi deploy tidak pernah perlu mengisi nilai palsu untuk fitur yang belum ada. `SKIP_ENV_VALIDATION=1` hanya untuk mencoba build produksi di lokal; jangan pernah diset di Hostinger.
 
 | Variabel | Contoh / format | Wajib | Publik? | Keterangan |
 | --- | --- | --- | --- | --- |
@@ -461,10 +461,10 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 
 ### Fase 3 — Admin
 
-- [ ] **T-13** Auth: API-01/02, `requireAdmin`, rate limit, `scripts/hash-password`, S-10.
+- [ ] **T-13** Auth: API-01/02, `requireAdmin`, rate limit, `scripts/hash-password`, S-10; tambahkan `"admin"` ke `REQUIRED_AT_START` di `lib/env.ts`; login memvalidasi `next` hanya ke `/admin*`.
 - [ ] **T-14** S-11 daftar project + layout admin G3.
 - [ ] **T-15** Skema Zod bersama + API-03/04 + `revalidate.ts`.
-- [ ] **T-16** ImageUploader + API-06/07 + integrasi Cloudinary.
+- [ ] **T-16** ImageUploader + API-06/07 + integrasi Cloudinary; tambahkan `"cloudinary"` ke `REQUIRED_AT_START` di `lib/env.ts`.
 - [ ] **T-17** S-12/S-13 ProjectForm lengkap (validasi, dialog discard, `beforeunload`) + API-05 hapus + ConfirmDialog.
 - [ ] **T-18** Test integrasi + e2e UF-06, UF-07, UF-09.
 
