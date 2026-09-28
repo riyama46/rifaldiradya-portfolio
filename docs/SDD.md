@@ -453,7 +453,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 ### Fase 2 — Halaman publik
 
 - [x] **T-07** Layout publik: Navbar (responsif), Footer (CTA email + Copy), skip link.
-- [ ] **T-08** S-01 Hero kolom kiri (BylineBadge dengan inisial fallback, H1 dengan `richText`, MetaRow + `site-config`) + tekstur grid + SectionHeader + ServiceTile dua tier + ProcessSteps + About (lead, `<mark>`, AboutFacts) + FooterCta, copy dari kamus.
+- [x] **T-08** S-01 Hero kolom kiri (BylineBadge dengan inisial fallback, H1 dengan `richText`, MetaRow + `site-config`) + tekstur grid + SectionHeader + ServiceTile dua tier + ProcessSteps + About (lead, `<mark>`, AboutFacts) + FooterCta, copy dari kamus.
 - [ ] **T-09** `getPublishedProjects()` + turunan `selectHomepageProjects()` (featured maks. 3, grid maks. 6 + total) + ProjectCard + Selected work + EmptyState + HeroProofPanel (rotasi, kontrol, E-21 s.d. E-24, pemuatan gambar bertahap); loader Cloudinary.
 - [ ] **T-10** S-02 Work, S-03 Privacy, S-04 not-found per locale.
 - [ ] **T-11** O-01 toggle + O-02 banner saran bahasa + cookie `lang_pref`.
@@ -470,7 +470,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 
 ### Fase 4 — Launch (gate: Lighthouse ≥ 90, semua AC lolos)
 
-- [ ] **T-19** GA4 + Consent Mode v2 + O-03 + `track()` 4 event + S-03 tombol Cookie settings.
+- [ ] **T-19** GA4 + Consent Mode v2 + O-03 + `track()` 4 event + S-03 tombol Cookie settings. Banner consent di mobile maks. ~130 px tingginya: di 375 × 667 tombol hero "See the Work" berakhir di y = 537 px dan harus tetap terlihat saat banner tampil (PRD F1).
 - [ ] **T-20** Header keamanan + CSP; uji securityheaders.com.
 - [ ] **T-21** Isi konten nyata lewat admin (2 project), copy final EN/ID; QA checklist bagian 11.
 - [ ] **T-22** Pindah ke domain utama, Search Console, submit sitemap, tempel link di profil Upwork.

@@ -182,6 +182,35 @@
     pointer-events: auto;
   }
 
+  /* Faint 32px grid behind the hero, fading out towards the edges (PRD signature motif). */
+  .hero-texture {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .hero-texture::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 -120px;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(in oklab, var(--color-border) 55%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--color-border) 55%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 32px 32px;
+    background-position: -1px -1px;
+    mask-image: radial-gradient(ellipse 90% 75% at 70% 35%, #000 20%, transparent 75%);
+  }
+
   /* Pulsing ring for StatusDot; transform/opacity only so it stays on the compositor. */
   .status-dot::after {
     content: "";
@@ -233,6 +262,12 @@
   }
 }
 
+@keyframes drift-down {
+  to {
+    transform: translateY(96px);
+  }
+}
+
 @keyframes header-bg-shrink {
   to {
     transform: scaleY(0.8125);
@@ -259,6 +294,12 @@
       animation: header-row-shrink linear both;
       animation-timeline: scroll(root);
       animation-range: 0 64px;
+    }
+
+    .hero-texture::before {
+      animation: drift-down linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100vh;
     }
 
     .reveal {

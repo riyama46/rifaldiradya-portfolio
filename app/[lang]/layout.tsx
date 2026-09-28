@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/site/Footer";
+import { HashFocus } from "@/components/site/HashFocus";
 import { SkipLink } from "@/components/site/SkipLink";
 import { getDictionary, locales } from "@/i18n";
 import { resolveLocale } from "@/i18n/server";
@@ -29,6 +30,7 @@ export default async function PublicLayout({ children, params }: LayoutProps<"/[
         <SkipLink label={dict.nav.skip} />
         {children}
         <Footer lang={lang} dict={dict} />
+        <HashFocus />
       </body>
     </html>
   );

@@ -6,6 +6,8 @@ export const siteConfig = {
   email: "hello@rifaldiradya.com",
   availableForWork: true,
   timezoneLabel: "GMT+7",
+  initials: "RR",
+  stack: ["Next.js", "React", "TypeScript", "Tailwind CSS", "HTML", "CSS", "JavaScript"],
   social: {
     linkedin: "https://www.linkedin.com/in/rifaldi-radya-070a44174/",
   },
