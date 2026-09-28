@@ -24,8 +24,22 @@ Buka http://localhost:3000.
 | `npm run typecheck`               | Cek tipe TypeScript                 |
 | `npm test` / `test:watch`         | Unit test (Vitest)                  |
 | `npm run format` / `format:check` | Format / cek format dengan Prettier |
+| `npm run db:generate`             | Buat file migrasi SQL dari skema    |
+| `npm run db:migrate`              | Terapkan migrasi (gagal jika error) |
+| `npm run start:app`               | `next start` tanpa migrasi          |
 
-Script database dan e2e ditambahkan di task yang membutuhkannya (SDD bagian 12).
+Script e2e dan `hash-password` ditambahkan di task yang membutuhkannya (SDD bagian 12).
+
+## Database lokal
+
+Butuh Docker Desktop. Salin `.env.example` ke `.env.local` (isi `DATABASE_PASSWORD=portfolio_local_only`), lalu:
+
+```bash
+docker compose up -d db
+npm run db:migrate
+```
+
+Database produksi (Hostinger) tidak pernah dipakai untuk development.
 
 ## Struktur folder
 
@@ -33,7 +47,9 @@ Script database dan e2e ditambahkan di task yang membutuhkannya (SDD bagian 12).
 app/          Route Next.js: publik di app/[lang] (en | id), 404 di app/global-not-found.tsx
 components/   ui/ (primitif: Button, Badge, StatusDot, ArrowIcon); site/, overlays/, admin/ menyusul
 i18n/         Kamus en.json + id.json, helper locale (index.ts), richText (rich.tsx)
-lib/          Helper bersama (fonts, cn, header locale); db, auth, projects menyusul
+lib/          Helper bersama (fonts, cn, env, header locale) + db/ (skema, klien); auth, projects menyusul
+drizzle/      File migrasi SQL (dibuat dengan npm run db:generate)
+scripts/      Script Node (migrate.mts)
 styles/       globals.css: token desain, Tailwind, motion
 tests/unit/   Unit test Vitest (i18n, richText, proxy)
 docs/         PRD, App Flow, SDD, DECISIONS, dan mockup desain
@@ -42,7 +58,7 @@ proxy.ts      Routing: www → non-www, /en → /, locale rewrite, guard admin
 AGENTS.md     Aturan untuk coding AI (dibaca di setiap sesi)
 ```
 
-URL: bahasa Inggris tanpa prefix (`/`, `/work`), bahasa Indonesia di `/id` (`/id`, `/id/work`). Folder lain (`drizzle/`, `scripts/`, `tests/e2e/`) dibuat saat task yang membutuhkannya dikerjakan, mengikuti SDD bagian 4.
+URL: bahasa Inggris tanpa prefix (`/`, `/work`), bahasa Indonesia di `/id` (`/id`, `/id/work`). Folder lain (`tests/e2e/`, dll.) dibuat saat task yang membutuhkannya dikerjakan, mengikuti SDD bagian 4.
 
 ## Dokumen
 

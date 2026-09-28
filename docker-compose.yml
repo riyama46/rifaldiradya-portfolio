@@ -1,0 +1,24 @@
+# Local development database only (SDD section 3). Production uses Hostinger MySQL.
+#   docker compose up -d db
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    environment:
+      MYSQL_DATABASE: portfolio
+      MYSQL_USER: portfolio
+      MYSQL_PASSWORD: portfolio_local_only
+      MYSQL_ROOT_PASSWORD: root_local_only
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - portfolio-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot_local_only"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  portfolio-db:
