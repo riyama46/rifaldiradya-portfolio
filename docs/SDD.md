@@ -265,7 +265,7 @@ Token PRD bagian 8 menjadi satu sumber di `styles/globals.css`; komponen hanya b
   --color-accent: oklch(52% 0.15 50);
   --color-accent-hover: oklch(47% 0.14 48);
   --color-accent-soft: oklch(93% 0.05 75);
-  --color-success: oklch(55% 0.13 150);
+  --color-success: oklch(51% 0.13 150);   /* L51: ≥ 4,8:1 di bg, surface, raised */
   --color-danger: oklch(55% 0.18 28);
 
   --font-display: var(--font-space-grotesk), system-ui, sans-serif;
@@ -431,8 +431,8 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 
 ### Fase 1 — Fondasi (gate: deploy pipeline jalan)
 
-- [ ] **T-01** Init Next.js 16.3 + TypeScript strict + Tailwind v4 + ESLint/Prettier; `engines` Node 24; commit `docs/` (PRD, App Flow, SDD, `design/homepage-mockup.html`) dan `AGENTS.md`.
-- [ ] **T-02** `styles/globals.css` token + keyframes/motion (bagian 8) + font via `next/font` + komponen `ui/*` dasar (Button, Badge, StatusDot, ArrowIcon) dengan semua state.
+- [x] **T-01** Init Next.js 16.3 + TypeScript strict + Tailwind v4 + ESLint/Prettier; `engines` Node 24; commit `docs/` (PRD, App Flow, SDD, `design/homepage-mockup.html`) dan `AGENTS.md`.
+- [x] **T-02** `styles/globals.css` token + keyframes/motion (bagian 8) + font via `next/font` + komponen `ui/*` dasar (Button, Badge, StatusDot, ArrowIcon) dengan semua state.
 - [ ] **T-03** Struktur `app/[lang]` + `proxy.ts` (rewrite, 301, guard admin) + `i18n/` (kamus, `localePath`, `altPath`) + unit test routing.
 - [ ] **T-04** `lib/env.ts` + koneksi Drizzle ke MySQL + skema 3 tabel + migrasi + `scripts/migrate`; Docker MySQL untuk lokal.
 - [ ] **T-05** GitHub Actions CI (lint, typecheck, unit, build tanpa DB).

@@ -286,7 +286,7 @@ Arah visual: **minimalis-profesional, light mode, warm off-white + satu aksen de
 | `--color-accent-hover` | oklch(47% 0.14 48) | Hover/pressed CTA |
 | `--color-accent-soft` | oklch(93% 0.05 75) | Highlight headline, badge "Main focus" |
 | `--color-danger` | oklch(55% 0.18 28) | Hanya di admin: error |
-| `--color-success` | oklch(55% 0.13 150) | Publik: titik status "Live"/"Available" dan langkah "Live"; admin: sukses simpan |
+| `--color-success` | oklch(51% 0.13 150) (awalnya L55; digelapkan supaya teks "Live" 14 px ≥ 4,5:1 di bg dan surface) | Publik: titik status "Live"/"Available" dan langkah "Live"; admin: sukses simpan |
 
 Semua kombinasi teks wajib lolos WCAG AA (≥ 4,5:1 body, ≥ 3:1 teks besar); nilai di atas adalah titik awal dan harus dicek dengan contrast checker saat implementasi, terutama teks putih di atas `--color-accent`.
 
