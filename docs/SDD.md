@@ -72,11 +72,12 @@ Hostinger menyatakan hanya menyediakan MySQL di paket shared/managed, dan app No
 
 Kredensial admin **tidak** disimpan di tabel: `ADMIN_EMAIL` dan `ADMIN_PASSWORD_HASH` di environment variable Hostinger (bagian 9). Ganti password = generate hash baru dengan skrip `npm run hash-password` lalu update env dan restart app.
 
-Migrasi: drizzle-kit menghasilkan file SQL di `/drizzle` (`npm run db:generate`, bekerja tanpa koneksi DB). `0000_init.sql` membuat 3 tabel; `0001_utf8mb4.sql` (migrasi custom) memaksa `utf8mb4_unicode_ci` di ketiga tabel apa pun default server-nya. Penerapan lewat `scripts/migrate.mts` (dijalankan `node` langsung; Node 24 membuang tipe TypeScript), idempotent:
+Migrasi: drizzle-kit menghasilkan file SQL di `/drizzle` (`npm run db:generate`, bekerja tanpa koneksi DB). `0000_init.sql` membuat 3 tabel; `0001_utf8mb4.sql` (migrasi custom) memaksa `utf8mb4_unicode_ci` di ketiga tabel apa pun default server-nya. Penerapan lewat satu fungsi, `runMigrations()` di `lib/db/migrate.ts`, idempotent dan dilindungi MySQL named lock (`GET_LOCK`) supaya beberapa proses yang start bersamaan tidak saling bentrok:
 
-- `npm start` = `node scripts/migrate.mts && next start`. Jika DB **tidak terjangkau** (`ECONNREFUSED`, `ETIMEDOUT`, `ENOTFOUND`, `EHOSTUNREACH`), migrasi dilewati dengan peringatan dan server tetap start (halaman statis tetap tersaji, NFR Ketersediaan). Error lain (SQL gagal, akses ditolak, env tidak valid) menghentikan start.
-- `npm run db:migrate` = mode `--strict` untuk CI dan manual: kegagalan apa pun → exit 1.
-- Jika pipeline Hostinger tidak mengizinkan migrasi di start, jalankan SQL di `/drizzle` manual lewat phpMyAdmin.
+- **Produksi: otomatis di `instrumentation.ts` setiap server start**, apa pun perintah start yang dipakai host. Hostinger ternyata menjalankan Next.js langsung, bukan `npm start` (terlihat dari runtime log 28 Sep 2026), jadi migrasi di perintah start tidak pernah jalan. Jika DB tidak terjangkau (`ECONNREFUSED`, `ETIMEDOUT`, `ENOTFOUND`, `EHOSTUNREACH`) atau migrasi gagal, error dicatat di runtime log (`[migrate] …`) dan server tetap melayani halaman statis (NFR Ketersediaan); migrasi dicoba lagi pada start berikutnya. `SKIP_MIGRATIONS=1` menonaktifkannya (darurat saja).
+- `npm run db:migrate` (`scripts/migrate.mts --strict`, dijalankan `node` langsung; Node 24 membuang tipe TypeScript) untuk CI, development lokal, dan manual: kegagalan apa pun → exit 1.
+- CI menguji dua proses migrasi paralel pada database kosong, lalu memastikan riwayat migrasi tercatat tepat sekali per file.
+- Cadangan terakhir: jalankan SQL di `/drizzle` manual lewat phpMyAdmin (lalu isi `__drizzle_migrations` sesuai), hanya jika semua cara di atas gagal.
 
 Seed tidak ada; project pertama diisi lewat admin.
 
@@ -367,7 +368,7 @@ Semua variabel divalidasi oleh `lib/env.ts` (Zod) dalam 5 kelompok: site, databa
 - Lokal: `.env.local` (tidak di-commit). `.env.example` berisi semua nama variabel tanpa nilai.
 - Konfigurasi non-secret di `lib/site-config.ts` (di-commit, bukan env): `availableForWork: boolean` (mengatur item "Available for new projects" di MetaRow; nilai awal `true`, diputuskan 28 Sep 2026), `timezoneLabel: 'GMT+7'` (dikonfirmasi 28 Sep 2026; dipakai blok fakta About lewat interpolasi kamus), dan `social: { linkedin: 'https://www.linkedin.com/in/rifaldi-radya-070a44174/' }` (dipakai link footer dan `sameAs` JSON-LD `Person`). Mengubahnya = commit + deploy (beberapa menit); sengaja tidak dimasukkan ke admin supaya scope v1 tidak bertambah.
 - `next.config.ts`: `images.loader: 'custom'`, `images.loaderFile: './lib/images/loader.ts'`, `images.remotePatterns` untuk `res.cloudinary.com`, `headers()` keamanan (bagian 6), `poweredByHeader: false`, `reactStrictMode: true`.
-- `package.json` (`"type": "module"`) scripts: `dev`, `build`, `start` (`node scripts/migrate.mts && next start`; Next.js membaca `PORT` dari env Hostinger), `start:app` (tanpa migrasi), `lint`, `typecheck`, `test`, `test:e2e`, `db:generate`, `db:migrate`, `hash-password`.
+- `package.json` (`"type": "module"`) scripts: `dev`, `build`, `start` (`next start`; migrasi berjalan otomatis di `instrumentation.ts`; Next.js membaca `PORT` dari env Hostinger), `lint`, `typecheck`, `test`, `test:e2e`, `db:generate`, `db:migrate`, `hash-password`.
 
 ## 10. Deploy ke Hostinger via GitHub
 
@@ -539,7 +540,7 @@ Empat hal perlu dijawab atau diuji sebelum/selama Fase 1; sisanya sudah dikunci.
 
 - [ ] Status rifaldiradya.com di hPanel: **WordPress masih aktif, kontennya tidak dibutuhkan** (dikonfirmasi 28 Sep 2026); tetap ikuti alur "Pindah ke domain utama" di bagian 10 (backup dulu sebagai jaring pengaman, lalu lepas). Masih perlu dicek: apakah staging0/staging1 terdaftar sebagai website terpisah.
 - [ ] Apakah server build Hostinger bisa menjangkau MySQL saat `next build` (diuji di T-06; desain sudah aman untuk kedua kemungkinan).
-- [ ] Apakah migrasi di perintah `start` diizinkan pipeline Hostinger; jika tidak, jalankan manual via phpMyAdmin setiap ada perubahan skema.
+- [x] Migrasi di perintah `start`: **tidak bisa diandalkan**, karena Hostinger menjalankan Next.js langsung. Solusi: migrasi di `instrumentation.ts` (bagian 3). Sebelumnya: jalankan manual via phpMyAdmin setiap ada perubahan skema.
 - [x] Link sosial di footer: LinkedIn (disimpan di `lib/site-config.ts`, bagian 9).
 
 **Sumber (dibuka 27 Sep 2026)**

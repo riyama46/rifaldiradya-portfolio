@@ -26,7 +26,6 @@ Buka http://localhost:3000.
 | `npm run format` / `format:check` | Format / cek format dengan Prettier |
 | `npm run db:generate`             | Buat file migrasi SQL dari skema    |
 | `npm run db:migrate`              | Terapkan migrasi (gagal jika error) |
-| `npm run start:app`               | `next start` tanpa migrasi          |
 
 Script e2e dan `hash-password` ditambahkan di task yang membutuhkannya (SDD bagian 12).
 
