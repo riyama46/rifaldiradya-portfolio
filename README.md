@@ -18,7 +18,7 @@ Buka http://localhost:3000.
 | Script                            | Fungsi                              |
 | --------------------------------- | ----------------------------------- |
 | `npm run dev`                     | Server development                  |
-| `npm run build`                   | Build produksi                      |
+| `npm run build`                   | Build produksi (webpack)            |
 | `npm run start`                   | Jalankan hasil build                |
 | `npm run lint`                    | ESLint                              |
 | `npm run typecheck`               | Cek tipe TypeScript                 |
