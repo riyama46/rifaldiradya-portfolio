@@ -159,6 +159,29 @@
     color: var(--color-text-muted);
   }
 
+  /* Sticky navbar. Its box never changes height (no layout shift); on scroll the background
+     scales down and the row nudges up, which reads as "shrinking" (PRD section 8). */
+  .site-header {
+    isolation: isolate;
+    pointer-events: none;
+  }
+
+  .site-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: color-mix(in oklab, var(--color-bg) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid transparent;
+    transform-origin: top;
+  }
+
+  .site-header a,
+  .site-header button {
+    pointer-events: auto;
+  }
+
   /* Pulsing ring for StatusDot; transform/opacity only so it stays on the compositor. */
   .status-dot::after {
     content: "";
@@ -210,9 +233,34 @@
   }
 }
 
+@keyframes header-bg-shrink {
+  to {
+    transform: scaleY(0.8125);
+    border-bottom-color: var(--color-border);
+  }
+}
+
+@keyframes header-row-shrink {
+  to {
+    transform: translateY(-6px);
+  }
+}
+
 /* Scroll-driven motion (PRD section 8). Unsupported browsers keep the static end state. */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
+    .site-header::before {
+      animation: header-bg-shrink linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 64px;
+    }
+
+    .site-header-inner {
+      animation: header-row-shrink linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 64px;
+    }
+
     .reveal {
       animation: rise linear both;
       animation-timeline: view();
