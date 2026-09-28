@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Format
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      # SDD section 11: the build must succeed without a database or any secrets.
+      - name: Build (no database, no env)
+        run: npm run build
+
+      - name: Schema and migrations are in sync
+        run: |
+          npm run db:generate
+          if [ -n "$(git status --porcelain drizzle)" ]; then
+            echo "::error::lib/db/schema.ts changed without a migration. Run npm run db:generate and commit /drizzle."
+            git status --porcelain drizzle
+            exit 1
+          fi
+
+  database:
+    name: Migrations on MySQL 8.4
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: portfolio
+          MYSQL_USER: portfolio
+          MYSQL_PASSWORD: ci_only_password
+          MYSQL_ROOT_PASSWORD: ci_only_root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pci_only_root"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=20
+    env:
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: "3306"
+      DATABASE_NAME: portfolio
+      DATABASE_USER: portfolio
+      DATABASE_PASSWORD: ci_only_password
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Apply migrations
+        run: npm run db:migrate
+
+      - name: Apply migrations again (must be idempotent)
+        run: npm run db:migrate
+
+      - name: Verify tables and collation
+        run: |
+          query() {
+            mysql -h 127.0.0.1 -u portfolio -p"$DATABASE_PASSWORD" portfolio -N -B -e "$1"
+          }
+          tables=$(query "SELECT TABLE_NAME, TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'portfolio' AND TABLE_NAME <> '__drizzle_migrations' ORDER BY TABLE_NAME")
+          echo "$tables"
+          expected=$(printf 'admin_sessions\tutf8mb4_unicode_ci\nlogin_attempts\tutf8mb4_unicode_ci\nprojects\tutf8mb4_unicode_ci')
+          if [ "$tables" != "$expected" ]; then
+            echo "::error::Unexpected tables or collation after migration"
+            exit 1
+          fi
+          query "SHOW INDEX FROM projects WHERE Key_name = 'projects_public_order_idx'" | grep -q published \
+            || { echo "::error::projects_public_order_idx is missing"; exit 1; }
