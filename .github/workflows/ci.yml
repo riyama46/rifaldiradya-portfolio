@@ -47,9 +47,9 @@ jobs:
       - name: Schema and migrations are in sync
         run: |
           npm run db:generate
-          if [ -n "$(git status --porcelain drizzle)" ]; then
-            echo "::error::lib/db/schema.ts changed without a migration. Run npm run db:generate and commit /drizzle."
-            git status --porcelain drizzle
+          if [ -n "$(git status --porcelain drizzle lib/db/migrations.generated.ts)" ]; then
+            echo "::error::Schema, /drizzle, and lib/db/migrations.generated.ts are out of sync. Run npm run db:generate (or db:embed after editing a custom migration) and commit the result."
+            git status --porcelain drizzle lib/db/migrations.generated.ts
             exit 1
           fi
 

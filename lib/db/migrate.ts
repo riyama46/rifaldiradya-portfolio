@@ -1,8 +1,9 @@
-import { join } from "node:path";
+import { createHash } from "node:crypto";
 import { drizzle } from "drizzle-orm/mysql2";
-import { migrate } from "drizzle-orm/mysql2/migrator";
+import type { MigrationConfig, MigrationMeta } from "drizzle-orm/migrator";
 import mysql, { type RowDataPacket } from "mysql2/promise";
 import type { parseDatabaseEnv } from "../env";
+import { embeddedMigrations } from "./migrations.generated.ts";
 
 // Shared by instrumentation.ts (every production server start) and scripts/migrate.mts (CI/manual).
 // No path aliases here: the script runs with plain `node`.
@@ -20,8 +21,28 @@ export function isUnreachable(error: unknown): boolean {
 }
 
 /**
- * Applies pending SQL migrations from /drizzle. Idempotent. A MySQL named lock makes concurrent
- * callers (several server processes starting at once) run one after another instead of racing.
+ * Same shape and hashes as drizzle's readMigrationFiles(), but from the bundled copy of /drizzle,
+ * because the production host does not ship that folder (tests/unit/migrations.test.ts).
+ */
+export function loadMigrations(): MigrationMeta[] {
+  return embeddedMigrations.map((migration) => ({
+    sql: migration.sql.split("--> statement-breakpoint"),
+    bps: migration.breakpoints,
+    folderMillis: migration.when,
+    hash: createHash("sha256").update(migration.sql).digest("hex"),
+  }));
+}
+
+// drizzle's own migrate() is `db.dialect.migrate(readMigrationFiles(config), db.session, config)`;
+// dialect and session exist at runtime but are not part of the public types.
+type MigratableDatabase = {
+  dialect: { migrate(m: MigrationMeta[], s: unknown, c: MigrationConfig): Promise<void> };
+  session: unknown;
+};
+
+/**
+ * Applies pending migrations. Idempotent. A MySQL named lock makes concurrent callers (several
+ * server processes starting at once) run one after another instead of racing.
  */
 export async function runMigrations(env: DatabaseEnv): Promise<void> {
   const connection = await mysql.createConnection({
@@ -45,9 +66,8 @@ export async function runMigrations(env: DatabaseEnv): Promise<void> {
     }
 
     try {
-      await migrate(drizzle(connection), {
-        migrationsFolder: join(process.cwd(), "drizzle"),
-      });
+      const db = drizzle(connection) as unknown as MigratableDatabase;
+      await db.dialect.migrate(loadMigrations(), db.session, { migrationsFolder: "(embedded)" });
     } finally {
       await connection.query("SELECT RELEASE_LOCK(?)", [LOCK_NAME]);
     }
