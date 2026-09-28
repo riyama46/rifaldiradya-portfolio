@@ -60,7 +60,7 @@ Tidak dipakai di v1: CMS headless, NextAuth/Auth.js, Prisma, state management li
 
 Hostinger menyatakan hanya menyediakan MySQL di paket shared/managed, dan app Node.js di akun yang sama terhubung secara lokal. Pakai host `127.0.0.1`, bukan `localhost`, karena Node.js bisa me-resolve `localhost` ke IPv6 `::1` yang ditolak user database ([Hostinger docs](https://docs.hostinger.com/websites/databases), [panduan MySQL + Node.js](https://www.hostinger.com/support/connecting-a-hostinger-mysql-database-to-a-node-js-application/)).
 
-**Development lokal:** MySQL 8 lokal via Docker (`docker compose up db`) dengan skema yang sama. Database produksi tidak pernah dipakai untuk development.
+**Development lokal:** MySQL 8.4 lokal via Docker (`docker compose up -d db`, konfigurasi di `docker-compose.yml`, port hanya di `127.0.0.1`) dengan skema yang sama. Database produksi tidak pernah dipakai untuk development. Migrasi juga dijalankan di CI terhadap service MySQL 8.4 (T-05), jadi tetap teruji walau mesin lokal belum punya Docker.
 
 ### Skema
 
@@ -72,7 +72,13 @@ Hostinger menyatakan hanya menyediakan MySQL di paket shared/managed, dan app No
 
 Kredensial admin **tidak** disimpan di tabel: `ADMIN_EMAIL` dan `ADMIN_PASSWORD_HASH` di environment variable Hostinger (bagian 9). Ganti password = generate hash baru dengan skrip `npm run hash-password` lalu update env dan restart app.
 
-Migrasi: drizzle-kit menghasilkan file SQL di `/drizzle`. Di produksi dijalankan lewat skrip `npm run db:migrate` sebagai bagian dari perintah start (idempotent), atau manual lewat phpMyAdmin jika pipeline tidak mengizinkan. Seed tidak ada; project pertama diisi lewat admin.
+Migrasi: drizzle-kit menghasilkan file SQL di `/drizzle` (`npm run db:generate`, bekerja tanpa koneksi DB). `0000_init.sql` membuat 3 tabel; `0001_utf8mb4.sql` (migrasi custom) memaksa `utf8mb4_unicode_ci` di ketiga tabel apa pun default server-nya. Penerapan lewat `scripts/migrate.mts` (dijalankan `node` langsung; Node 24 membuang tipe TypeScript), idempotent:
+
+- `npm start` = `node scripts/migrate.mts && next start`. Jika DB **tidak terjangkau** (`ECONNREFUSED`, `ETIMEDOUT`, `ENOTFOUND`, `EHOSTUNREACH`), migrasi dilewati dengan peringatan dan server tetap start (halaman statis tetap tersaji, NFR Ketersediaan). Error lain (SQL gagal, akses ditolak, env tidak valid) menghentikan start.
+- `npm run db:migrate` = mode `--strict` untuk CI dan manual: kegagalan apa pun → exit 1.
+- Jika pipeline Hostinger tidak mengizinkan migrasi di start, jalankan SQL di `/drizzle` manual lewat phpMyAdmin.
+
+Seed tidak ada; project pertama diisi lewat admin.
 
 ### Gambar (Cloudinary)
 
@@ -130,7 +136,9 @@ Repo GitHub private `rifaldiradya-portfolio`, satu branch produksi `main`. Struk
 │  └─ site-config.ts           # availableForWork, timezoneLabel (konfigurasi non-secret)
 ├─ styles/globals.css          # tokens (CSS variables) + Tailwind + keyframes & motion
 ├─ drizzle/                    # file migrasi SQL
-├─ scripts/ (hash-password.ts, migrate.ts)
+├─ scripts/ (hash-password.mts, migrate.mts)   # dijalankan `node` langsung (ESM, "type": "module")
+├─ instrumentation.ts          # validasi semua env saat server produksi start
+├─ drizzle.config.ts, docker-compose.yml
 ├─ tests/ (unit/, e2e/)        # unit: Vitest (vitest.config.mts), e2e: Playwright
 ├─ docs/ (PRD.md, APP_FLOW.md, SDD.md, DECISIONS.md, design/homepage-mockup.html)
 ├─ proxy.ts                    # Next.js 16 (pengganti middleware): rewrite locale, 301, guard /admin, header x-locale
@@ -339,7 +347,7 @@ Semua motion mengikuti tabel Motion di PRD bagian 8. Keyframes dan aturan motion
 
 ## 9. Environment variables & konfigurasi
 
-Semua variabel divalidasi saat app start oleh `lib/env.ts` (Zod); variabel wajib yang hilang membuat app gagal start dengan pesan jelas, bukan error acak saat runtime.
+Semua variabel divalidasi oleh `lib/env.ts` (Zod) dalam 5 kelompok: site, database, admin, Cloudinary, analytics. Setiap kelompok dicek saat pertama dipakai (`databaseEnv()`, `adminEnv()`, dst.), supaya `next build` di CI dan development lokal tetap jalan tanpa semua secret. Di server produksi, `instrumentation.ts` memanggil `assertServerEnv()` saat start: variabel wajib yang hilang membuat app gagal start dengan pesan jelas yang menyebut semua variabel bermasalah per kelompok (tanpa menampilkan nilainya), bukan error acak saat runtime. `SKIP_ENV_VALIDATION=1` hanya untuk mencoba build produksi di lokal; jangan pernah diset di Hostinger.
 
 | Variabel | Contoh / format | Wajib | Publik? | Keterangan |
 | --- | --- | --- | --- | --- |
@@ -350,7 +358,7 @@ Semua variabel divalidasi saat app start oleh `lib/env.ts` (Zod); variabel wajib
 | `ADMIN_EMAIL` | `rifaldi@rifaldiradya.com` | ya | tidak | Email login admin |
 | `ADMIN_PASSWORD_HASH` | hash bcrypt (`$2b$12$...`) | ya | tidak | Dibuat dengan `npm run hash-password` |
 | `RATE_LIMIT_SALT` | string acak 32+ karakter | ya | tidak | Untuk hash IP |
-| `CLOUDINARY_CLOUD_NAME` | nama cloud | ya | ya, sebagai `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | Dipakai loader gambar (bukan secret) |
+| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | nama cloud | ya | ya | Dipakai loader gambar dan upload server (bukan secret); cukup satu variabel |
 | `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | dari dashboard Cloudinary | ya | tidak | Hanya di server |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | `G-XXXXXXXXXX` | tidak | ya | Kosong → komponen analytics & banner consent tidak dirender (berguna di dev) |
 | `NODE_ENV` | `production` | otomatis | — | Diset platform |
@@ -359,7 +367,7 @@ Semua variabel divalidasi saat app start oleh `lib/env.ts` (Zod); variabel wajib
 - Lokal: `.env.local` (tidak di-commit). `.env.example` berisi semua nama variabel tanpa nilai.
 - Konfigurasi non-secret di `lib/site-config.ts` (di-commit, bukan env): `availableForWork: boolean` (mengatur item "Available for new projects" di MetaRow; nilai awal `true`, diputuskan 28 Sep 2026), `timezoneLabel: 'GMT+7'` (dikonfirmasi 28 Sep 2026; dipakai blok fakta About lewat interpolasi kamus), dan `social: { linkedin: 'https://www.linkedin.com/in/rifaldi-radya-070a44174/' }` (dipakai link footer dan `sameAs` JSON-LD `Person`). Mengubahnya = commit + deploy (beberapa menit); sengaja tidak dimasukkan ke admin supaya scope v1 tidak bertambah.
 - `next.config.ts`: `images.loader: 'custom'`, `images.loaderFile: './lib/images/loader.ts'`, `images.remotePatterns` untuk `res.cloudinary.com`, `headers()` keamanan (bagian 6), `poweredByHeader: false`, `reactStrictMode: true`.
-- `package.json` scripts: `dev`, `build`, `start` (`node scripts/migrate.js && next start -p $PORT`), `lint`, `typecheck`, `test`, `test:e2e`, `db:generate`, `db:migrate`, `hash-password`.
+- `package.json` (`"type": "module"`) scripts: `dev`, `build`, `start` (`node scripts/migrate.mts && next start`; Next.js membaca `PORT` dari env Hostinger), `start:app` (tanpa migrasi), `lint`, `typecheck`, `test`, `test:e2e`, `db:generate`, `db:migrate`, `hash-password`.
 
 ## 10. Deploy ke Hostinger via GitHub
 
@@ -438,7 +446,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 - [x] **T-01** Init Next.js 16.3 + TypeScript strict + Tailwind v4 + ESLint/Prettier; `engines` Node 24; commit `docs/` (PRD, App Flow, SDD, `design/homepage-mockup.html`) dan `AGENTS.md`.
 - [x] **T-02** `styles/globals.css` token + keyframes/motion (bagian 8) + font via `next/font` + komponen `ui/*` dasar (Button, Badge, StatusDot, ArrowIcon) dengan semua state.
 - [x] **T-03** Struktur `app/[lang]` + `proxy.ts` (rewrite, 301, guard admin) + `i18n/` (kamus, `localePath`, `altPath`) + unit test routing.
-- [ ] **T-04** `lib/env.ts` + koneksi Drizzle ke MySQL + skema 3 tabel + migrasi + `scripts/migrate`; Docker MySQL untuk lokal.
+- [x] **T-04** `lib/env.ts` + koneksi Drizzle ke MySQL + skema 3 tabel + migrasi + `scripts/migrate`; Docker MySQL untuk lokal.
 - [ ] **T-05** GitHub Actions CI (lint, typecheck, unit, build tanpa DB).
 - [ ] **T-06** Deploy pertama ke subdomain uji di Hostinger (bagian 10); catat hasil di `docs/DECISIONS.md`, termasuk apakah build bisa menjangkau DB.
 
