@@ -24,11 +24,21 @@ const databaseSchema = z.object({
   DATABASE_PASSWORD: required(),
 });
 
+const BCRYPT_HASH = /^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/;
+
+/** `npm run hash-password` prints the bcrypt hash base64-encoded: `$` in .env files and some host
+ * panels is treated as a variable reference and would silently corrupt a raw `$2b$…` hash. */
+function decodePasswordHash(value: string): string {
+  const trimmed = value.trim();
+  return trimmed.startsWith("$2") ? trimmed : Buffer.from(trimmed, "base64").toString("utf8");
+}
+
 const adminSchema = z.object({
   ADMIN_EMAIL: z.email("must be an email address"),
   ADMIN_PASSWORD_HASH: z
     .string({ error: "is required" })
-    .regex(/^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/, "must be a bcrypt hash (npm run hash-password)"),
+    .transform(decodePasswordHash)
+    .pipe(z.string().regex(BCRYPT_HASH, "must come from npm run hash-password")),
   RATE_LIMIT_SALT: z
     .string({ error: "is required" })
     .min(32, "must be at least 32 random characters"),
@@ -92,24 +102,31 @@ const groupParsers = {
 
 export type EnvGroup = keyof typeof groupParsers;
 
-// Groups whose features exist in the code. Add "admin" in T-13 and "cloudinary" in T-16, so a
-// deploy never has to invent values for features that are not built yet. Analytics is optional
-// (empty = off) but a wrong ID is still rejected.
+// Groups the public site cannot run without: a problem here stops the server with a clear message.
+// Analytics is optional (empty = off) but a wrong ID is still rejected.
 export const REQUIRED_AT_START: readonly EnvGroup[] = ["site", "database", "analytics"];
+
+// Admin-only groups: a problem is logged at start and only that feature is disabled, so a typo in
+// an admin secret never takes the public site down (SDD NFR "Ketersediaan").
+export const CHECKED_AT_START: readonly EnvGroup[] = ["admin"];
+
+/** Error messages for the given groups; empty when all are valid. Never includes values. */
+export function envProblems(groups: readonly EnvGroup[], source: Source = process.env): string[] {
+  return groups.flatMap((group) => {
+    try {
+      groupParsers[group](source);
+      return [];
+    } catch (error) {
+      return [(error as Error).message];
+    }
+  });
+}
 
 /** Throws one error listing every missing/invalid group. Used at production server start. */
 export function assertServerEnv(
   source: Source = process.env,
   groups: readonly EnvGroup[] = REQUIRED_AT_START,
 ): void {
-  const checks = groups.map((group) => groupParsers[group]);
-  const errors = checks.flatMap((check) => {
-    try {
-      check(source);
-      return [];
-    } catch (error) {
-      return [(error as Error).message];
-    }
-  });
+  const errors = envProblems(groups, source);
   if (errors.length > 0) throw new Error(errors.join("\n"));
 }

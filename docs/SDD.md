@@ -103,11 +103,12 @@ Repo GitHub private `rifaldiradya-portfolio`, satu branch produksi `main`. Struk
 │  ├─ global-not-found.tsx     # S-04 untuk semua path tak dikenal; locale dari header x-locale (proxy)
 │  ├─ admin/                   # root layout admin (G3), terpisah
 │  │  ├─ layout.tsx
-│  │  ├─ login/page.tsx        # S-10
-│  │  ├─ page.tsx              # S-11
-│  │  └─ projects/
-│  │     ├─ new/page.tsx       # S-12
-│  │     └─ [id]/page.tsx      # S-13
+│  │  ├─ login/page.tsx        # S-10 (di luar grup, tanpa sesi)
+│  │  └─ (panel)/              # route group: layout.tsx = requireAdmin() + header G3
+│  │     ├─ page.tsx           # S-11 (/admin)
+│  │     └─ projects/
+│  │        ├─ new/page.tsx    # S-12
+│  │        └─ [id]/page.tsx   # S-13
 │  ├─ api/admin/               # API-01..07 (route handlers)
 │  ├─ sitemap.ts
 │  └─ robots.ts
@@ -206,10 +207,11 @@ Satu admin, sesi disimpan di database, dan semua pemeriksaan dilakukan di server
 
 ### Alur login (API-01)
 
-1. Validasi body dengan Zod (email valid, password 1–200 karakter).
-2. Rate limit: hitung baris `login_attempts` gagal untuk `sha256(ip + RATE_LIMIT_SALT)` dalam 15 menit terakhir; ≥ 5 → `429` + `retryAfterSeconds`. IP diambil dari header proxy Hostinger (`x-forwarded-for`, entri pertama) dengan fallback alamat socket.
-3. Bandingkan email (case-insensitive) dengan `ADMIN_EMAIL` dan password dengan `ADMIN_PASSWORD_HASH` via `bcryptjs.compare` (cost 12). Perbandingan tetap dijalankan walau email salah, supaya waktu respons tidak membocorkan info.
-4. Catat attempt (success true/false).
+0. Cek header `Origin` = `SITE_URL` (403). Env admin tidak valid → `503 ADMIN_NOT_CONFIGURED` (situs publik tetap jalan, lihat bagian 9).
+1. Validasi body dengan Zod (email 1–254, password 1–200 karakter) → `400`.
+2. Rate limit: hitung baris `login_attempts` gagal dalam 15 menit terakhir, **per IP** (`sha256(ip + "|" + RATE_LIMIT_SALT)`, ≥ 5) **dan global** (semua IP, ≥ 20). Salah satu terlampaui → `429` + `retryAfterSeconds` + header `Retry-After`; waktu tunggu = sampai kegagalan cukup banyak keluar dari jendela. IP diambil dari `x-real-ip`, lalu entri **terakhir** `x-forwarded-for` (ditambahkan proxy di depan app), fallback `"unknown"`. Entri pertama `x-forwarded-for` tidak dipakai karena bisa dipalsukan klien; batas global membuat brute force tetap mustahil walau header IP ternyata bisa dipalsukan.
+3. Bandingkan email (case-insensitive, di-trim) dengan `ADMIN_EMAIL` dan password dengan `ADMIN_PASSWORD_HASH` via `bcryptjs.compare` (cost 12). Perbandingan bcrypt tetap dijalankan terhadap hash dummy walau email salah, supaya waktu respons tidak membocorkan info.
+4. Catat attempt (success true/false). Kegagalan ke-5 langsung dijawab `429` (form terkunci), bukan `401`.
 5. Sukses: buat token acak 32 byte (`crypto.randomBytes`), simpan `sha256(token)` di `admin_sessions` dengan `expires_at = now + 7 hari`, set cookie `admin_session` = token (`httpOnly`, `secure`, `sameSite=lax`, `path=/`, `maxAge` 7 hari). Hapus sesi dan attempt kedaluwarsa.
 
 ### requireAdmin()
@@ -348,7 +350,7 @@ Semua motion mengikuti tabel Motion di PRD bagian 8. Keyframes dan aturan motion
 
 ## 9. Environment variables & konfigurasi
 
-Semua variabel divalidasi oleh `lib/env.ts` (Zod) dalam 5 kelompok: site, database, admin, Cloudinary, analytics. Setiap kelompok dicek saat pertama dipakai (`databaseEnv()`, `adminEnv()`, dst.), supaya `next build` di CI dan development lokal tetap jalan tanpa semua secret. Di server produksi, `instrumentation.ts` memanggil `assertServerEnv()` saat start untuk kelompok di `REQUIRED_AT_START`: variabel wajib yang hilang membuat app gagal start dengan pesan jelas yang menyebut semua variabel bermasalah per kelompok (tanpa menampilkan nilainya), bukan error acak saat runtime. `REQUIRED_AT_START` hanya berisi kelompok yang fiturnya sudah dibangun: saat ini `site`, `database`, `analytics` (opsional, tapi ID yang salah format ditolak); `admin` ditambahkan di T-13 dan `cloudinary` di T-16. Jadi deploy tidak pernah perlu mengisi nilai palsu untuk fitur yang belum ada. `SKIP_ENV_VALIDATION=1` hanya untuk mencoba build produksi di lokal; jangan pernah diset di Hostinger.
+Semua variabel divalidasi oleh `lib/env.ts` (Zod) dalam 5 kelompok: site, database, admin, Cloudinary, analytics. Setiap kelompok dicek saat pertama dipakai (`databaseEnv()`, `adminEnv()`, dst.), supaya `next build` di CI dan development lokal tetap jalan tanpa semua secret. Di server produksi, `instrumentation.ts` memanggil `assertServerEnv()` saat start untuk kelompok di `REQUIRED_AT_START`: variabel wajib yang hilang membuat app gagal start dengan pesan jelas yang menyebut semua variabel bermasalah per kelompok (tanpa menampilkan nilainya), bukan error acak saat runtime. `REQUIRED_AT_START` hanya berisi kelompok yang fiturnya sudah dibangun: `site`, `database`, `analytics` (opsional, tapi ID yang salah format ditolak). Kelompok khusus admin (`CHECKED_AT_START`: `admin`, nanti juga kelompok penyimpanan gambar) dicek saat start tapi **hanya dicatat** (`[env] admin login disabled until fixed: …`): kesalahan di secret admin menonaktifkan login admin (`503 ADMIN_NOT_CONFIGURED`), bukan seluruh situs publik (NFR Ketersediaan). Deploy juga tidak pernah perlu mengisi nilai palsu untuk fitur yang belum ada. `SKIP_ENV_VALIDATION=1` hanya untuk mencoba build produksi di lokal; jangan pernah diset di Hostinger.
 
 | Variabel | Contoh / format | Wajib | Publik? | Keterangan |
 | --- | --- | --- | --- | --- |
@@ -357,7 +359,7 @@ Semua variabel divalidasi oleh `lib/env.ts` (Zod) dalam 5 kelompok: site, databa
 | `DATABASE_PORT` | `3306` | ya | tidak | — |
 | `DATABASE_NAME` / `DATABASE_USER` / `DATABASE_PASSWORD` | dari hPanel → Databases | ya | tidak | User khusus app, hanya akses ke 1 database |
 | `ADMIN_EMAIL` | `rifaldi@rifaldiradya.com` | ya | tidak | Email login admin |
-| `ADMIN_PASSWORD_HASH` | hash bcrypt (`$2b$12$...`) | ya | tidak | Dibuat dengan `npm run hash-password` |
+| `ADMIN_PASSWORD_HASH` | hash bcrypt cost 12, **di-encode base64** (tanpa `$`) | ya (admin) | tidak | Dibuat dengan `npm run hash-password` di terminal sendiri (input tersembunyi). Base64 karena `$` pada hash mentah dianggap referensi variabel di file `.env` (dotenv-expand) dan bisa merusak hash; hash mentah `$2b$…` tetap diterima |
 | `RATE_LIMIT_SALT` | string acak 32+ karakter | ya | tidak | Untuk hash IP |
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | nama cloud | ya | ya | Dipakai loader gambar dan upload server (bukan secret); cukup satu variabel |
 | `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | dari dashboard Cloudinary | ya | tidak | Hanya di server |
@@ -462,7 +464,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 
 ### Fase 3 — Admin
 
-- [ ] **T-13** Auth: API-01/02, `requireAdmin`, rate limit, `scripts/hash-password`, S-10; tambahkan `"admin"` ke `REQUIRED_AT_START` di `lib/env.ts`; login memvalidasi `next` hanya ke `/admin*`.
+- [x] **T-13** Auth: API-01/02, `requireAdmin`, rate limit (per IP + global), `scripts/hash-password`, S-10; kelompok env `admin` dicek saat start sebagai peringatan (`CHECKED_AT_START`), bukan syarat start; login memvalidasi `next` hanya ke `/admin*`.
 - [ ] **T-14** S-11 daftar project + layout admin G3.
 - [ ] **T-15** Skema Zod bersama + API-03/04 + `revalidate.ts`.
 - [ ] **T-16** ImageUploader + API-06/07 + integrasi Cloudinary; tambahkan `"cloudinary"` ke `REQUIRED_AT_START` di `lib/env.ts`.
