@@ -150,7 +150,7 @@ MVP = 9 fitur. Semuanya must-have; kalau satu dicabut, portfolio gagal membuktik
 
 - [ ] Urutan section sesuai bagian 5; headline + CTA primer terlihat di atas fold pada layar 375 × 667 px, termasuk saat banner cookie tampil.
 - [ ] CTA "See the Work" scroll halus ke section Selected work (bukan pindah halaman).
-- [ ] Selected work menampilkan project `published = true`, urut `sort_order` naik, maksimal 6, dalam grid ke bawah (1 / 2 / 3 kolom seperti halaman Work), tanpa scroll ke samping dan tanpa animasi geser otomatis. Jika total project published > 6, tombol berbunyi "View all work ({total})".
+- [ ] Selected work menampilkan project `published = true`, urut `sort_order` naik, maksimal 6, dalam grid ke bawah (aturan kolom sama dengan halaman Work, lihat F2), tanpa scroll ke samping dan tanpa animasi geser otomatis. Jika total project published > 6, tombol berbunyi "View all work ({total})".
 - [ ] Flag `featured` hanya menentukan project di panel hero (maks. 3); tidak memengaruhi isi grid Selected work.
 - [ ] Tombol "View all work" di bawah featured menuju `/work` (atau `/id/work`).
 - [ ] Foto profil tampil sebagai badge kecil (64–80 px) di samping nama; kalau foto belum ada, tampil inisial "RR" di lingkaran aksen.
@@ -166,7 +166,7 @@ MVP = 9 fitur. Semuanya must-have; kalau satu dicabut, portfolio gagal membuktik
 **Story:** Sebagai klien, saya mau lihat semua project di satu tempat.
 
 - [ ] Menampilkan semua project `published = true`, urut `sort_order` naik.
-- [ ] Grid 1 kolom (mobile), 2 kolom (≥ 768 px), 3 kolom (≥ 1200 px).
+- [ ] Grid 1 kolom (mobile), 2 kolom (≥ 768 px), 3 kolom (≥ 1200 px) **hanya jika ada ≥ 3 project**. Dengan 1–2 project, desktop tetap 2 kolom lebar supaya tidak ada kolom kosong yang membuat portfolio terkesan tipis. Aturan yang sama berlaku untuk grid Selected work di homepage.
 - [ ] Empty state kalau 0 project: pesan singkat + CTA email (tidak pernah halaman kosong).
 - [ ] Tanpa filter/kategori di v1.
 
