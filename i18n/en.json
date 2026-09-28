@@ -112,6 +112,40 @@
     "cookies": "Cookie settings",
     "linkedinAria": "LinkedIn (opens in new tab)"
   },
+  "privacy": {
+    "title": "Privacy",
+    "updated": "Last updated: 29 September 2026",
+    "intro": "This site keeps things simple: no accounts, no contact forms, and no analytics unless you allow them.",
+    "collectTitle": "What is collected",
+    "collectBody": "If you click Accept on the cookie banner, Google Analytics 4 records anonymous usage data: which pages are viewed, the rough region and device type, and clicks on the email buttons and project links. It does not tell me who you are. If you click Reject or ignore the banner, Google Analytics does not run and sets no cookies.",
+    "cookiesTitle": "Cookies",
+    "cookieName": "Cookie",
+    "cookiePurpose": "Purpose",
+    "cookieDuration": "Duration",
+    "cookies": [
+      {
+        "name": "lang_pref",
+        "purpose": "Remembers your language choice (English or Indonesian).",
+        "duration": "1 year"
+      },
+      {
+        "name": "consent",
+        "purpose": "Remembers whether you accepted or rejected analytics.",
+        "duration": "6 months"
+      },
+      {
+        "name": "_ga, _ga_*",
+        "purpose": "Google Analytics, set only after you click Accept.",
+        "duration": "Up to 2 years (set by Google)"
+      }
+    ],
+    "changeTitle": "Changing your choice",
+    "changeBody": "Use “Cookie settings” at the bottom of any page to change your choice at any time. Switching to Reject also removes the Google Analytics cookies.",
+    "emailTitle": "When you email me",
+    "emailBody": "Your message is used only to reply and talk about your project. It is not added to a mailing list or shared with anyone.",
+    "contactTitle": "Questions",
+    "contactBody": "Email {email} about anything on this page."
+  },
   "notFound": {
     "title": "This page doesn't exist",
     "body": "The link may be broken, or the page may have moved.",
