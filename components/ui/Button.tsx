@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "icon" | "sm" | "md" | "lg";
 
 type CommonProps = {
@@ -33,6 +33,8 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary: "border-transparent bg-accent text-on-accent hover:bg-accent-hover",
+  // Admin only (PRD: --color-danger is for admin errors and destructive actions).
+  danger: "border-transparent bg-danger text-on-accent hover:bg-danger/90",
   secondary: "border-border bg-surface-raised text-text hover:border-text-muted",
   ghost:
     "border-transparent bg-transparent text-text underline decoration-border decoration-2 underline-offset-[5px] hover:decoration-accent",
