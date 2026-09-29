@@ -142,7 +142,7 @@ Repo GitHub private `rifaldiradya-portfolio`, satu branch produksi `main`. Struk
 ├─ scripts/ (hash-password.mts, migrate.mts)   # dijalankan `node` langsung (ESM, "type": "module")
 ├─ instrumentation.ts          # validasi semua env saat server produksi start
 ├─ drizzle.config.ts, docker-compose.yml
-├─ tests/ (unit/, e2e/)        # unit: Vitest (vitest.config.mts), e2e: Playwright
+├─ tests/ (unit/, integration/, e2e/)  # Vitest (vitest.config.ts, vitest.integration.config.ts), Playwright
 ├─ docs/ (PRD.md, APP_FLOW.md, SDD.md, DECISIONS.md, design/homepage-mockup.html)
 ├─ proxy.ts                    # Next.js 16 (pengganti middleware): rewrite locale, 301, guard /admin, header x-locale
 ├─ AGENTS.md                   # aturan untuk coding AI (bagian 13)
@@ -467,7 +467,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 - [x] **T-15** Skema Zod bersama (`lib/projects/validation.ts`) + API-03/04 + `revalidate.ts`; revalidasi diverifikasi di `next start` (4 halaman berubah di kunjungan pertama setelah simpan).
 - [x] **T-16** Penyimpanan gambar di MySQL (tabel `images` + `image_variants`, migrasi 0002), kompresi di browser, API-06/07, route `/media`, loader; ImageUploader (dipasang di form T-17); kelompok env Cloudinary dihapus.
 - [x] **T-17** S-12/S-13 ProjectForm lengkap (validasi, dialog discard, `beforeunload`) + API-05 hapus + ConfirmDialog; Toggle, ImageUploader terpasang, varian Button `danger`.
-- [ ] **T-18** Test integrasi + e2e UF-06, UF-07, UF-09.
+- [x] **T-18** Test integrasi (`npm run test:integration`, juga di CI job `database`) + e2e UF-06, UF-07, UF-09 (`npm run test:e2e`, Playwright di Edge terpasang, desktop + 375 px).
 
 ### Fase 4 — Launch (gate: Lighthouse ≥ 90, semua AC lolos)
 
