@@ -184,7 +184,7 @@ Tidak ada logika yang membaca `Accept-Language`, IP, atau `lang_pref` di proxy (
 - `richText(str)` di `i18n/rich.tsx` mengubah penanda di string kamus menjadi elemen React tanpa `dangerouslySetInnerHTML`: `<hl>` → `<span class="hl">` (highlighter), `<dim>` → `<span class="dim">`, `<mark>` → `<mark>`, `<strong>` → `<strong>`. Parser sederhana (tanpa nesting); tag lain dirender sebagai teks biasa. Test unit memastikan setiap key yang dipakai `richText` hanya berisi tag yang diizinkan dan tag-nya seimbang di `en.json` maupun `id.json`.
 - `localePath('/work', 'id')` → `/id/work`; `localePath('/work', 'en')` → `/work`. Semua link internal wajib lewat helper ini.
 - `altPath(currentPath)` menghasilkan path padanan untuk O-01, hreflang, dan O-02.
-- `app/[lang]/layout.tsx`: `generateStaticParams` → `[{lang:'en'},{lang:'id'}]`; `dynamicParams = false`; lang selain `en`/`id` → 404.
+- `app/[lang]/layout.tsx`: `generateStaticParams` → `[{lang:'en'},{lang:'id'}]`; lang selain `en`/`id` → 404 lewat `resolveLocale()` → `notFound()`. **Jangan** pakai `dynamicParams = false`: bersama revalidasi on-demand, semua halaman publik jadi 404 (lihat DECISIONS T-15).
 
 ### Rendering & cache
 
@@ -466,7 +466,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 
 - [x] **T-13** Auth: API-01/02, `requireAdmin`, rate limit (per IP + global), `scripts/hash-password`, S-10; kelompok env `admin` dicek saat start sebagai peringatan (`CHECKED_AT_START`), bukan syarat start; login memvalidasi `next` hanya ke `/admin*`.
 - [x] **T-14** S-11 daftar project (tabel ≥ 768 px, kartu di mobile) + layout admin G3, info featured/grid + peringatan E-08, Toast (`?notice=`), error boundary admin.
-- [ ] **T-15** Skema Zod bersama + API-03/04 + `revalidate.ts`.
+- [x] **T-15** Skema Zod bersama (`lib/projects/validation.ts`) + API-03/04 + `revalidate.ts`; revalidasi diverifikasi di `next start` (4 halaman berubah di kunjungan pertama setelah simpan).
 - [ ] **T-16** ImageUploader + API-06/07 + integrasi Cloudinary; tambahkan `"cloudinary"` ke `REQUIRED_AT_START` di `lib/env.ts`.
 - [ ] **T-17** S-12/S-13 ProjectForm lengkap (validasi, dialog discard, `beforeunload`) + API-05 hapus + ConfirmDialog.
 - [ ] **T-18** Test integrasi + e2e UF-06, UF-07, UF-09.

@@ -36,3 +36,9 @@ export async function getPublishedProjects(): Promise<Project[]> {
 export async function getAllProjects(): Promise<Project[]> {
   return getDb().select().from(projects).orderBy(asc(projects.sortOrder), desc(projects.createdAt));
 }
+
+/** One project, drafts included (S-13, API-04). null when the id doesn't exist. */
+export async function getProjectById(id: string): Promise<Project | null> {
+  const [row] = await getDb().select().from(projects).where(eq(projects.id, id)).limit(1);
+  return row ?? null;
+}
