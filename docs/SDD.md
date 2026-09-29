@@ -465,7 +465,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 ### Fase 3 — Admin
 
 - [x] **T-13** Auth: API-01/02, `requireAdmin`, rate limit (per IP + global), `scripts/hash-password`, S-10; kelompok env `admin` dicek saat start sebagai peringatan (`CHECKED_AT_START`), bukan syarat start; login memvalidasi `next` hanya ke `/admin*`.
-- [ ] **T-14** S-11 daftar project + layout admin G3.
+- [x] **T-14** S-11 daftar project (tabel ≥ 768 px, kartu di mobile) + layout admin G3, info featured/grid + peringatan E-08, Toast (`?notice=`), error boundary admin.
 - [ ] **T-15** Skema Zod bersama + API-03/04 + `revalidate.ts`.
 - [ ] **T-16** ImageUploader + API-06/07 + integrasi Cloudinary; tambahkan `"cloudinary"` ke `REQUIRED_AT_START` di `lib/env.ts`.
 - [ ] **T-17** S-12/S-13 ProjectForm lengkap (validasi, dialog discard, `beforeunload`) + API-05 hapus + ConfirmDialog.
