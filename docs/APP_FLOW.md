@@ -152,7 +152,7 @@ Tiga overlay ini muncul di semua layar publik dan tidak pernah di admin. Banner 
 
 ### O-02 Banner saran bahasa
 
-- Dievaluasi di client setelah halaman tampil, tanpa memblokir render dan tanpa menggeser layout (bar tinggi tetap 48 px di bawah navbar, ruangnya sudah dicadangkan atau muncul sebagai overlay).
+- Dievaluasi di client setelah halaman tampil, tanpa memblokir render dan tanpa menggeser layout: overlay setinggi 48 px, di bawah navbar mulai 768 px dan menempel di bawah layar di HP (hero di HP hanya berjarak 24 px dari navbar, jadi overlay atas akan menutupi byline). Di layar < 420 px hanya tombol yang tampil; kalimatnya tetap jadi label region untuk pembaca layar.
 - Syarat tampil (lihat diagram): path bukan `/id*`, cookie `lang_pref` tidak ada, dan `navigator.languages` berisi entri yang diawali `id`.
 - Isi: Also available in Indonesian. + tombol Lihat versi Indonesia + tombol tutup (ikon silang, `aria-label` Dismiss).
 - Lihat versi Indonesia → set `lang_pref=id` → buka halaman padanan ID. Tutup → set `lang_pref=en` → banner hilang. Keduanya permanen sampai cookie habis.

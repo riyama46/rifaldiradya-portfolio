@@ -460,7 +460,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 - [x] **T-08** S-01 Hero kolom kiri (BylineBadge dengan inisial fallback, H1 dengan `richText`, MetaRow + `site-config`) + tekstur grid + SectionHeader + ServiceTile dua tier + ProcessSteps + About (lead, `<mark>`, AboutFacts) + FooterCta, copy dari kamus.
 - [x] **T-09** `getPublishedProjects()` + turunan `selectHomepageProjects()` (featured maks. 3, grid maks. 6 + total) + ProjectCard + Selected work + EmptyState + HeroProofPanel (rotasi, kontrol, E-21 s.d. E-24, pemuatan gambar bertahap); loader Cloudinary (diganti loader `/media` di T-16).
 - [x] **T-10** S-02 Work, S-03 Privacy, S-04 not-found per locale.
-- [ ] **T-11** O-01 toggle + O-02 banner saran bahasa + cookie `lang_pref`.
+- [x] **T-11** O-01 toggle (client, tetap `<a href>`; simpan `lang_pref`, bawa `#hash`) + O-02 banner saran bahasa (`lib/lang-pref.ts`) + cookie `lang_pref`; e2e UF-02/UF-04. Event `language_switch` dan koordinasi O-02/O-03 di mobile ditambahkan di T-19.
 - [ ] **T-12** SEO: `buildMetadata`, JSON-LD, `sitemap.ts`, `robots.ts`, gambar OG.
 
 ### Fase 3 — Admin

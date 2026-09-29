@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LanguageSuggestBanner } from "@/components/overlays/LanguageSuggestBanner";
 import { LanguageToggle } from "@/components/overlays/LanguageToggle";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -65,6 +66,7 @@ export function SiteHeader({ lang, dict, path }: SiteHeaderProps) {
           {dict.nav.email}
         </Button>
       </Container>
+      {lang === "en" && <LanguageSuggestBanner lang={lang} path={path} labels={dict.langBanner} />}
     </header>
   );
 }
