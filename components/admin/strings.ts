@@ -3,6 +3,8 @@ export const adminStrings = {
   appName: "Portfolio Admin",
   viewSite: "View site",
   logout: "Log out",
+  loadError: "Couldn't load this page. Check the database connection and try again.",
+  retry: "Try again",
   signIn: {
     title: "Sign in",
     email: "Email",
@@ -23,6 +25,47 @@ export const adminStrings = {
   },
   projects: {
     title: "Projects",
+    count: (n: number) => `${n} ${n === 1 ? "project" : "projects"}`,
+    newProject: "New project",
     empty: "No projects yet. Add your first one to show it on the site.",
+    featuredInHero: (n: number, limit: number) => `Featured in homepage hero: ${n}/${limit}`,
+    featuredOverLimit: "Only the first 3 featured projects appear in the homepage hero.",
+    gridInfo: "Shown on homepage grid: first 6 published projects by sort order.",
+    published: "Published",
+    draft: "Draft",
+    featured: "Featured",
+    edit: "Edit",
+    editProject: (title: string) => `Edit ${title}`,
+    columns: {
+      thumbnail: "Thumbnail",
+      title: "Title",
+      status: "Status",
+      order: "Order",
+      updated: "Updated",
+      actions: "Actions",
+    },
+    order: (n: number) => `Order ${n}`,
+    updated: (relative: string) => `Updated ${relative}`,
+  },
+  // Toast after an action that lands on S-11 (App Flow S-11, E-14, E-19; set by T-17 via ?notice=).
+  notices: {
+    created: { tone: "success", message: "Project created" },
+    saved: { tone: "success", message: "Changes saved" },
+    deleted: { tone: "success", message: "Project deleted" },
+    "saved-stale": {
+      tone: "warning",
+      message: "Saved, but the site may take a few minutes to update.",
+    },
+    "not-found": { tone: "warning", message: "Project not found" },
+    gone: { tone: "warning", message: "This project no longer exists." },
   },
 } as const;
+
+export type NoticeKey = keyof typeof adminStrings.notices;
+
+/** Whitelist lookup, so an arbitrary ?notice= value can never inject text into the page. */
+export function parseNotice(value: string | string[] | undefined): NoticeKey | null {
+  return typeof value === "string" && Object.hasOwn(adminStrings.notices, value)
+    ? (value as NoticeKey)
+    : null;
+}

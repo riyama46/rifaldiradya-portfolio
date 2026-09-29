@@ -28,3 +28,11 @@ export async function getPublishedProjects(): Promise<Project[]> {
     throw error;
   }
 }
+
+/**
+ * Every project, drafts included, in the same standard order (S-11). Admin pages render per
+ * request behind requireAdmin(), so errors are simply thrown to the admin error boundary.
+ */
+export async function getAllProjects(): Promise<Project[]> {
+  return getDb().select().from(projects).orderBy(asc(projects.sortOrder), desc(projects.createdAt));
+}
