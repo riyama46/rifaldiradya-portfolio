@@ -235,7 +235,7 @@ Satu admin, sesi disimpan di database, dan semua pemeriksaan dilakukan di server
 | URL berbahaya di kartu | `live_url` wajib `https:`; dirender dengan `rel="noopener noreferrer"` |
 | Brute force | Rate limit login + bcrypt cost 12 |
 | Kebocoran secret | Semua secret di env Hostinger; `.env*` di `.gitignore`; `.env.example` tanpa nilai; tidak ada secret dengan prefix `NEXT_PUBLIC_` |
-| Clickjacking & header | `next.config.ts` headers: `Content-Security-Policy` (default-src 'self'; img-src 'self' data:; script-src 'self' 'unsafe-inline' www.googletagmanager.com; connect-src 'self' \*.google-analytics.com \*.analytics.google.com; frame-ancestors 'none'), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` minimal, `Strict-Transport-Security` |
+| Clickjacking & header | `lib/security-headers.ts` lewat `next.config.ts` `headers()` di semua respons: `Content-Security-Policy` (default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com, + 'unsafe-eval' hanya di dev; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: + host GA; font-src 'self'; connect-src 'self' + host GA; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (kamera, mikrofon, lokasi, pembayaran, USB, topics dimatikan), `Cross-Origin-Opener-Policy: same-origin`, `Strict-Transport-Security: max-age=31536000` (produksi) |
 | Dependency rentan | Aktifkan scan kerentanan otomatis Hostinger + Dependabot di GitHub; ikuti security release Next.js |
 | Enumerasi admin | Pesan login generik; `/admin/*` noindex + disallow di robots |
 
@@ -474,7 +474,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 ### Fase 4 — Launch (gate: Lighthouse ≥ 90, semua AC lolos)
 
 - [x] **T-19** GA4 + Consent Mode v2 + O-03 + `track()` 4 event + S-03 tombol Cookie settings (gtag.js baru dimuat setelah Accept; event lewat atribut `data-track`; O-02 menunggu O-03 di HP; e2e UF-05 dengan request Google dicegat). Banner consent di mobile maks. ~130 px tingginya: di 375 × 667 tombol hero "See the Work" berakhir di y = 537 px dan harus tetap terlihat saat banner tampil (PRD F1).
-- [ ] **T-20** Header keamanan + CSP; uji securityheaders.com.
+- [x] **T-20** Header keamanan + CSP (`lib/security-headers.ts`); e2e merekam pelanggaran CSP (0 di halaman publik, 404, GA setelah Accept, admin + upload). Uji securityheaders.com di devstaging setelah deploy.
 - [ ] **T-21** Isi konten nyata lewat admin (2 project), copy final EN/ID; QA checklist bagian 11.
 - [ ] **T-22** Pindah ke domain utama, Search Console, submit sitemap, tempel link di profil Upwork.
 
