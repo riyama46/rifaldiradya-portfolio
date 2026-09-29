@@ -11,6 +11,7 @@ const BASE_URL = `http://localhost:${PORT}`;
 
 export default defineConfig({
   testDir: "tests/e2e",
+  globalSetup: "./tests/e2e/global-setup.ts",
   // One database and one login rate limit: run tests one at a time.
   workers: 1,
   fullyParallel: false,
