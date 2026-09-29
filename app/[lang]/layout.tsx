@@ -7,8 +7,9 @@ import { resolveLocale } from "@/i18n/server";
 import { fontVariables } from "@/lib/fonts";
 import "@/styles/globals.css";
 
-export const dynamicParams = false;
-
+// No `dynamicParams = false` here: with it, on-demand revalidation of this layout (T-15) deletes the
+// prerendered pages and every public URL becomes a 404 (vercel/next.js#63479, reproduced on
+// 16.3.6). Unknown locales still 404 through resolveLocale() → notFound().
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }

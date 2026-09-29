@@ -25,6 +25,22 @@ export function apiError(
   return NextResponse.json({ error: { code, message, ...extras } }, { status, headers });
 }
 
+/** Admin JSON bodies are small forms; anything bigger is rejected before parsing. */
+export const MAX_JSON_BYTES = 32 * 1024;
+
+/** Parsed JSON body, or undefined when it is missing, too large, or not valid JSON. */
+export async function readJsonBody(request: Request): Promise<unknown> {
+  const declared = Number(request.headers.get("content-length") ?? 0);
+  if (declared > MAX_JSON_BYTES) return undefined;
+  const text = await request.text().catch(() => "");
+  if (!text || new TextEncoder().encode(text).length > MAX_JSON_BYTES) return undefined;
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return undefined;
+  }
+}
+
 /** CSRF guard for write requests (SDD section 6): the Origin header must be this site. */
 export function isSameOrigin(request: Request, siteUrl: string): boolean {
   const origin = request.headers.get("origin");
