@@ -23,6 +23,30 @@ export const adminStrings = {
     network: "Couldn't reach the server. Check your connection and try again.",
     server: "Couldn't sign in right now. Try again.",
   },
+  // ImageUploader (App Flow S-12 field 7, section 11 messages, E-12).
+  uploader: {
+    drop: "Drag an image here, or",
+    choose: "choose a file",
+    hint: "JPG, PNG, or WebP · at least 1200 px wide · under 5 MB · recommended 1600 × 1000",
+    cropNote: "Cropped to 16:10 from the top, like the site's cards.",
+    preparing: "Preparing image…",
+    uploading: (percent: number) => `Uploading… ${percent}%`,
+    replace: "Replace",
+    remove: "Remove",
+    retry: "Retry",
+    previewAlt: "Thumbnail preview",
+    errors: {
+      type: "Use a JPG, PNG, or WebP image.",
+      size: (megabytes: number) => `This image is ${megabytes} MB. Upload one under 5 MB.`,
+      width: (width: number) => `This image is ${width} px wide. Use one at least 1200 px wide.`,
+      short: (height: number) =>
+        `This image is only ${height} px tall. Use one at least 750 px tall for a 16:10 thumbnail.`,
+      unreadable: "This file couldn't be read as an image. Try another one.",
+      tooLarge: "This image is too detailed to compress under 1 MB. Try another one.",
+      failed: "Upload failed. Check your connection and try again.",
+      session: "Your session expired. Sign in again in a new tab, then retry.",
+    },
+  },
   projects: {
     title: "Projects",
     count: (n: number) => `${n} ${n === 1 ? "project" : "projects"}`,

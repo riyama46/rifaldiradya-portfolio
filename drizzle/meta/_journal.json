@@ -15,6 +15,13 @@
       "when": 1790603131475,
       "tag": "0001_utf8mb4",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1790693601814,
+      "tag": "0002_images",
+      "breakpoints": true
     }
   ]
 }

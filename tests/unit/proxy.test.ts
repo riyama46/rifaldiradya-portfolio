@@ -51,14 +51,18 @@ describe("rule 1: www to canonical host", () => {
 });
 
 describe("rule 2: api and files pass through", () => {
-  it.each(["/api/admin/login", "/robots.txt", "/sitemap.xml", "/favicon.ico", "/og/en.png"])(
-    "%s is not rewritten",
-    (path) => {
-      const res = run(`http://localhost:3000${path}`);
-      expect(isRewrite(res)).toBe(false);
-      expect(getRedirectUrl(res)).toBeNull();
-    },
-  );
+  it.each([
+    "/api/admin/login",
+    "/robots.txt",
+    "/sitemap.xml",
+    "/favicon.ico",
+    "/og/en.png",
+    "/media/01JIMAGE000000000000000000-640.webp",
+  ])("%s is not rewritten", (path) => {
+    const res = run(`http://localhost:3000${path}`);
+    expect(isRewrite(res)).toBe(false);
+    expect(getRedirectUrl(res)).toBeNull();
+  });
 });
 
 describe("rule 4: /en prefix", () => {

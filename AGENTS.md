@@ -15,9 +15,9 @@
 - Tidak ada dependency baru tanpa izin; tidak ada dependency native.
 - Tidak ada auto-redirect bahasa; locale hanya dari URL.
 - Tidak ada GA4/cookie analytics sebelum consent=granted.
-- Tidak ada gambar di filesystem server; semua lewat Cloudinary.
+- Tidak ada gambar di filesystem server; gambar project disimpan di MySQL (lib/images) dan disajikan lewat /media.
 - Tidak ada teks UI hardcode; semua dari i18n/en.json dan i18n/id.json.
-- Akses DB hanya di lib/projects dan lib/auth.
+- Akses DB hanya di lib/projects, lib/images, dan lib/auth.
 - Jangan menambah layar, field, fitur, atau library di luar docs.
 - Animasi hanya yang ada di tabel Motion PRD; hanya CSS kecuali rotasi HeroProofPanel; tanpa fade-in di H1/subheadline/panel hero.
 - String kamus dengan penanda (<hl>, <dim>, <mark>, <strong>) dirender lewat richText(), jangan dangerouslySetInnerHTML.

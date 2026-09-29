@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Project } from "@/lib/db/schema";
-import { cloudinaryUrl } from "@/lib/images/loader";
+import { mediaLoader } from "@/lib/images/loader";
 import {
   compareProjects,
   gridColumnsClass,
@@ -18,8 +18,8 @@ function project(overrides: Partial<Project> = {}): Project {
     summaryId: "Situs satu halaman dengan menu dan tombol pesan WhatsApp.",
     liveUrl: "https://staging0.rifaldiradya.com",
     tags: ["Next.js", "Tailwind CSS"],
-    thumbnailPublicId: "portfolio/projects/coffee",
-    thumbnailUrl: "https://res.cloudinary.com/demo/image/upload/v1/portfolio/projects/coffee.jpg",
+    thumbnailPublicId: "01JIMAGE000000000000000000",
+    thumbnailUrl: "/media/01JIMAGE000000000000000000.webp",
     thumbnailWidth: 1600,
     thumbnailHeight: 1000,
     thumbnailAltEn: "Homepage of a coffee shop site",
@@ -106,23 +106,23 @@ describe("gridColumnsClass", () => {
   });
 });
 
-describe("cloudinaryUrl", () => {
-  const src = "https://res.cloudinary.com/demo/image/upload/v1/portfolio/projects/coffee.jpg";
+describe("mediaLoader", () => {
+  const src = "/media/01JIMAGE000000000000000000.webp";
 
-  it("inserts auto format/quality and the next allowed width", () => {
-    expect(cloudinaryUrl({ src, width: 700 })).toBe(
-      "https://res.cloudinary.com/demo/image/upload/f_auto,q_auto,w_960,c_limit/v1/portfolio/projects/coffee.jpg",
+  it("asks /media for the next stored width", () => {
+    expect(mediaLoader({ src, width: 700 })).toBe("/media/01JIMAGE000000000000000000-960.webp");
+    expect(mediaLoader({ src, width: 640 })).toBe("/media/01JIMAGE000000000000000000-640.webp");
+  });
+
+  it("caps the width at 1600 and keeps a JPEG extension", () => {
+    expect(mediaLoader({ src: "/media/01JIMAGE000000000000000000.jpg", width: 3840 })).toBe(
+      "/media/01JIMAGE000000000000000000-1600.jpg",
     );
   });
 
-  it("caps the width at 1600", () => {
-    expect(cloudinaryUrl({ src, width: 3840 })).toContain("w_1600");
-  });
-
-  it("leaves non-Cloudinary URLs untouched", () => {
-    expect(cloudinaryUrl({ src: "/og/en.png", width: 640 })).toBe("/og/en.png");
-    expect(cloudinaryUrl({ src: "https://example.com/a.jpg", width: 640 })).toBe(
-      "https://example.com/a.jpg",
-    );
+  it("leaves anything else untouched", () => {
+    for (const other of ["/og/en.png", "https://example.com/a.jpg", "/media/../etc.webp"]) {
+      expect(mediaLoader({ src: other, width: 640 })).toBe(other);
+    }
   });
 });

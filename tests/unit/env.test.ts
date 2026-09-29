@@ -3,7 +3,6 @@ import {
   assertServerEnv,
   parseAdminEnv,
   parseAnalyticsEnv,
-  parseCloudinaryEnv,
   parseDatabaseEnv,
   parseSiteEnv,
   REQUIRED_AT_START,
@@ -21,9 +20,6 @@ const valid = {
   ADMIN_EMAIL: "rifaldi@rifaldiradya.com",
   ADMIN_PASSWORD_HASH: BCRYPT,
   RATE_LIMIT_SALT: "x".repeat(32),
-  NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: "demo",
-  CLOUDINARY_API_KEY: "123",
-  CLOUDINARY_API_SECRET: "super-secret-cloudinary",
   NEXT_PUBLIC_GA_MEASUREMENT_ID: "G-ABC123",
 };
 
@@ -86,14 +82,6 @@ describe("admin env", () => {
   });
 });
 
-describe("cloudinary env", () => {
-  it("requires all three values", () => {
-    expect(() => parseCloudinaryEnv({ ...valid, CLOUDINARY_API_SECRET: "" })).toThrow(
-      /CLOUDINARY_API_SECRET/,
-    );
-  });
-});
-
 describe("analytics env", () => {
   it("is optional; empty means disabled", () => {
     expect(parseAnalyticsEnv({}).NEXT_PUBLIC_GA_MEASUREMENT_ID).toBeUndefined();
@@ -138,23 +126,19 @@ describe("assertServerEnv", () => {
   });
 
   it("can check groups that are not required yet when asked", () => {
-    expect(() =>
-      assertServerEnv(siteAndDatabaseOnly, ["site", "database", "admin", "cloudinary"]),
-    ).toThrow(/admin[\s\S]*Cloudinary/);
+    expect(() => assertServerEnv(siteAndDatabaseOnly, ["site", "database", "admin"])).toThrow(
+      /admin/,
+    );
   });
 
   it("never includes secret values in error messages", () => {
     const broken = { ...valid, SITE_URL: "", ADMIN_PASSWORD_HASH: "plain-secret-value" };
     try {
-      assertServerEnv(broken, ["site", "database", "admin", "cloudinary", "analytics"]);
+      assertServerEnv(broken, ["site", "database", "admin", "analytics"]);
       expect.unreachable();
     } catch (error) {
       const message = (error as Error).message;
-      for (const secret of [
-        "plain-secret-value",
-        "secret-db-password",
-        "super-secret-cloudinary",
-      ]) {
+      for (const secret of ["plain-secret-value", "secret-db-password"]) {
         expect(message).not.toContain(secret);
       }
     }

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { guardAdminWrite } from "@/lib/auth/guard";
 import { apiError, readJsonBody } from "@/lib/http/api";
-import { createProject, toProjectJson } from "@/lib/projects/mutations";
+import { missingImage } from "@/lib/projects/errors";
+import { createProject, toProjectJson, withStoredThumbnail } from "@/lib/projects/mutations";
 import { fieldErrors, pickProjectFields, projectInputSchema } from "@/lib/projects/validation";
 import { revalidatePublicPages } from "@/lib/revalidate";
 
@@ -19,7 +20,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    const project = await createProject(parsed.data);
+    const input = await withStoredThumbnail(parsed.data);
+    if (!input) return missingImage();
+    const project = await createProject(input);
     const revalidated = revalidatePublicPages();
     return NextResponse.json({ project: toProjectJson(project), revalidated }, { status: 201 });
   } catch (error) {

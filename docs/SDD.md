@@ -6,11 +6,11 @@ Sep 27, 2026 · @Pal
 
 ## 1. Ringkasan arsitektur
 
-v1 adalah **satu aplikasi Next.js** yang berjalan di Hostinger Business (Node.js web app), memakai **MySQL bawaan Hostinger** untuk data dan **Cloudinary** untuk gambar. Halaman publik dirender statis dan hanya dibangun ulang saat admin menyimpan, jadi situs tetap cepat dan tetap tampil walau database sedang bermasalah.
+v1 adalah **satu aplikasi Next.js** yang berjalan di Hostinger Business (Node.js web app), memakai **MySQL bawaan Hostinger** untuk data dan gambar (DECISIONS 2026-09-29: gambar pindah dari rencana Cloudinary ke MySQL). Halaman publik dirender statis dan hanya dibangun ulang saat admin menyimpan, jadi situs tetap cepat dan tetap tampil walau database sedang bermasalah.
 
 &#91;embedded content: arsitektur v1 · 1 app Node.js, 1 database, 2 layanan eksternal\]
 
-Gambar project dikirim ke browser langsung dari CDN Cloudinary, dan GA4 dimuat di browser pengunjung setelah consent; keduanya tidak melewati server Hostinger.
+Gambar project disajikan dari `/media/…` dengan cache 1 tahun (`immutable`), jadi setelah permintaan pertama dilayani CDN Hostinger dan browser, bukan MySQL. GA4 dimuat di browser pengunjung setelah consent.
 
 **Keputusan utama**
 
@@ -18,10 +18,10 @@ Gambar project dikirim ke browser langsung dari CDN Cloudinary, dan GA4 dimuat d
 | --- | --- | --- |
 | K1 | Satu repo, satu app Next.js (publik + admin + API) | Paling sedikit bagian bergerak untuk 1 orang dengan 5–10 jam/minggu |
 | K2 | MySQL Hostinger, bukan Postgres eksternal | Sudah termasuk paket, koneksi lokal, ada backup Hostinger, tidak ada vendor tambahan yang bisa pause |
-| K3 | Cloudinary untuk upload + delivery gambar | Gambar aman dari redeploy; free tier jauh di atas kebutuhan |
+| K3 | Gambar disimpan di MySQL (dikompres di browser admin: 16:10, 4 lebar WebP), disajikan lewat `/media` dengan cache panjang | Aman dari redeploy (bukan filesystem), tanpa vendor pihak ketiga, ±300–500 KB per project (disetujui Pal, 29 Sep 2026) |
 | K4 | Halaman publik statis + revalidasi on-demand | Performa maksimal dan tahan gangguan DB |
 | K5 | Auth buatan sendiri yang minimal (1 admin, sesi di DB) | Tidak butuh layanan auth pihak ketiga untuk 1 user |
-| K6 | Tanpa dependency native (bcryptjs, bukan argon2/bcrypt native; loader Cloudinary, bukan sharp) | Mengurangi risiko build gagal di Hostinger |
+| K6 | Tanpa dependency native (bcryptjs, bukan argon2/bcrypt native; gambar dikompres di browser admin, bukan sharp di server) | Mengurangi risiko build gagal di Hostinger |
 
 ## 2. Tech stack final
 
@@ -39,7 +39,7 @@ Stack dipilih dengan satu kriteria utama: **sedikit bagian bergerak, tanpa build
 | ORM & migrasi | Drizzle ORM + `mysql2` + drizzle-kit | terbaru stabil | Ringan, typed, migrasi berupa file SQL yang bisa dijalankan manual di phpMyAdmin bila perlu |
 | Validasi | Zod | 3.x/4.x stabil | Satu skema dipakai client dan server |
 | Password | `bcryptjs` | terbaru | Pure JS, tidak butuh kompilasi native saat build di Hostinger |
-| Gambar | Cloudinary Node SDK (upload server-side) + custom `next/image` loader | terbaru | Tanpa `sharp` di server; transformasi di CDN Cloudinary |
+| Gambar | Canvas API di browser admin (resize + WebP) + tabel MySQL + custom `next/image` loader ke `/media` | — | Tanpa dependency tambahan; tanpa `sharp` di server |
 | i18n | Kamus JSON + helper sendiri (tanpa library i18n) | — | Hanya 2 bahasa & sedikit string; menghindari middleware library yang melakukan auto-redirect bahasa (dilarang di App Flow G1) |
 | Analytics | GA4 via `next/script` + Consent Mode v2 | — | Default denied sebelum consent |
 | Test | Vitest (unit) + Playwright (e2e smoke) | terbaru | Cukup untuk validasi, util, dan flow utama |
@@ -50,7 +50,7 @@ Tidak dipakai di v1: CMS headless, NextAuth/Auth.js, Prisma, state management li
 
 ## 3. Database & penyimpanan gambar
 
-**Keputusan: MySQL bawaan Hostinger untuk data, Cloudinary untuk gambar.**
+**Keputusan: MySQL bawaan Hostinger untuk data dan gambar.** (Rencana awal: Cloudinary untuk gambar; diganti 29 Sep 2026, lihat DECISIONS.)
 
 | Opsi database | Kelebihan | Kekurangan | Hasil |
 | --- | --- | --- | --- |
@@ -81,12 +81,13 @@ Migrasi: drizzle-kit menghasilkan file SQL di `/drizzle` (`npm run db:generate`,
 
 Seed tidak ada; project pertama diisi lewat admin.
 
-### Gambar (Cloudinary)
+### Gambar (MySQL)
 
-- Upload: browser → API-06 (server) → Cloudinary Upload API ke folder `portfolio/projects/`, dengan validasi tipe/ukuran/lebar sebelum dan sesudah upload. Server menyimpan `public_id`, `secure_url`, `width`, `height`.
-- Delivery: `next/image` dengan **custom loader** yang membentuk URL Cloudinary `f_auto,q_auto,w_{width}`; lebar dibatasi `[640, 960, 1280, 1600]` supaya jumlah varian transformasi tetap kecil. `images.unoptimized` tidak dipakai; optimizer bawaan Next.js tidak ikut memproses gambar Cloudinary.
-- Kuota: free plan 25 kredit/bulan (1 kredit = 1 GB storage, 1 GB bandwidth, atau 1.000 transformasi). Dengan beberapa project × 4 lebar, kebutuhan jauh di bawah 1 kredit/bulan ([Cloudinary credits](https://cloudinary.com/documentation/developer_onboarding_faq_credits)).
-- Hapus: saat project dihapus atau thumbnail diganti, server memanggil `destroy(public_id)`; gagal hapus tidak membatalkan operasi utama, hanya dicatat di log.
+- **Kompresi di browser admin** (`lib/images/compress.ts`): file JPG/PNG/WebP ≤ 5 MB, lebar ≥ 1200 px → crop 16:10 (gambar tinggi dipotong dari atas, gambar lebar dari tengah) → lebar standar di bawah hasil crop (640/960/1280) + hasil crop itu sendiri (maks. 1600) → WebP kualitas 0,8 (JPEG 0,82 jika browser tidak bisa encode WebP). Menggambar ulang lewat canvas juga membuang EXIF/GPS.
+- **Upload (API-06)**: multipart dengan satu bagian `variant` per lebar. Server tidak mempercayai apa pun dari client: format dan ukuran dibaca dari byte file (`lib/images/inspect.ts`, hanya WebP/JPEG), set lebar harus persis hasil kompresi, bentuk 16:10, tiap varian ≤ 1 MB, terbesar ≥ 1200 px. Disimpan di `images` (1 baris per upload) + `image_variants` (1 baris per lebar, `MEDIUMBLOB`) dalam satu transaksi.
+- **Delivery**: `/media/<id>.<ext>` (terbesar) dan `/media/<id>-<lebar>.<ext>`; loader `next/image` memilih lebar tersimpan terkecil yang cukup. Gambar tidak pernah berubah (thumbnail baru = id baru), jadi `Cache-Control: public, max-age=31536000, immutable`.
+- **Project hanya memilih `public_id`**: API-03/04 mengambil url, lebar, dan tinggi dari tabel `images`, bukan dari request.
+- **Hapus**: thumbnail lama dihapus setelah project tersimpan dengan gambar baru; API-05 (T-17) menghapus gambar project. Upload yang tidak pernah tersimpan dihapus lewat API-07 (Remove/Replace/Cancel) atau otomatis setelah 24 jam (dibersihkan saat upload berikutnya). Gagal hapus tidak membatalkan operasi utama, hanya dicatat di log. Salinan di cache CDN bisa bertahan, tapi tidak lagi ditautkan dari mana pun.
 
 ## 4. Struktur repo & konvensi kode
 
@@ -129,7 +130,7 @@ Repo GitHub private `rifaldiradya-portfolio`, satu branch produksi `main`. Struk
 │  ├─ db/ (client.ts, schema.ts)
 │  ├─ projects/ (queries.ts, mutations.ts, validation.ts, slug.ts)
 │  ├─ auth/ (session.ts, password.ts, rate-limit.ts, guard.ts)
-│  ├─ images/ (cloudinary.ts, loader.ts)
+│  ├─ images/ (rules.ts, compress.ts, inspect.ts, upload.ts, store.ts, loader.ts)
 │  ├─ seo/ (metadata.ts, jsonld.ts)
 │  ├─ analytics/ (events.ts)
 │  ├─ revalidate.ts
@@ -227,11 +228,11 @@ Satu admin, sesi disimpan di database, dan semua pemeriksaan dilakukan di server
 | --- | --- |
 | CSRF | Cookie `sameSite=lax` + cek header `Origin` = `SITE_URL` di semua request tulis (`403 FORBIDDEN_ORIGIN`) |
 | XSS | React escaping; tidak ada `dangerouslySetInnerHTML` kecuali JSON-LD yang dibentuk dari objek (di-`JSON.stringify` + escape `<`); input admin disimpan sebagai teks biasa |
-| Upload berbahaya | Cek MIME + magic bytes (JPG/PNG/WebP), maks 5 MB, lebar ≥ 1200 px; upload ke Cloudinary sebagai `resource_type: image`; nama file asli dibuang |
+| Upload berbahaya | Client: tipe JPG/PNG/WebP, maks 5 MB, lebar ≥ 1200 px, digambar ulang lewat canvas. Server: format + dimensi dari magic bytes (hanya WebP/JPEG; SVG/HTML/PNG ditolak), set lebar dan rasio 16:10 wajib cocok, maks 1 MB per varian; nama file dan MIME dari client diabaikan; disajikan dengan `Content-Type` dari DB + `X-Content-Type-Options: nosniff` |
 | URL berbahaya di kartu | `live_url` wajib `https:`; dirender dengan `rel="noopener noreferrer"` |
 | Brute force | Rate limit login + bcrypt cost 12 |
 | Kebocoran secret | Semua secret di env Hostinger; `.env*` di `.gitignore`; `.env.example` tanpa nilai; tidak ada secret dengan prefix `NEXT_PUBLIC_` |
-| Clickjacking & header | `next.config.ts` headers: `Content-Security-Policy` (default-src 'self'; img-src 'self' res.cloudinary.com data:; script-src 'self' 'unsafe-inline' www.googletagmanager.com; connect-src 'self' \*.google-analytics.com \*.analytics.google.com; frame-ancestors 'none'), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` minimal, `Strict-Transport-Security` |
+| Clickjacking & header | `next.config.ts` headers: `Content-Security-Policy` (default-src 'self'; img-src 'self' data:; script-src 'self' 'unsafe-inline' www.googletagmanager.com; connect-src 'self' \*.google-analytics.com \*.analytics.google.com; frame-ancestors 'none'), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` minimal, `Strict-Transport-Security` |
 | Dependency rentan | Aktifkan scan kerentanan otomatis Hostinger + Dependabot di GitHub; ikuti security release Next.js |
 | Enumerasi admin | Pesan login generik; `/admin/*` noindex + disallow di robots |
 
@@ -247,7 +248,7 @@ CSP sengaja tanpa nonce: nonce per request memaksa semua halaman dirender dinami
 - `app/sitemap.ts`: 6 URL (home, work, privacy × 2 bahasa), masing-masing dengan `alternates.languages`, `lastModified`.
 - `app/robots.ts`: allow `/`, disallow `/admin` dan `/api`, `sitemap: SITE_URL/sitemap.xml`. Tidak ada blok khusus crawler AI (diizinkan).
 - Admin: `metadata.robots = { index: false, follow: false }` + header dari proxy.
-- Gambar: `next/image` + loader Cloudinary, `sizes` diisi sesuai grid (`(min-width:1200px) 33vw, (min-width:768px) 50vw, 100vw`). Gambar prioritas (`loading="eager"` + `fetchPriority="high"`; prop `priority` sudah deprecated di Next.js 16) hanya untuk: slide pertama HeroProofPanel di S-01 (`sizes="(min-width:1024px) 560px, 100vw"`) dan kartu pertama di S-02. Slide panel ke-2 dan ke-3 dirender dengan `loading="lazy"` + `fetchPriority="low"` dan elemen `<img>`-nya baru dipasang setelah `requestIdleCallback` (fallback `setTimeout` 2 s), paling lambat sebelum rotasi pertama.
+- Gambar: `next/image` + loader `/media`, `sizes` diisi sesuai grid (`(min-width:1200px) 33vw, (min-width:768px) 50vw, 100vw`). Gambar prioritas (`loading="eager"` + `fetchPriority="high"`; prop `priority` sudah deprecated di Next.js 16) hanya untuk: slide pertama HeroProofPanel di S-01 (`sizes="(min-width:1024px) 560px, 100vw"`) dan kartu pertama di S-02. Slide panel ke-2 dan ke-3 dirender dengan `loading="lazy"` + `fetchPriority="low"` dan elemen `<img>`-nya baru dipasang setelah `requestIdleCallback` (fallback `setTimeout` 2 s), paling lambat sebelum rotasi pertama.
 
 ### Analytics & consent (implementasi F8)
 
@@ -350,7 +351,7 @@ Semua motion mengikuti tabel Motion di PRD bagian 8. Keyframes dan aturan motion
 
 ## 9. Environment variables & konfigurasi
 
-Semua variabel divalidasi oleh `lib/env.ts` (Zod) dalam 5 kelompok: site, database, admin, Cloudinary, analytics. Setiap kelompok dicek saat pertama dipakai (`databaseEnv()`, `adminEnv()`, dst.), supaya `next build` di CI dan development lokal tetap jalan tanpa semua secret. Di server produksi, `instrumentation.ts` memanggil `assertServerEnv()` saat start untuk kelompok di `REQUIRED_AT_START`: variabel wajib yang hilang membuat app gagal start dengan pesan jelas yang menyebut semua variabel bermasalah per kelompok (tanpa menampilkan nilainya), bukan error acak saat runtime. `REQUIRED_AT_START` hanya berisi kelompok yang fiturnya sudah dibangun: `site`, `database`, `analytics` (opsional, tapi ID yang salah format ditolak). Kelompok khusus admin (`CHECKED_AT_START`: `admin`, nanti juga kelompok penyimpanan gambar) dicek saat start tapi **hanya dicatat** (`[env] admin login disabled until fixed: …`): kesalahan di secret admin menonaktifkan login admin (`503 ADMIN_NOT_CONFIGURED`), bukan seluruh situs publik (NFR Ketersediaan). Deploy juga tidak pernah perlu mengisi nilai palsu untuk fitur yang belum ada. `SKIP_ENV_VALIDATION=1` hanya untuk mencoba build produksi di lokal; jangan pernah diset di Hostinger.
+Semua variabel divalidasi oleh `lib/env.ts` (Zod) dalam 4 kelompok: site, database, admin, analytics (gambar di MySQL tidak butuh env tambahan). Setiap kelompok dicek saat pertama dipakai (`databaseEnv()`, `adminEnv()`, dst.), supaya `next build` di CI dan development lokal tetap jalan tanpa semua secret. Di server produksi, `instrumentation.ts` memanggil `assertServerEnv()` saat start untuk kelompok di `REQUIRED_AT_START`: variabel wajib yang hilang membuat app gagal start dengan pesan jelas yang menyebut semua variabel bermasalah per kelompok (tanpa menampilkan nilainya), bukan error acak saat runtime. `REQUIRED_AT_START` hanya berisi kelompok yang fiturnya sudah dibangun: `site`, `database`, `analytics` (opsional, tapi ID yang salah format ditolak). Kelompok khusus admin (`CHECKED_AT_START`: `admin`) dicek saat start tapi **hanya dicatat** (`[env] admin login disabled until fixed: …`): kesalahan di secret admin menonaktifkan login admin (`503 ADMIN_NOT_CONFIGURED`), bukan seluruh situs publik (NFR Ketersediaan). Deploy juga tidak pernah perlu mengisi nilai palsu untuk fitur yang belum ada. `SKIP_ENV_VALIDATION=1` hanya untuk mencoba build produksi di lokal; jangan pernah diset di Hostinger.
 
 | Variabel | Contoh / format | Wajib | Publik? | Keterangan |
 | --- | --- | --- | --- | --- |
@@ -361,15 +362,13 @@ Semua variabel divalidasi oleh `lib/env.ts` (Zod) dalam 5 kelompok: site, databa
 | `ADMIN_EMAIL` | `rifaldi@rifaldiradya.com` | ya | tidak | Email login admin |
 | `ADMIN_PASSWORD_HASH` | hash bcrypt cost 12, **di-encode base64** (tanpa `$`) | ya (admin) | tidak | Dibuat dengan `npm run hash-password` di terminal sendiri (input tersembunyi). Base64 karena `$` pada hash mentah dianggap referensi variabel di file `.env` (dotenv-expand) dan bisa merusak hash; hash mentah `$2b$…` tetap diterima |
 | `RATE_LIMIT_SALT` | string acak 32+ karakter | ya | tidak | Untuk hash IP |
-| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | nama cloud | ya | ya | Dipakai loader gambar dan upload server (bukan secret); cukup satu variabel |
-| `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | dari dashboard Cloudinary | ya | tidak | Hanya di server |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | `G-XXXXXXXXXX` | tidak | ya | Kosong → komponen analytics & banner consent tidak dirender (berguna di dev) |
 | `NODE_ENV` | `production` | otomatis | — | Diset platform |
 
 - Di Hostinger: isi lewat pengaturan environment variables app Node.js, lalu **restart app** (env tidak di-reload otomatis). Variabel `NEXT_PUBLIC_*` dibaca saat **build**, jadi setelah mengubahnya perlu redeploy, bukan hanya restart.
 - Lokal: `.env.local` (tidak di-commit). `.env.example` berisi semua nama variabel tanpa nilai.
 - Konfigurasi non-secret di `lib/site-config.ts` (di-commit, bukan env): `availableForWork: boolean` (mengatur item "Available for new projects" di MetaRow; nilai awal `true`, diputuskan 28 Sep 2026), `timezoneLabel: 'GMT+7'` (dikonfirmasi 28 Sep 2026; dipakai blok fakta About lewat interpolasi kamus), dan `social: { linkedin: 'https://www.linkedin.com/in/rifaldi-radya-070a44174/' }` (dipakai link footer dan `sameAs` JSON-LD `Person`). Mengubahnya = commit + deploy (beberapa menit); sengaja tidak dimasukkan ke admin supaya scope v1 tidak bertambah.
-- `next.config.ts`: `images.loader: 'custom'`, `images.loaderFile: './lib/images/loader.ts'`, `images.remotePatterns` untuk `res.cloudinary.com`, `headers()` keamanan (bagian 6), `poweredByHeader: false`, `reactStrictMode: true`.
+- `next.config.ts`: `images.loader: 'custom'`, `images.loaderFile: './lib/images/loader.ts'`, `deviceSizes` = lebar tersimpan, `headers()` keamanan (bagian 6), `poweredByHeader: false`, `reactStrictMode: true`.
 - `package.json` (`"type": "module"`) scripts: `dev`, `build`, `start` (`next start`; migrasi berjalan otomatis di `instrumentation.ts`; Next.js membaca `PORT` dari env Hostinger), `lint`, `typecheck`, `test`, `test:e2e`, `db:generate`, `db:migrate`, `hash-password`.
 
 ## 10. Deploy ke Hostinger via GitHub
@@ -381,7 +380,6 @@ Alurnya: kode di GitHub → Hostinger menarik repo → install, build, start oto
 - [ ] **Cek domain utama di hPanel → Websites.** Jika rifaldiradya.com masih terpasang sebagai website (mis. WordPress), jangan dihapus dulu. Backup file + database WordPress lewat hPanel, dan pastikan subdomain `staging0`/`staging1` terdaftar sebagai website terpisah yang tidak ikut terhapus.
 - [ ] Buat repo GitHub private, push skeleton Next.js yang sudah bisa `npm run build` di lokal.
 - [ ] hPanel → Databases: buat database MySQL + user khusus app; catat nama, user, password.
-- [ ] Buat akun Cloudinary (free), catat cloud name, API key, API secret.
 - [ ] Buat property GA4, catat Measurement ID.
 - [ ] Generate `ADMIN_PASSWORD_HASH` di lokal.
 
@@ -392,7 +390,7 @@ Alurnya: kode di GitHub → Hostinger menarik repo → install, build, start oto
 3. Pakai subdomain uji: **`devstaging.rifaldiradya.com`** (dipilih 28 Sep 2026), dengan `SITE_URL=https://devstaging.rifaldiradya.com`.
 4. Isi environment variable kelompok yang sudah wajib (`REQUIRED_AT_START`, bagian 9), lalu Deploy. Output directory `.next`, package manager npm.
 5. Pantau build log. Jika gagal: cek versi Node, script `package.json`, dan dependency native (App Flow melarang yang native). `TurbopackInternalError … node process exited` = build berjalan dengan Turbopack; pastikan script `build` masih `next build --webpack`.
-6. Verifikasi (bertahap sesuai fitur yang sudah ada): halaman publik tampil, migrasi membuat 3 tabel; nanti `/admin/login` bisa login (T-13), upload ke Cloudinary berhasil (T-16), revalidasi bekerja (T-15).
+6. Verifikasi (bertahap sesuai fitur yang sudah ada): halaman publik tampil, migrasi membuat tabel; `/admin/login` bisa login (T-13), upload gambar + tampil dari `/media` (T-16), revalidasi bekerja (T-15).
 
 ### Pindah ke domain utama (Fase 4)
 
@@ -421,7 +419,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 | --- | --- | --- | --- |
 | Unit | Vitest | Skema Zod project (semua aturan App Flow bagian 6 & 9), `slugify` + penanganan bentrok, `localePath`/`altPath` untuk semua route, aturan `proxy.ts` (matcher, www → non-www, `/en`, guard admin, rewrite locale, header `x-locale`; memakai helper `next/experimental/testing/server`), kesamaan key `en.json` vs `id.json`, `richText` (tag yang diizinkan, tag seimbang, tag asing jadi teks), rate-limit window, builder metadata (canonical + hreflang) | Setiap PR (CI) |
 | Integrasi | Vitest + MySQL Docker | Query publik hanya mengembalikan `published=true` dengan urutan benar; create/update/delete project; sesi login/expired/logout | Setiap PR (CI, service MySQL) |
-| E2E smoke | Playwright (Chromium + WebKit mobile 375 px) | UF-01, UF-02, UF-04, UF-05, UF-06, UF-07 (dengan Cloudinary di-mock), UF-09; HeroProofPanel (berganti setelah 6 s, klik 02 pindah slide, pause menghentikan rotasi, `reducedMotion: 'reduce'` tidak berotasi, 0/1 featured sesuai E-21/E-22); axe accessibility scan di S-01 dan S-02 | Sebelum merge fitur besar + sebelum launch |
+| E2E smoke | Playwright (Chromium + WebKit mobile 375 px) | UF-01, UF-02, UF-04, UF-05, UF-06, UF-07 (upload gambar nyata ke DB uji), UF-09; HeroProofPanel (berganti setelah 6 s, klik 02 pindah slide, pause menghentikan rotasi, `reducedMotion: 'reduce'` tidak berotasi, 0/1 featured sesuai E-21/E-22); axe accessibility scan di S-01 dan S-02 | Sebelum merge fitur besar + sebelum launch |
 | Build | `next build` | Build sukses tanpa koneksi DB | Setiap PR (CI) |
 
 ### Checklist QA manual sebelum launch
@@ -457,7 +455,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 
 - [x] **T-07** Layout publik: Navbar (responsif), Footer (CTA email + Copy), skip link.
 - [x] **T-08** S-01 Hero kolom kiri (BylineBadge dengan inisial fallback, H1 dengan `richText`, MetaRow + `site-config`) + tekstur grid + SectionHeader + ServiceTile dua tier + ProcessSteps + About (lead, `<mark>`, AboutFacts) + FooterCta, copy dari kamus.
-- [x] **T-09** `getPublishedProjects()` + turunan `selectHomepageProjects()` (featured maks. 3, grid maks. 6 + total) + ProjectCard + Selected work + EmptyState + HeroProofPanel (rotasi, kontrol, E-21 s.d. E-24, pemuatan gambar bertahap); loader Cloudinary.
+- [x] **T-09** `getPublishedProjects()` + turunan `selectHomepageProjects()` (featured maks. 3, grid maks. 6 + total) + ProjectCard + Selected work + EmptyState + HeroProofPanel (rotasi, kontrol, E-21 s.d. E-24, pemuatan gambar bertahap); loader Cloudinary (diganti loader `/media` di T-16).
 - [x] **T-10** S-02 Work, S-03 Privacy, S-04 not-found per locale.
 - [ ] **T-11** O-01 toggle + O-02 banner saran bahasa + cookie `lang_pref`.
 - [ ] **T-12** SEO: `buildMetadata`, JSON-LD, `sitemap.ts`, `robots.ts`, gambar OG.
@@ -467,7 +465,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 - [x] **T-13** Auth: API-01/02, `requireAdmin`, rate limit (per IP + global), `scripts/hash-password`, S-10; kelompok env `admin` dicek saat start sebagai peringatan (`CHECKED_AT_START`), bukan syarat start; login memvalidasi `next` hanya ke `/admin*`.
 - [x] **T-14** S-11 daftar project (tabel ≥ 768 px, kartu di mobile) + layout admin G3, info featured/grid + peringatan E-08, Toast (`?notice=`), error boundary admin.
 - [x] **T-15** Skema Zod bersama (`lib/projects/validation.ts`) + API-03/04 + `revalidate.ts`; revalidasi diverifikasi di `next start` (4 halaman berubah di kunjungan pertama setelah simpan).
-- [ ] **T-16** ImageUploader + API-06/07 + integrasi Cloudinary; tambahkan `"cloudinary"` ke `REQUIRED_AT_START` di `lib/env.ts`.
+- [x] **T-16** Penyimpanan gambar di MySQL (tabel `images` + `image_variants`, migrasi 0002), kompresi di browser, API-06/07, route `/media`, loader; ImageUploader (dipasang di form T-17); kelompok env Cloudinary dihapus.
 - [ ] **T-17** S-12/S-13 ProjectForm lengkap (validasi, dialog discard, `beforeunload`) + API-05 hapus + ConfirmDialog.
 - [ ] **T-18** Test integrasi + e2e UF-06, UF-07, UF-09.
 
@@ -500,9 +498,9 @@ Kalau semuanya tidak menjawab: BERHENTI dan tanya. Jangan mengarang.
 - Tidak ada dependency baru tanpa izin; tidak ada dependency native.
 - Tidak ada auto-redirect bahasa; locale hanya dari URL.
 - Tidak ada GA4/cookie analytics sebelum consent=granted.
-- Tidak ada gambar di filesystem server; semua lewat Cloudinary.
+- Tidak ada gambar di filesystem server; gambar project di MySQL (`lib/images`).
 - Tidak ada teks UI hardcode; semua dari i18n/en.json dan i18n/id.json.
-- Akses DB hanya di lib/projects dan lib/auth.
+- Akses DB hanya di lib/projects, lib/images, dan lib/auth.
 - Jangan menambah layar, field, fitur, atau library di luar docs.
 - Animasi hanya yang ada di tabel Motion PRD; hanya CSS kecuali rotasi HeroProofPanel; tanpa fade-in di H1/subheadline/panel hero.
 - String kamus dengan penanda (<hl>, <dim>, <mark>, <strong>) dirender lewat richText(), jangan dangerouslySetInnerHTML.
@@ -517,7 +515,7 @@ Kalau semuanya tidak menjawab: BERHENTI dan tanya. Jangan mengarang.
 
 ### Pola prompt per task
 
-> Kerjakan **T-09** dari docs/SDD.md bagian 12. Rujukan: App Flow S-01 (Selected work), ProjectCard, E-01, E-03, E-05; SDD bagian 3 (loader Cloudinary). Tulis rencana dulu, tunggu persetujuan, lalu implementasi. Jangan ubah file di luar `components/site`, `lib/projects`, `lib/images`, `app/[lang]/page.tsx`.
+> Kerjakan **T-09** dari docs/SDD.md bagian 12. Rujukan: App Flow S-01 (Selected work), ProjectCard, E-01, E-03, E-05; SDD bagian 3 (loader gambar). Tulis rencana dulu, tunggu persetujuan, lalu implementasi. Jangan ubah file di luar `components/site`, `lib/projects`, `lib/images`, `app/[lang]/page.tsx`.
 
 ### Definisi selesai (per task)
 
@@ -553,4 +551,3 @@ Empat hal perlu dijawab atau diuji sebelum/selama Fase 1; sisanya sudah dikunci.
 - [Hostinger — integrasi GitHub dan build otomatis](https://docs.hostinger.com/node.js/github)
 - [Hostinger — database MySQL dan host 127.0.0.1](https://docs.hostinger.com/websites/databases)
 - [Hostinger — menghubungkan MySQL ke app Node.js](https://www.hostinger.com/support/connecting-a-hostinger-mysql-database-to-a-node-js-application/)
-- [Cloudinary — cara kerja kredit](https://cloudinary.com/documentation/developer_onboarding_faq_credits)

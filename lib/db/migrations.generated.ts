@@ -16,5 +16,11 @@ export const embeddedMigrations: readonly {
     "when": 1790603131475,
     "breakpoints": true,
     "sql": "-- Force utf8mb4_unicode_ci regardless of the server/database default (SDD section 3).\nALTER TABLE `projects` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\n--> statement-breakpoint\nALTER TABLE `admin_sessions` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\n--> statement-breakpoint\nALTER TABLE `login_attempts` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\n"
+  },
+  {
+    "tag": "0002_images",
+    "when": 1790693601814,
+    "breakpoints": true,
+    "sql": "-- Explicit charset (SDD section 3): utf8mb4_unicode_ci regardless of the database default.\nCREATE TABLE `image_variants` (\n\t`image_id` varchar(26) NOT NULL,\n\t`width` smallint unsigned NOT NULL,\n\t`height` smallint unsigned NOT NULL,\n\t`bytes` mediumblob NOT NULL,\n\tCONSTRAINT `image_variants_image_id_width_pk` PRIMARY KEY(`image_id`,`width`)\n) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n--> statement-breakpoint\nCREATE TABLE `images` (\n\t`id` varchar(26) NOT NULL,\n\t`format` varchar(4) NOT NULL,\n\t`width` smallint unsigned NOT NULL,\n\t`height` smallint unsigned NOT NULL,\n\t`created_at` datetime(3) NOT NULL,\n\tCONSTRAINT `images_id` PRIMARY KEY(`id`)\n) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n--> statement-breakpoint\nALTER TABLE `image_variants` ADD CONSTRAINT `image_variants_image_id_images_id_fk` FOREIGN KEY (`image_id`) REFERENCES `images`(`id`) ON DELETE cascade ON UPDATE no action;"
   }
 ];
