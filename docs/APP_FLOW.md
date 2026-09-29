@@ -106,7 +106,7 @@ Urutan section tetap; tidak boleh ada section tambahan. Section 2–5 diawali Se
 | Caption | `title_{locale}` | `[hero.proofLabel]` "Latest work" · judul project aktif · link `[card.visitShort]` "Visit" + ikon ↗ ke `live_url` (tab baru). |
 | Kontrol | statis | Tombol `01`, `02`, `03` (`aria-pressed` = aktif) masing-masing dengan progress bar; tombol pause/play ikon dengan `aria-label` `[slider.pause]` / `[slider.play]`. Kontrol berada di luar elemen `<a>`. |
 | Rotasi | client | Ganti ke project berikutnya setiap 6 detik (berputar kembali ke 01). Klik tombol nomor → langsung ke project itu dan timer mulai ulang. Hover atau fokus di dalam panel → jeda; pause → berhenti sampai play. `prefers-reduced-motion: reduce` → tidak ada rotasi otomatis, progress bar tampil penuh. Tidak ada `aria-live` (pergantian tidak diumumkan screen reader). |
-| Gambar | Cloudinary | Gambar slide 1 dimuat prioritas (kandidat LCP desktop), `sizes="(min-width:1024px) 560px, 100vw"`. Gambar slide 2–3 dimuat setelah halaman idle, paling lambat sebelum rotasi pertama. Ruang frame dicadangkan dengan `aspect-ratio` (anti-CLS). |
+| Gambar | `/media` (MySQL) | Gambar slide 1 dimuat prioritas (kandidat LCP desktop), `sizes="(min-width:1024px) 560px, 100vw"`. Gambar slide 2–3 dimuat setelah halaman idle, paling lambat sebelum rotasi pertama. Ruang frame dicadangkan dengan `aspect-ratio` (anti-CLS). |
 | Analytics | — | Klik frame atau link Visit → `project_link_click` dengan `placement: hero_panel`. |
 
 **ProjectCard (dipakai di S-01 dan S-02)**
@@ -204,7 +204,7 @@ Form yang sama. S-13 terisi data dan punya zona hapus.
 | 4 | Summary (ID) | textarea + counter | wajib, 1–160 karakter | — |
 | 5 | Live URL | url | wajib, `https://`, URL valid, maks 300 | "Opens in a new tab on the site" |
 | 6 | Tags | input chip (Enter/koma untuk tambah) | 0–4 tag, tiap tag 1–24 karakter, unik | Contoh: Next.js, Tailwind |
-| 7 | Thumbnail | ImageUploader (drag/drop + pilih file) + preview 16:10 | JPG/PNG/WebP, ≤ 5 MB, min 1200 px lebar; wajib jika Published = on | "Recommended 1600 × 1000" |
+| 7 | Thumbnail | ImageUploader (drag/drop + pilih file) + preview 16:10 | JPG/PNG/WebP, ≤ 5 MB, min 1200 px lebar; dicrop 16:10 (dari atas untuk screenshot tinggi); wajib jika Published = on | "Recommended 1600 × 1000" |
 | 8 | Thumbnail alt (EN) | text | wajib jika ada thumbnail, 1–140 | Deskripsikan isi gambar |
 | 9 | Thumbnail alt (ID) | text | wajib jika ada thumbnail, 1–140 | — |
 | 10 | Sort order | number | integer 0–999, default 100 | "Lower shows first" |
@@ -215,7 +215,7 @@ Form yang sama. S-13 terisi data dan punya zona hapus.
 - Tombol bawah (sticky di mobile): "Save" primer + "Cancel" sekunder. Save disabled saat upload berjalan.
 - Validasi client saat blur + validasi server saat submit; pesan error di bawah field, menyebut cara memperbaiki (bagian 11). Saat submit gagal, fokus pindah ke field error pertama dan ringkasan error muncul di atas form.
 - Cancel dengan perubahan belum disimpan → dialog "Discard changes?" (Discard / Keep editing). Navigasi browser keluar juga memicu peringatan `beforeunload`.
-- ImageUploader: pilih file → validasi tipe & ukuran di client → upload langsung (API-06) dengan progress bar → preview → tombol "Replace" dan "Remove". Gambar lama di storage baru dihapus setelah project berhasil disimpan dengan gambar baru.
+- ImageUploader: pilih file → validasi tipe & ukuran di client → kompres di browser (crop 16:10, 4 lebar WebP) → upload langsung (API-06) dengan progress bar → preview → tombol "Replace" dan "Remove". Gambar lama di storage baru dihapus setelah project berhasil disimpan dengan gambar baru.
 - **Zona hapus (S-13 saja):** di paling bawah, dipisah garis, tombol merah "Delete project" → ConfirmDialog "Delete {title EN}? This removes it from the site and deletes its image. This can't be undone." (Delete / Cancel). Fokus awal di Cancel.
 
 ## 7. User flows
@@ -393,8 +393,8 @@ Hanya admin yang menulis data; halaman publik membaca langsung di server saat re
 | API-03 | `POST /api/admin/projects` | `ProjectInput` | `201 { project, revalidated: boolean }` | `401` · `422 VALIDATION_FAILED` + `fields` · `500 SERVER_ERROR` |
 | API-04 | `PATCH /api/admin/projects/:id` | `ProjectInput` parsial | `200 { project, revalidated }` | `401` · `404 NOT_FOUND` · `422` · `500` |
 | API-05 | `DELETE /api/admin/projects/:id` | — | `200 { revalidated }` (gambar ikut dihapus) | `401` · `404` · `500` |
-| API-06 | `POST /api/admin/uploads` | multipart `file` | `201 { public_id, url, width, height }` | `401` · `413 FILE_TOO_LARGE` · `415 UNSUPPORTED_TYPE` · `422 IMAGE_TOO_SMALL` · `502 UPLOAD_FAILED` |
-| API-07 | `DELETE /api/admin/uploads/:public_id` | — | `204` | `401` · `404` (dianggap sukses oleh UI) |
+| API-06 | `POST /api/admin/uploads` | multipart: 1–4 bagian `variant` (lebar hasil kompresi browser dari satu gambar) | `201 { public_id, url, width, height }` | `401` · `413 FILE_TOO_LARGE` · `415 UNSUPPORTED_TYPE` · `422 IMAGE_TOO_SMALL` / `VALIDATION_FAILED` · `502 UPLOAD_FAILED` |
+| API-07 | `DELETE /api/admin/uploads/:public_id` | — | `204` | `401` · `404` (dianggap sukses oleh UI) · `409 IMAGE_IN_USE` (gambar dipakai project tersimpan; tidak dihapus) |
 
 **`ProjectInput`**
 
@@ -410,7 +410,7 @@ Hanya admin yang menulis data; halaman publik membaca langsung di server saat re
 }
 ```
 
-- `thumbnail` boleh `null` saat `published = false`.
+- `thumbnail` boleh `null` saat `published = false`. Server hanya memakai `thumbnail.public_id`; `url`, `width`, `height` diambil dari penyimpanan gambar. `public_id` yang sudah tidak ada → `422` dengan pesan di field `thumbnail`.
 - `revalidated: false` → UI menampilkan E-19.
 - API-07 dipanggil saat user klik Remove/Replace pada gambar yang belum pernah tersimpan, atau Cancel form dengan upload baru. Gambar yang sudah tersimpan hanya dihapus lewat API-04/05.
 - Daftar project di S-11 dan data S-13 dibaca langsung di server (bukan lewat endpoint publik), tetap dilindungi sesi.

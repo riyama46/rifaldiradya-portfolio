@@ -44,12 +44,6 @@ const adminSchema = z.object({
     .min(32, "must be at least 32 random characters"),
 });
 
-const cloudinarySchema = z.object({
-  NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: required(),
-  CLOUDINARY_API_KEY: required(),
-  CLOUDINARY_API_SECRET: required(),
-});
-
 const analyticsSchema = z.object({
   NEXT_PUBLIC_GA_MEASUREMENT_ID: z
     .string()
@@ -78,7 +72,6 @@ function parse<S extends z.ZodType>(group: string, schema: S, source: Source): z
 export const parseSiteEnv = (source: Source) => parse("site", siteSchema, source);
 export const parseDatabaseEnv = (source: Source) => parse("database", databaseSchema, source);
 export const parseAdminEnv = (source: Source) => parse("admin", adminSchema, source);
-export const parseCloudinaryEnv = (source: Source) => parse("Cloudinary", cloudinarySchema, source);
 export const parseAnalyticsEnv = (source: Source) => parse("analytics", analyticsSchema, source);
 
 function cached<T>(load: () => T): () => T {
@@ -89,14 +82,12 @@ function cached<T>(load: () => T): () => T {
 export const siteEnv = cached(() => parseSiteEnv(process.env));
 export const databaseEnv = cached(() => parseDatabaseEnv(process.env));
 export const adminEnv = cached(() => parseAdminEnv(process.env));
-export const cloudinaryEnv = cached(() => parseCloudinaryEnv(process.env));
 export const analyticsEnv = cached(() => parseAnalyticsEnv(process.env));
 
 const groupParsers = {
   site: parseSiteEnv,
   database: parseDatabaseEnv,
   admin: parseAdminEnv,
-  cloudinary: parseCloudinaryEnv,
   analytics: parseAnalyticsEnv,
 };
 

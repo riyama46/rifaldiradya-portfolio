@@ -1,11 +1,13 @@
 import { eq, like, or } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { projects, type Project } from "@/lib/db/schema";
+import { mediaUrl } from "@/lib/images/rules";
+import { deleteImageIfUnused, getImage } from "@/lib/images/store";
 import { getProjectById } from "./queries";
 import { slugify, uniqueSlug } from "./slug";
 import type { ProjectInput, ProjectInputRaw } from "./validation";
 
-// Writes for API-03/04 (SDD section 4: DB access stays in lib/projects and lib/auth).
+// Writes for API-03/04 (SDD section 4: DB access stays in lib/projects, lib/images and lib/auth).
 
 /** Stored project → ProjectInput shape, the base that API-04 merges a partial body over. */
 export function toProjectInput(project: Project): ProjectInputRaw {
@@ -105,8 +107,41 @@ export async function createProject(input: ProjectInput): Promise<Project> {
   }
 }
 
-/** API-04: the caller has already merged and validated the full input. null = project is gone. */
-export async function updateProject(id: string, input: ProjectInput): Promise<Project | null> {
-  await getDb().update(projects).set(toColumns(input)).where(eq(projects.id, id));
-  return getProjectById(id);
+/**
+ * The client only chooses *which* uploaded image to use (public_id). Its URL and size always come
+ * from the images table, never from the request. null = that image doesn't exist (anymore).
+ */
+export async function withStoredThumbnail(input: ProjectInput): Promise<ProjectInput | null> {
+  if (!input.thumbnail) return input;
+  const image = await getImage(input.thumbnail.public_id);
+  if (!image) return null;
+  return {
+    ...input,
+    thumbnail: {
+      public_id: image.id,
+      url: mediaUrl(image.id, image.format),
+      width: image.width,
+      height: image.height,
+    },
+  };
+}
+
+/**
+ * API-04: the caller has already merged and validated the full input. null = project is gone.
+ * A replaced or removed thumbnail is deleted only after the new data is saved (App Flow S-12).
+ */
+export async function updateProject(
+  existing: Project,
+  input: ProjectInput,
+): Promise<Project | null> {
+  await getDb().update(projects).set(toColumns(input)).where(eq(projects.id, existing.id));
+  const updated = await getProjectById(existing.id);
+
+  const previous = existing.thumbnailPublicId;
+  if (updated && previous && previous !== updated.thumbnailPublicId) {
+    await deleteImageIfUnused(previous).catch((error: Error) =>
+      console.error("[images] old thumbnail cleanup failed:", error.message),
+    );
+  }
+  return updated;
 }

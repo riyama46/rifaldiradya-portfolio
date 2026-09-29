@@ -48,7 +48,7 @@ Database produksi (Hostinger) tidak pernah dipakai untuk development.
 app/          Route Next.js: publik di app/[lang] (en | id), 404 di app/global-not-found.tsx
 components/   ui/ (primitif: Button, Badge, Toast, StatusDot, ArrowIcon), site/, overlays/, admin/ (layar admin)
 i18n/         Kamus en.json + id.json, helper locale (index.ts), richText (rich.tsx)
-lib/          Helper bersama (fonts, cn, env, header locale) + db/ (skema, klien); auth, projects menyusul
+lib/          Helper bersama (fonts, cn, env, header locale), db/ (skema, klien, migrasi), auth/, projects/, images/ (gambar di MySQL)
 drizzle/      File migrasi SQL (dibuat dengan npm run db:generate)
 scripts/      Script Node (migrate.mts)
 styles/       globals.css: token desain, Tailwind, motion

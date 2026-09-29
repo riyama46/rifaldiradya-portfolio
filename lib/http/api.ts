@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-// Error shape and codes from App Flow section 10 (+ ADMIN_NOT_CONFIGURED, see DECISIONS T-13).
+// Error shape and codes from App Flow section 10 (+ ADMIN_NOT_CONFIGURED, IMAGE_IN_USE: DECISIONS).
 export type ApiErrorCode =
   | "VALIDATION_FAILED"
   | "INVALID_CREDENTIALS"
@@ -9,7 +9,12 @@ export type ApiErrorCode =
   | "FORBIDDEN_ORIGIN"
   | "NOT_FOUND"
   | "SERVER_ERROR"
-  | "ADMIN_NOT_CONFIGURED";
+  | "ADMIN_NOT_CONFIGURED"
+  | "FILE_TOO_LARGE"
+  | "UNSUPPORTED_TYPE"
+  | "IMAGE_TOO_SMALL"
+  | "UPLOAD_FAILED"
+  | "IMAGE_IN_USE";
 
 type ErrorExtras = { fields?: Record<string, string>; retryAfterSeconds?: number };
 

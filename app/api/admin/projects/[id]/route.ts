@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { guardAdminWrite } from "@/lib/auth/guard";
 import { apiError, readJsonBody } from "@/lib/http/api";
-import { toProjectInput, toProjectJson, updateProject } from "@/lib/projects/mutations";
+import { missingImage } from "@/lib/projects/errors";
+import {
+  toProjectInput,
+  toProjectJson,
+  updateProject,
+  withStoredThumbnail,
+} from "@/lib/projects/mutations";
 import { getProjectById } from "@/lib/projects/queries";
 import { fieldErrors, pickProjectFields, projectInputSchema } from "@/lib/projects/validation";
 import { revalidatePublicPages } from "@/lib/revalidate";
@@ -35,7 +41,9 @@ export async function PATCH(request: Request, ctx: RouteContext<"/api/admin/proj
       });
     }
 
-    const project = await updateProject(id, parsed.data);
+    const input = await withStoredThumbnail(parsed.data);
+    if (!input) return missingImage();
+    const project = await updateProject(existing, input);
     if (!project) return notFound(); // deleted in another tab meanwhile (E-14)
 
     const revalidated = revalidatePublicPages();

@@ -431,7 +431,7 @@ SEO v1 = level **standard**: fondasi teknis yang benar untuk 2 bahasa, on-page p
 | Deploy | Push ke GitHub → Hostinger GitHub integration build otomatis (install → build → start) setiap push ke branch `main` | Final |
 | Domain | rifaldiradya.com (sudah dimiliki); project demo di `staging0.` dan `staging1.rifaldiradya.com` | Final |
 | Email | hello@rifaldiradya.com (public), rifaldi@rifaldiradya.com (primer) | Final |
-| Penyimpanan gambar | Storage eksternal (kandidat: Cloudinary free tier), bukan filesystem server, supaya aman dari redeploy | Final prinsipnya; vendor dikunci di SDD |
+| Penyimpanan gambar | Bukan filesystem server, supaya aman dari redeploy. Dikunci: MySQL Hostinger, dikompres di browser admin (16:10, WebP, 4 lebar) | Final (29 Sep 2026, tanpa vendor pihak ketiga) |
 | Database | Database terkelola kecil untuk data project + akun admin (kandidat dibandingkan di SDD: MySQL bawaan Hostinger vs Postgres terkelola seperti Supabase/Neon) | Diputuskan di SDD |
 | Analytics | Google Analytics 4 + Consent Mode v2 | Final |
 | Font | Space Grotesk + IBM Plex Sans, self-host via `next/font` | Final |

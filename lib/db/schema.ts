@@ -2,11 +2,13 @@ import {
   bigint,
   boolean,
   char,
+  customType,
   datetime,
   index,
   int,
   json,
   mysqlTable,
+  primaryKey,
   smallint,
   varchar,
 } from "drizzle-orm/mysql-core";
@@ -88,6 +90,37 @@ export const loginAttempts = mysqlTable(
   (table) => [index("login_attempts_ip_created_idx").on(table.ipHash, table.createdAt)],
 );
 
+// Project thumbnails live in MySQL (DECISIONS 2026-09-29): one row per upload, one variant row per
+// width. Images are immutable; replacing a thumbnail uploads a new image and deletes the old one.
+const mediumBlob = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType: () => "mediumblob",
+});
+
+export const images = mysqlTable("images", {
+  id: varchar("id", { length: 26 })
+    .primaryKey()
+    .$defaultFn(() => ulid()),
+  format: varchar("format", { length: 4, enum: ["webp", "jpeg"] }).notNull(),
+  // Size of the largest variant; the thumbnail width/height stored on a project.
+  width: smallint("width", { unsigned: true }).notNull(),
+  height: smallint("height", { unsigned: true }).notNull(),
+  createdAt: createdAt(),
+});
+
+export const imageVariants = mysqlTable(
+  "image_variants",
+  {
+    imageId: varchar("image_id", { length: 26 })
+      .notNull()
+      .references(() => images.id, { onDelete: "cascade" }),
+    width: smallint("width", { unsigned: true }).notNull(),
+    height: smallint("height", { unsigned: true }).notNull(),
+    bytes: mediumBlob("bytes").notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.imageId, table.width] })],
+);
+
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 export type AdminSession = typeof adminSessions.$inferSelect;
+export type Image = typeof images.$inferSelect;
