@@ -23,12 +23,31 @@ export const adminStrings = {
     network: "Couldn't reach the server. Check your connection and try again.",
     server: "Couldn't sign in right now. Try again.",
   },
+  nav: {
+    label: "Admin",
+    projects: "Projects",
+    profile: "Profile",
+  },
+  // S-14 Profile (DECISIONS T-18b): the photo in the homepage hero byline.
+  profile: {
+    title: "Profile",
+    photo: "Photo",
+    intro:
+      "Shown as a small circle next to your name at the top of the homepage. Without a photo the site shows your initials.",
+    save: "Save",
+    saving: "Saving…",
+    saved: "Profile saved",
+    savedStale: "Saved, but the site may take a few minutes to update.",
+    failed: "Couldn't save. Try again.",
+  },
   // ImageUploader (App Flow S-12 field 7, section 11 messages, E-12).
   uploader: {
     drop: "Drag an image here, or",
     choose: "choose a file",
     hint: "JPG, PNG, or WebP · at least 1200 px wide · under 5 MB · recommended 1600 × 1000",
     cropNote: "Cropped to 16:10 from the top, like the site's cards.",
+    hintAvatar: "JPG, PNG, or WebP · at least 320 × 320 px · under 5 MB",
+    cropNoteAvatar: "Cropped to a centred square and shown as a circle.",
     preparing: "Preparing image…",
     uploading: (percent: number) => `Uploading… ${percent}%`,
     replace: "Replace",
@@ -38,7 +57,8 @@ export const adminStrings = {
     errors: {
       type: "Use a JPG, PNG, or WebP image.",
       size: (megabytes: number) => `This image is ${megabytes} MB. Upload one under 5 MB.`,
-      width: (width: number) => `This image is ${width} px wide. Use one at least 1200 px wide.`,
+      width: (width: number, minimum: number) =>
+        `This image is ${width} px wide. Use one at least ${minimum} px wide.`,
       short: (height: number) =>
         `This image is only ${height} px tall. Use one at least 750 px tall for a 16:10 thumbnail.`,
       unreadable: "This file couldn't be read as an image. Try another one.",
@@ -54,7 +74,12 @@ export const adminStrings = {
     empty: "No projects yet. Add your first one to show it on the site.",
     featuredInHero: (n: number, limit: number) => `Featured in homepage hero: ${n}/${limit}`,
     featuredOverLimit: "Only the first 3 featured projects appear in the homepage hero.",
-    gridInfo: "Shown on homepage grid: first 6 published projects by sort order.",
+    gridInfo: "Shown on homepage grid: first 6 published projects in this order.",
+    orderHelp: "Use ↑ and ↓ to change the order. New projects are added at the top.",
+    moveUp: (title: string) => `Move ${title} up`,
+    moveDown: (title: string) => `Move ${title} down`,
+    moved: (title: string, position: number) => `${title} moved to position ${position}.`,
+    moveFailed: "Couldn't change the order. Try again.",
     published: "Published",
     draft: "Draft",
     featured: "Featured",
@@ -64,11 +89,12 @@ export const adminStrings = {
       thumbnail: "Thumbnail",
       title: "Title",
       status: "Status",
-      order: "Order",
+      order: "#",
+      reorder: "Reorder",
       updated: "Updated",
       actions: "Actions",
     },
-    order: (n: number) => `Order ${n}`,
+    order: (n: number) => `#${n}`,
     updated: (relative: string) => `Updated ${relative}`,
   },
   // S-12 / S-13 (App Flow section 6, E-11, E-13, E-16).
@@ -83,7 +109,6 @@ export const adminStrings = {
       live_url: "Opens in a new tab on the site",
       tags: "Press Enter or comma to add. Up to 4, e.g. Next.js, Tailwind",
       thumbnail_alt_en: "Describe what the image shows",
-      sort_order: "Lower shows first",
       featured: "Show in homepage hero (max 3)",
       published: "Off = draft, not shown on the site",
     },

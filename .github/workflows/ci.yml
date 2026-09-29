@@ -113,7 +113,7 @@ jobs:
           }
           tables=$(query "SELECT TABLE_NAME, TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'portfolio' AND TABLE_NAME <> '__drizzle_migrations' ORDER BY TABLE_NAME")
           echo "$tables"
-          expected=$(printf 'admin_sessions\tutf8mb4_unicode_ci\nimage_variants\tutf8mb4_unicode_ci\nimages\tutf8mb4_unicode_ci\nlogin_attempts\tutf8mb4_unicode_ci\nprojects\tutf8mb4_unicode_ci')
+          expected=$(printf 'admin_sessions\tutf8mb4_unicode_ci\nimage_variants\tutf8mb4_unicode_ci\nimages\tutf8mb4_unicode_ci\nlogin_attempts\tutf8mb4_unicode_ci\nprojects\tutf8mb4_unicode_ci\nsite_settings\tutf8mb4_unicode_ci')
           if [ "$tables" != "$expected" ]; then
             echo "::error::Unexpected tables or collation after migration"
             exit 1

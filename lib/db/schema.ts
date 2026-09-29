@@ -49,7 +49,8 @@ export const projects = mysqlTable(
     thumbnailHeight: int("thumbnail_height"),
     thumbnailAltEn: varchar("thumbnail_alt_en", { length: 140 }),
     thumbnailAltId: varchar("thumbnail_alt_id", { length: 140 }),
-    sortOrder: smallint("sort_order").notNull().default(100),
+    // Position 1…n, unique, maintained by lib/projects/mutations.ts (↑/↓ on S-11, new = 1).
+    sortOrder: smallint("sort_order").notNull().default(1),
     featured: boolean("featured").notNull().default(false),
     published: boolean("published").notNull().default(false),
     createdAt: createdAt(),
@@ -119,6 +120,13 @@ export const imageVariants = mysqlTable(
   },
   (table) => [primaryKey({ columns: [table.imageId, table.width] })],
 );
+
+// Small key/value settings edited in the admin (S-14): currently only the profile photo image id.
+export const siteSettings = mysqlTable("site_settings", {
+  key: varchar("key", { length: 50 }).primaryKey(),
+  value: varchar("value", { length: 255 }),
+  updatedAt: updatedAt(),
+});
 
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;

@@ -3,10 +3,18 @@ import { afterAll, describe, expect, it } from "vitest";
 import { getDb } from "@/lib/db/client";
 import { images, projects } from "@/lib/db/schema";
 import { mediaUrl } from "@/lib/images/rules";
-import { deleteOrphanImages, getImage, getVariant, saveImage } from "@/lib/images/store";
+import {
+  deleteOrphanImages,
+  getImage,
+  getProfilePhoto,
+  getVariant,
+  saveImage,
+  setProfilePhoto,
+} from "@/lib/images/store";
 import {
   createProject,
   deleteProject,
+  moveProject,
   toProjectInput,
   updateProject,
   withStoredThumbnail,
@@ -42,44 +50,100 @@ async function newImage() {
   return image;
 }
 
-const ours = (list: { titleEn: string }[]) => list.filter((p) => p.titleEn.startsWith(run));
+const ours = <T extends { titleEn: string }>(list: T[]) =>
+  list.filter((p) => p.titleEn.startsWith(run));
 const pause = () => new Promise((resolve) => setTimeout(resolve, 10));
 
+const names = async () =>
+  ours(await getAllProjects()).map((p) => [p.titleEn.slice(run.length + 1), p.sortOrder] as const);
+
+/** Positions of the whole table must always be exactly 1…n. */
+async function expectCompactPositions() {
+  const all = await getAllProjects();
+  expect(all.map((p) => p.sortOrder)).toEqual(all.map((_, i) => i + 1));
+}
+
+let profilePhotoBefore: string | null = null;
+
 afterAll(async () => {
-  const db = getDb();
-  await db.delete(projects).where(like(projects.titleEn, `${run}%`));
-  for (const id of createdImages) await db.delete(images).where(eq(images.id, id));
+  // deleteProject closes position gaps, so the local sample data keeps positions 1…n.
+  const left = await getDb()
+    .select()
+    .from(projects)
+    .where(like(projects.titleEn, `${run}%`));
+  for (const project of left) await deleteProject((await getProjectById(project.id))!);
+  await setProfilePhoto(profilePhotoBefore);
+  for (const id of createdImages) await getDb().delete(images).where(eq(images.id, id));
 });
 
-describe("public query (App Flow section 9)", () => {
-  it("returns only published projects, sort_order asc then newest first", async () => {
-    await createProject(input("draft first", { sort_order: 0 }));
-    const low = await createProject(input("sort 1", { sort_order: 1, published: false }));
-    await pause();
-    const olderFive = await createProject(input("sort 5 older", { sort_order: 5 }));
-    await pause();
-    const newerFive = await createProject(input("sort 5 newer", { sort_order: 5 }));
+describe("positions (T-18b: 1…n, new first, ↑/↓)", () => {
+  it("puts every new project first and keeps positions unique", async () => {
+    await createProject(input("A"));
+    await createProject(input("B"));
+    await createProject(input("C"));
+    expect(await names()).toEqual([
+      ["C", 1],
+      ["B", 2],
+      ["A", 3],
+    ]);
+    await expectCompactPositions();
+  });
 
+  it("↑/↓ swaps neighbours and does nothing past the top", async () => {
+    const [, b] = ours(await getAllProjects());
+    expect(await moveProject(b.id, "up")).toBe(1);
+    expect((await names()).map(([name]) => name)).toEqual(["B", "C", "A"]);
+    expect(await moveProject(b.id, "up")).toBe(1); // already first
+    expect(await moveProject(b.id, "down")).toBe(2);
+    expect((await names()).map(([name]) => name)).toEqual(["C", "B", "A"]);
+    expect(await moveProject("01ZZZZZZZZZZZZZZZZZZZZZZZZ", "up")).toBeNull();
+    await expectCompactPositions();
+  });
+
+  it("closes the gap when a project is deleted", async () => {
+    const [, b] = ours(await getAllProjects());
+    await deleteProject(b);
+    expect(await names()).toEqual([
+      ["C", 1],
+      ["A", 2],
+    ]);
+    await expectCompactPositions();
+  });
+
+  it("shifting positions does not count as editing the other projects (updated_at kept)", async () => {
+    const stamps = async () =>
+      Object.fromEntries((await getAllProjects()).map((p) => [p.id, p.updatedAt.getTime()]));
+    const before = await stamps();
+    await pause();
+    const extra = await createProject(input("shift probe"));
+    await moveProject(extra.id, "down");
+    await deleteProject((await getProjectById(extra.id))!);
+    const after = await stamps();
+    for (const [id, time] of Object.entries(before)) expect(after[id]).toBe(time);
+  });
+
+  it("heals duplicate positions on the next move", async () => {
+    const [c, a] = ours(await getAllProjects());
+    await getDb().update(projects).set({ sortOrder: 1 }).where(eq(projects.id, a.id)); // corrupt
+    await moveProject(c.id, "down");
+    await expectCompactPositions();
+  });
+
+  it("the public query follows positions and leaves drafts out", async () => {
     const image = await newImage();
-    const published = {
-      published: true,
-      thumbnail: { public_id: image.id, url: "/x", width: 1, height: 1 },
-      thumbnail_alt_en: "a",
-      thumbnail_alt_id: "a",
-    };
-    for (const project of [low, olderFive, newerFive]) {
-      const stored = await withStoredThumbnail(
-        projectInputSchema.parse({ ...toProjectInput(project), ...published }),
-      );
-      await updateProject(project, stored!);
-    }
-
-    const titles = ours(await getPublishedProjects()).map((p) => p.titleEn.slice(run.length + 1));
-    expect(titles).toEqual(["sort 1", "sort 5 newer", "sort 5 older"]);
-
-    const all = ours(await getAllProjects()).map((p) => p.titleEn.slice(run.length + 1));
-    expect(all[0]).toBe("draft first");
-    expect(all).toHaveLength(4);
+    const [first] = ours(await getAllProjects());
+    const stored = await withStoredThumbnail(
+      projectInputSchema.parse({
+        ...toProjectInput(first),
+        published: true,
+        thumbnail: { public_id: image.id, url: "/x", width: 1, height: 1 },
+        thumbnail_alt_en: "a",
+        thumbnail_alt_id: "a",
+      }),
+    );
+    await updateProject(first, stored!);
+    const published = ours(await getPublishedProjects());
+    expect(published.map((p) => p.id)).toEqual([first.id]);
   });
 });
 
@@ -191,5 +255,29 @@ describe("image storage", () => {
     expect(await getImage(orphan.id)).toBeNull();
     expect(await getImage(recent.id)).not.toBeNull();
     expect(await getImage(used.id)).not.toBeNull();
+  });
+});
+
+describe("profile photo (S-14)", () => {
+  it("sets, replaces (deleting the old photo), clears, and survives the orphan cleanup", async () => {
+    profilePhotoBefore = (await getProfilePhoto())?.id ?? null;
+    const square = (width: number) => ({ width, height: width, bytes: new Uint8Array([1, 2, 3]) });
+    const first = await saveImage("webp", [square(160), square(320)]);
+    const second = await saveImage("webp", [square(160), square(320)]);
+    createdImages.push(first.id, second.id);
+    const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+
+    await setProfilePhoto(first.id);
+    expect((await getProfilePhoto())?.id).toBe(first.id);
+    await getDb().update(images).set({ createdAt: twoDaysAgo }).where(eq(images.id, first.id));
+    await deleteOrphanImages();
+    expect(await getImage(first.id)).not.toBeNull(); // in use as the profile photo
+
+    await setProfilePhoto(second.id);
+    expect(await getImage(first.id)).toBeNull();
+
+    await setProfilePhoto(null);
+    expect(await getProfilePhoto()).toBeNull();
+    expect(await getImage(second.id)).toBeNull();
   });
 });

@@ -22,5 +22,11 @@ export const embeddedMigrations: readonly {
     "when": 1790693601814,
     "breakpoints": true,
     "sql": "-- Explicit charset (SDD section 3): utf8mb4_unicode_ci regardless of the database default.\nCREATE TABLE `image_variants` (\n\t`image_id` varchar(26) NOT NULL,\n\t`width` smallint unsigned NOT NULL,\n\t`height` smallint unsigned NOT NULL,\n\t`bytes` mediumblob NOT NULL,\n\tCONSTRAINT `image_variants_image_id_width_pk` PRIMARY KEY(`image_id`,`width`)\n) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n--> statement-breakpoint\nCREATE TABLE `images` (\n\t`id` varchar(26) NOT NULL,\n\t`format` varchar(4) NOT NULL,\n\t`width` smallint unsigned NOT NULL,\n\t`height` smallint unsigned NOT NULL,\n\t`created_at` datetime(3) NOT NULL,\n\tCONSTRAINT `images_id` PRIMARY KEY(`id`)\n) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n--> statement-breakpoint\nALTER TABLE `image_variants` ADD CONSTRAINT `image_variants_image_id_images_id_fk` FOREIGN KEY (`image_id`) REFERENCES `images`(`id`) ON DELETE cascade ON UPDATE no action;"
+  },
+  {
+    "tag": "0003_positions_and_settings",
+    "when": 1790697382852,
+    "breakpoints": true,
+    "sql": "-- T-18b (DECISIONS): profile photo setting + project positions 1…n without duplicates.\n-- Explicit charset (SDD section 3): utf8mb4_unicode_ci regardless of the database default.\nCREATE TABLE `site_settings` (\n\t`key` varchar(50) NOT NULL,\n\t`value` varchar(255),\n\t`updated_at` datetime(3) NOT NULL,\n\tCONSTRAINT `site_settings_key` PRIMARY KEY(`key`)\n) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n--> statement-breakpoint\nALTER TABLE `projects` MODIFY COLUMN `sort_order` smallint NOT NULL DEFAULT 1;\n--> statement-breakpoint\n-- Renumber existing projects in their current order (sort_order asc, newest first) to 1…n.\nUPDATE `projects` AS `p`\nJOIN (\n\tSELECT `id`, ROW_NUMBER() OVER (ORDER BY `sort_order` ASC, `created_at` DESC) AS `position`\n\tFROM `projects`\n) AS `ranked` ON `ranked`.`id` = `p`.`id`\nSET `p`.`sort_order` = `ranked`.`position`;\n"
   }
 ];

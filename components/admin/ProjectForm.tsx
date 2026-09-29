@@ -501,23 +501,6 @@ export function ProjectForm(props: ProjectFormProps) {
           </div>
         )}
 
-        <div className="max-w-48">
-          <Field field="sort_order" errors={errors} help={t.help.sort_order}>
-            <input
-              id="sort_order"
-              name="sort_order"
-              type="text"
-              inputMode="numeric"
-              value={values.sort_order}
-              onChange={(event) => set("sort_order", event.target.value)}
-              onBlur={blur("sort_order")}
-              aria-invalid={errors.sort_order ? true : undefined}
-              aria-describedby={describedBy("sort_order", errors, true)}
-              className={cn(inputClass, errors.sort_order ? "border-danger" : "border-border")}
-            />
-          </Field>
-        </div>
-
         <div className="grid gap-5">
           <Toggle
             id="featured"

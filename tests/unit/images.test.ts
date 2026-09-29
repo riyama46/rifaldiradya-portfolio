@@ -157,8 +157,38 @@ describe("source file checks (browser, before compressing)", () => {
       kind: "size",
       megabytes: 7.3,
     });
-    expect(checkSourceSize(1100, 2000)).toEqual({ kind: "width", width: 1100 });
+    expect(checkSourceSize(1100, 2000)).toEqual({ kind: "width", width: 1100, minimum: 1200 });
     expect(checkSourceSize(2400, 700)).toEqual({ kind: "short", height: 700 });
     expect(checkSourceSize(1920, 1080)).toBeNull();
+  });
+});
+
+describe("avatar images (S-14 profile photo)", () => {
+  const square = (width: number) => webpVp8x(width, width);
+
+  it("crops a centred square and always stores 160 and 320 px", () => {
+    expect(cropFor(3000, 4000, "avatar")).toEqual({ x: 0, y: 500, width: 3000, height: 3000 });
+    expect(cropFor(4000, 3000, "avatar")).toEqual({ x: 500, y: 0, width: 3000, height: 3000 });
+    expect(variantWidthsFor(3000, "avatar")).toEqual([160, 320]);
+    expect(heightFor(320, "avatar")).toBe(320);
+  });
+
+  it("needs a 320 px source", () => {
+    expect(checkSourceSize(300, 900, "avatar")).toEqual({
+      kind: "width",
+      width: 300,
+      minimum: 320,
+    });
+    expect(checkSourceSize(800, 300, "avatar")).toEqual({ kind: "short", height: 300 });
+    expect(checkSourceSize(320, 320, "avatar")).toBeNull();
+  });
+
+  it("the server accepts exactly 160 + 320 squares, and never a thumbnail set as an avatar", () => {
+    expect(checkVariants([square(160), square(320)], "avatar").ok).toBe(true);
+    expect(checkVariants([square(160), webpVp8x(320, 200)], "avatar").ok).toBe(false);
+    expect(checkVariants([square(160)], "avatar")).toMatchObject({ code: "IMAGE_TOO_SMALL" });
+    const thumbnail = [640, 960, 1280, 1600].map((w) => webpVp8x(w, heightFor(w)));
+    expect(checkVariants(thumbnail, "avatar").ok).toBe(false);
+    expect(checkVariants([square(160), square(320)], "thumbnail").ok).toBe(false);
   });
 });

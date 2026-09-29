@@ -2,7 +2,6 @@ import type { UploadedImage } from "@/components/admin/ImageUploader";
 import {
   fieldErrors,
   projectInputSchema,
-  SORT_ORDER_DEFAULT,
   TAG_MAX,
   TAGS_MAX,
   messages,
@@ -22,15 +21,13 @@ export type FormValues = {
   thumbnail: UploadedImage | null;
   thumbnail_alt_en: string;
   thumbnail_alt_id: string;
-  /** Kept as typed so "12a" can be reported instead of silently becoming NaN. */
-  sort_order: string;
   featured: boolean;
   published: boolean;
 };
 
 export type FieldErrors = Partial<Record<ProjectField, string>>;
 
-/** UF-07 step 1: empty, Published off, Featured off, sort order 100. */
+/** UF-07 step 1: empty, Published off, Featured off (the server places a new project first). */
 export const emptyValues: FormValues = {
   title_en: "",
   title_id: "",
@@ -41,7 +38,6 @@ export const emptyValues: FormValues = {
   thumbnail: null,
   thumbnail_alt_en: "",
   thumbnail_alt_id: "",
-  sort_order: String(SORT_ORDER_DEFAULT),
   featured: false,
   published: false,
 };
@@ -57,19 +53,14 @@ export function valuesFromInput(input: ProjectInputRaw): FormValues {
     thumbnail: input.thumbnail ?? null,
     thumbnail_alt_en: input.thumbnail_alt_en ?? "",
     thumbnail_alt_id: input.thumbnail_alt_id ?? "",
-    sort_order: String(input.sort_order ?? SORT_ORDER_DEFAULT),
     featured: input.featured ?? false,
     published: input.published ?? false,
   };
 }
 
 export function toPayload(values: FormValues): ProjectInputRaw {
-  const sort = values.sort_order.trim();
   return {
     ...values,
-    // Only plain digits become a number; anything else is sent as-is and rejected with the
-    // "whole number from 0 to 999" message instead of turning into NaN or a rounded value.
-    sort_order: (/^\d{1,4}$/.test(sort) ? Number(sort) : sort) as number,
     thumbnail_alt_en: values.thumbnail ? values.thumbnail_alt_en : null,
     thumbnail_alt_id: values.thumbnail ? values.thumbnail_alt_id : null,
   };
@@ -92,7 +83,6 @@ export const fieldOrder: ProjectField[] = [
   "thumbnail",
   "thumbnail_alt_en",
   "thumbnail_alt_id",
-  "sort_order",
   "featured",
   "published",
 ];

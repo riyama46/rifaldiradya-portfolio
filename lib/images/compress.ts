@@ -2,20 +2,22 @@ import {
   ACCEPTED_TYPES,
   cropFor,
   heightFor,
+  KINDS,
   MAX_SOURCE_BYTES,
   MAX_VARIANT_BYTES,
-  MIN_SOURCE_WIDTH,
   variantWidthsFor,
   type ImageFormat,
+  type ImageKind,
 } from "./rules";
 
-// Browser-only: turns the file the admin picked into the 16:10 widths stored in MySQL. Drawing
+// Browser-only: turns the file the admin picked into the widths stored in MySQL (16:10 thumbnail
+// or 1:1 avatar). Drawing
 // through a canvas also drops EXIF metadata (camera, GPS). No library, no server CPU.
 
 export type SourceProblem =
   | { kind: "type" }
   | { kind: "size"; megabytes: number }
-  | { kind: "width"; width: number }
+  | { kind: "width"; width: number; minimum: number }
   | { kind: "short"; height: number }
   | { kind: "unreadable" }
   | { kind: "tooLarge" };
@@ -34,10 +36,18 @@ export function checkSourceFile(file: { type: string; size: number }): SourcePro
   return null;
 }
 
-/** Checks on the decoded size: at least 1200 px wide, and tall enough for a 1200 px 16:10 crop. */
-export function checkSourceSize(width: number, height: number): SourceProblem | null {
-  if (width < MIN_SOURCE_WIDTH) return { kind: "width", width };
-  if (cropFor(width, height).width < MIN_SOURCE_WIDTH) return { kind: "short", height };
+/**
+ * Checks on the decoded size: wide enough for the kind (1200 px thumbnail, 320 px avatar), and tall
+ * enough that the crop keeps that width.
+ */
+export function checkSourceSize(
+  width: number,
+  height: number,
+  kind: ImageKind = "thumbnail",
+): SourceProblem | null {
+  const minimum = KINDS[kind].minSourceWidth;
+  if (width < minimum) return { kind: "width", width, minimum };
+  if (cropFor(width, height, kind).width < minimum) return { kind: "short", height };
   return null;
 }
 
@@ -65,7 +75,10 @@ function encode(canvas: Canvas, type: string, quality: number): Promise<Blob> {
 const QUALITY = { webp: 0.8, jpeg: 0.82 } as const;
 const MIME = { webp: "image/webp", jpeg: "image/jpeg" } as const;
 
-export async function compressImage(file: File): Promise<CompressedImage | SourceProblem> {
+export async function compressImage(
+  file: File,
+  kind: ImageKind = "thumbnail",
+): Promise<CompressedImage | SourceProblem> {
   const fileProblem = checkSourceFile(file);
   if (fileProblem) return fileProblem;
 
@@ -78,11 +91,11 @@ export async function compressImage(file: File): Promise<CompressedImage | Sourc
   }
 
   try {
-    const sizeProblem = checkSourceSize(bitmap.width, bitmap.height);
+    const sizeProblem = checkSourceSize(bitmap.width, bitmap.height, kind);
     if (sizeProblem) return sizeProblem;
 
-    const crop = cropFor(bitmap.width, bitmap.height);
-    const widths = variantWidthsFor(crop.width).reverse(); // largest first
+    const crop = cropFor(bitmap.width, bitmap.height, kind);
+    const widths = variantWidthsFor(crop.width, kind).reverse(); // largest first
 
     // Largest variant straight from the source; each smaller one from the previous canvas, so no
     // single step shrinks too much (a big one-step downscale looks jagged).
@@ -95,7 +108,7 @@ export async function compressImage(file: File): Promise<CompressedImage | Sourc
       h: crop.height,
     };
     for (const width of widths) {
-      const height = heightFor(width);
+      const height = heightFor(width, kind);
       const canvas = makeCanvas(width, height);
       const context = canvas.getContext("2d") as
         CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null;

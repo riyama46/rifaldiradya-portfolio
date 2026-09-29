@@ -54,6 +54,7 @@ v1 punya 8 layar publik (4 per bahasa), 4 layar admin, dan 3 overlay. Tidak ada 
 | S-11 | `/admin` | — | Butuh sesi | Dinamis | Daftar project | F7 |
 | S-12 | `/admin/projects/new` | — | Butuh sesi | Dinamis | Form buat project | F7 |
 | S-13 | `/admin/projects/[id]` | — | Butuh sesi | Dinamis | Form edit + hapus project | F7 |
+| S-14 | `/admin/profile` | — | Butuh sesi | Dinamis | Foto profil di hero (T-18b) | F1, F7 |
 | O-01 | Toggle bahasa (navbar) |  | Publik | Client | Pindah ke halaman padanan | F4 |
 | O-02 | Banner saran bahasa |  | Publik | Client | Tawarkan versi ID ke browser berbahasa Indonesia | F4 |
 | O-03 | Cookie consent |  | Publik | Client | Minta izin analytics | F8 |
@@ -91,7 +92,7 @@ Urutan section tetap; tidak boleh ada section tambahan. Section 2–5 diawali Se
 
 | # | Section | Elemen (urut) | Aturan |
 | --- | --- | --- | --- |
-| 1 | Hero `#top` | **Kolom kiri:** BylineBadge (avatar 64/72 px + "Rifaldi Radya Pratama" + "Web Developer") → H1 `[hero.title]` (highlighter amber pada "Days"/"Hari", "Not Weeks"/"Bukan Minggu" warna muted) → subheadline `[hero.subtitle]` → tombol primer `[hero.ctaPrimary]` "See the Work" → link sekunder `[hero.ctaSecondary]` "Email Me About Your Project" → MetaRow (`[meta.available]` dengan StatusDot jika flag aktif · `[meta.location]` · `[meta.remote]` · "EN / ID"). **Kolom kanan:** HeroProofPanel (lihat spesifikasi di bawah). | Rata kiri. Dua kolom di ≥ 1024 px, satu kolom di bawahnya (panel di bawah MetaRow). Tombol primer scroll halus ke `#work` dan memindahkan fokus ke heading `#work`. Avatar: foto jika aset ada, jika tidak inisial "RR" di lingkaran `--color-accent-soft`. Di 375 × 667, H1 + tombol primer harus terlihat tanpa scroll walau O-03 tampil. Latar hero bertekstur grid (dekoratif, `aria-hidden`). |
+| 1 | Hero `#top` | **Kolom kiri:** BylineBadge (avatar 64/72 px + "Rifaldi Radya Pratama" + "Web Developer") → H1 `[hero.title]` (highlighter amber pada "Days"/"Hari", "Not Weeks"/"Bukan Minggu" warna muted) → subheadline `[hero.subtitle]` → tombol primer `[hero.ctaPrimary]` "See the Work" → link sekunder `[hero.ctaSecondary]` "Email Me About Your Project" → MetaRow (`[meta.available]` dengan StatusDot jika flag aktif · `[meta.location]` · `[meta.remote]` · "EN / ID"). **Kolom kanan:** HeroProofPanel (lihat spesifikasi di bawah). | Rata kiri. Dua kolom di ≥ 1024 px, satu kolom di bawahnya (panel di bawah MetaRow). Tombol primer scroll halus ke `#work` dan memindahkan fokus ke heading `#work`. Avatar: foto yang diatur di S-14 (persegi, tampil bulat; `<img>` 160/320 px, alt kosong karena nama tertulis di sebelahnya), jika belum ada inisial "RR" di lingkaran `--color-accent-soft`. Di 375 × 667, H1 + tombol primer harus terlihat tanpa scroll walau O-03 tampil. Latar hero bertekstur grid (dekoratif, `aria-hidden`). |
 | 2 | Services `#services` | SectionHeader `01` + H2 `[services.title]` "What I build" → ServiceTile utama (badge `[services.primary.badge]` "Main focus", judul, deskripsi, ProcessSteps `[steps.1–3]` + keterangan `[steps.1d–3d]`) → ServiceTile sekunder (badge "For bigger projects", judul, deskripsi) | Tile utama lebih besar/menonjol (border aksen); di ≥ 768 px dua tile berdampingan rasio 3:2, di mobile menumpuk. Tile tidak bisa diklik. ProcessSteps berupa `<ol>` 3 kolom; langkah terakhir memakai StatusDot hijau. |
 | 3 | Selected work `#work` | SectionHeader `02` + H2 `[work.featuredTitle]` "Selected work" → grid ProjectCard (0–6 item) → tombol `[work.viewAll]` "View all work" (atau `[work.viewAllCount]` "View all work ({n})" jika total published > 6) + ikon → ke S-02 locale aktif | Data: `published=true`, urut `sort_order` asc, lalu `created_at` desc, limit 6 (tidak bergantung pada `featured`). Grid ke bawah dengan aturan kolom yang sama dengan S-02 (lihat S-02 poin 2); tanpa scroll horizontal dan tanpa animasi geser otomatis. Kartu muncul dengan reveal saat scroll (kartu kedua dst. sedikit tertunda). Jika 0 item → section tetap tampil dengan EmptyState (E-01). |
 | 4 | About `#about` | SectionHeader `03` + H2 `[about.title]` "Who you'll work with" → lead `[about.lead]` → body `[about.body]` → AboutFacts (`<dl>`: `[facts.based*]`, `[facts.work*]`, `[facts.focus*]`, `[facts.lang*]`, Stack sebagai tag teks) | Grid 1:2 di ≥ 1024 px. Lead dan body boleh berisi penanda `<mark>` (maks. 2 per section) dan `<strong>` lewat rich-text i18n (SDD bagian 5). Maks lebar teks 62ch. Stack = teks, bukan logo. |
@@ -186,9 +187,10 @@ Tidak ada link "forgot password" dan "sign up". Reset password dilakukan manual 
 ### S-11 Project list (`/admin`)
 
 - Header halaman: "Projects" + jumlah ("2 projects") + tombol primer "New project" → S-12.
-- Daftar baris (desktop: tabel; mobile: kartu bertumpuk), urut `sort_order` asc lalu `created_at` desc. Tiap baris: thumbnail 64 × 40 · judul EN (link ke S-13) · badge status "Published" / "Draft" · badge "Featured" jika true · angka urutan · tanggal update relatif ("2 days ago") · tombol "Edit".
-- Tidak ada inline toggle, drag-and-drop, atau bulk action di v1; semua perubahan lewat S-13.
-- Info kecil di bawah header: "Featured in homepage hero: {n}/3". Jika n > 3, tampilkan peringatan kuning "Only the first 3 featured projects appear in the homepage hero." (E-08). Info kedua: "Shown on homepage grid: first 6 published projects by sort order."
+- Daftar baris (desktop: tabel; mobile: kartu bertumpuk), urut posisi (`sort_order`) asc. Tiap baris: nomor posisi (#1, #2, …) · thumbnail 64 × 40 · judul EN (link ke S-13) · badge status "Published" / "Draft" · badge "Featured" jika true · tanggal update relatif ("2 days ago") · tombol ↑ / ↓ · tombol "Edit".
+- **Urutan (T-18b):** tombol ↑ / ↓ (44 × 44 px, label "Move {title} up/down") menukar project dengan tetangganya lewat API-08 dan langsung tersimpan; ↑ nonaktif di #1, ↓ nonaktif di posisi terakhir. Fokus tetap di tombol yang ditekan, posisi baru diumumkan ke pembaca layar. Posisi selalu 1…n tanpa angka kembar; tidak ada field urutan di form. Tanpa drag-and-drop, inline toggle, atau bulk action; perubahan lain lewat S-13.
+- Header admin (G3) punya navigasi "Projects" · "Profile" (S-14).
+- Info kecil di bawah header: "Featured in homepage hero: {n}/3". Jika n > 3, tampilkan peringatan kuning "Only the first 3 featured projects appear in the homepage hero." (E-08). Info kedua: "Shown on homepage grid: first 6 published projects in this order." Info ketiga: "Use ↑ and ↓ to change the order. New projects are added at the top."
 - Empty state (0 project): "No projects yet. Add your first one to show it on the site." + tombol "New project".
 - Toast sukses dari aksi sebelumnya ("Project created", "Changes saved", "Project deleted") tampil 4 detik, `role=status`.
 
@@ -207,7 +209,6 @@ Form yang sama. S-13 terisi data dan punya zona hapus.
 | 7 | Thumbnail | ImageUploader (drag/drop + pilih file) + preview 16:10 | JPG/PNG/WebP, ≤ 5 MB, min 1200 px lebar; dicrop 16:10 (dari atas untuk screenshot tinggi); wajib jika Published = on | "Recommended 1600 × 1000" |
 | 8 | Thumbnail alt (EN) | text | wajib jika ada thumbnail, 1–140 | Deskripsikan isi gambar |
 | 9 | Thumbnail alt (ID) | text | wajib jika ada thumbnail, 1–140 | — |
-| 10 | Sort order | number | integer 0–999, default 100 | "Lower shows first" |
 | 11 | Featured | switch | — | "Show in homepage hero (max 3)" |
 | 12 | Published | switch | Publish butuh field 1–5, 7–9 valid | Off = draft, tidak tampil di situs |
 
@@ -217,6 +218,12 @@ Form yang sama. S-13 terisi data dan punya zona hapus.
 - Cancel dengan perubahan belum disimpan → dialog "Discard changes?" (Discard / Keep editing). Navigasi browser keluar juga memicu peringatan `beforeunload`.
 - ImageUploader: pilih file → validasi tipe & ukuran di client → kompres di browser (crop 16:10, 4 lebar WebP) → upload langsung (API-06) dengan progress bar → preview → tombol "Replace" dan "Remove". Gambar lama di storage baru dihapus setelah project berhasil disimpan dengan gambar baru.
 - **Zona hapus (S-13 saja):** di paling bawah, dipisah garis, tombol merah "Delete project" → ConfirmDialog "Delete {title EN}? This removes it from the site and deletes its image. This can't be undone." (Delete / Cancel). Fokus awal di Cancel.
+
+### S-14 Profile (`/admin/profile`) — T-18b
+
+- Heading "Profile", satu field "Photo" dengan penjelasan "Shown as a small circle next to your name at the top of the homepage. Without a photo the site shows your initials."
+- ImageUploader mode avatar: JPG/PNG/WebP ≤ 5 MB, minimal 320 × 320 px, dicrop persegi di tengah, dikompres di browser ke 160 dan 320 px; preview bulat; Replace / Remove.
+- Tombol "Save" (nonaktif selama upload atau jika tidak ada perubahan) → API-09 → revalidasi halaman publik → toast "Profile saved" (kuning jika revalidasi gagal, E-19). Remove + Save = kembali ke inisial "RR".
 
 ## 7. User flows
 
@@ -265,7 +272,7 @@ Form yang sama. S-13 terisi data dan punya zona hapus.
 
 &#91;embedded content: UF-07 tambah project · 6 langkah, 1 validasi server\]
 
-1. Di S-11 klik "New project" → S-12 kosong, Published off, Featured off, sort order 100.
+1. Di S-11 klik "New project" → S-12 kosong, Published off, Featured off. Setelah disimpan, project baru otomatis di posisi #1 dan yang lain mundur satu.
 2. Isi judul + summary EN dan ID, live URL, tag.
 3. Upload thumbnail → API-06 → preview tampil; isi alt EN dan ID.
 4. Nyalakan Published (dan Featured bila perlu) → Save → API-03.
@@ -336,7 +343,7 @@ v1 hanya punya satu entitas bisnis: **Project**. Kredensial admin dan sesi adala
 | `tags` | string\[\] | tidak | 0–4 item, tiap item 1–24 karakter, unik (case-insensitive) | pill di kartu |
 | `thumbnail` | objek atau null | wajib jika published | `{ public_id, url, width, height }` dari storage gambar | kartu, admin |
 | `thumbnail_alt_en` / `thumbnail_alt_id` | string atau null | wajib jika ada thumbnail | 1–140 karakter | alt gambar |
-| `sort_order` | integer | ya | 0–999, default 100 | urutan semua daftar |
+| `sort_order` | integer | ya | posisi 1…n, unik, diatur server: project baru = 1 (yang lain +1), ↑/↓ menukar dua tetangga (API-08), hapus menutup celah; `updated_at` tidak berubah karena pergeseran posisi | urutan semua daftar |
 | `featured` | boolean | ya | default false | S-01 |
 | `published` | boolean | ya | default false | filter publik |
 | `created_at` / `updated_at` | datetime (UTC) | ya | diisi server | urutan sekunder, `lastmod` sitemap, S-11 |
@@ -344,7 +351,7 @@ v1 hanya punya satu entitas bisnis: **Project**. Kredensial admin dan sesi adala
 **Aturan turunan**
 
 - Publik hanya melihat `published = true`. Draft tidak pernah bocor ke HTML, sitemap, schema, atau API publik.
-- Urutan standar: `sort_order` asc, lalu `created_at` desc.
+- Urutan standar: `sort_order` (posisi) asc; `created_at` desc hanya sebagai cadangan jika posisi kembar (tidak terjadi setelah migrasi 0003).
 - Menghapus project juga menghapus `thumbnail.public_id` di storage. Mengganti thumbnail menghapus gambar lama setelah simpan berhasil.
 - `lastmod` sitemap = `max(updated_at)` dari project published.
 
@@ -394,7 +401,9 @@ Hanya admin yang menulis data; halaman publik membaca langsung di server saat re
 | API-04 | `PATCH /api/admin/projects/:id` | `ProjectInput` parsial | `200 { project, revalidated }` | `401` · `404 NOT_FOUND` · `422` · `500` |
 | API-05 | `DELETE /api/admin/projects/:id` | — | `200 { revalidated }` (gambar ikut dihapus) | `401` · `404` · `500` |
 | API-06 | `POST /api/admin/uploads` | multipart: 1–4 bagian `variant` (lebar hasil kompresi browser dari satu gambar) | `201 { public_id, url, width, height }` | `401` · `413 FILE_TOO_LARGE` · `415 UNSUPPORTED_TYPE` · `422 IMAGE_TOO_SMALL` / `VALIDATION_FAILED` · `502 UPLOAD_FAILED` |
-| API-07 | `DELETE /api/admin/uploads/:public_id` | — | `204` | `401` · `404` (dianggap sukses oleh UI) · `409 IMAGE_IN_USE` (gambar dipakai project tersimpan; tidak dihapus) |
+| API-07 | `DELETE /api/admin/uploads/:public_id` | — | `204` | `401` · `404` (dianggap sukses oleh UI) · `409 IMAGE_IN_USE` (gambar dipakai project tersimpan atau foto profil; tidak dihapus) |
+| API-08 | `POST /api/admin/projects/:id/move` | `{ direction: "up" | "down" }` | `200 { position, revalidated }` (posisi tetap jika sudah di ujung) | `401` · `404` · `422 VALIDATION_FAILED` · `500` |
+| API-09 | `PUT /api/admin/profile` | `{ photo_public_id: string | null }` (gambar dari API-06 `kind=avatar`, persegi) | `200 { photo, revalidated }`; foto lama dihapus | `401` · `422` + `fields.photo` · `500` |
 
 **`ProjectInput`**
 

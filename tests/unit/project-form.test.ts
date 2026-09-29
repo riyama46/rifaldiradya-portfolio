@@ -28,13 +28,9 @@ const filled: FormValues = {
 };
 
 describe("project form model", () => {
-  it("starts as App Flow UF-07 step 1: empty, draft, not featured, sort order 100", () => {
-    expect(emptyValues).toMatchObject({
-      published: false,
-      featured: false,
-      sort_order: "100",
-      tags: [],
-    });
+  it("starts as App Flow UF-07 step 1: empty, draft, not featured, no position field", () => {
+    expect(emptyValues).toMatchObject({ published: false, featured: false, tags: [] });
+    expect(emptyValues).not.toHaveProperty("sort_order");
   });
 
   it("a filled draft is valid; publishing it without an image is not (E-16)", () => {
@@ -52,19 +48,14 @@ describe("project form model", () => {
   });
 
   it("reports the first error in on-screen order", () => {
-    const errors = validate({ ...emptyValues, sort_order: "x" });
+    const errors = validate(emptyValues);
     expect(firstErrorField(errors)).toBe("title_en");
-    expect(firstErrorField({ sort_order: "bad", live_url: "bad" })).toBe("live_url");
+    expect(firstErrorField({ thumbnail: "bad", live_url: "bad" })).toBe("live_url");
     expect(firstErrorField({})).toBeNull();
   });
 
-  it("only turns plain digits into a sort order", () => {
-    expect(toPayload({ ...filled, sort_order: " 20 " }).sort_order).toBe(20);
-    expect(validate({ ...filled, sort_order: "12a" }).sort_order).toBe(
-      "Use a whole number from 0 to 999.",
-    );
-    expect(validate({ ...filled, sort_order: "" }).sort_order).toBeDefined();
-    expect(validate({ ...filled, sort_order: "1000" }).sort_order).toBeDefined();
+  it("never sends a position (it only changes with ↑/↓ on the list)", () => {
+    expect(toPayload(filled)).not.toHaveProperty("sort_order");
   });
 
   it("drops alt text when there is no image", () => {
@@ -73,8 +64,8 @@ describe("project form model", () => {
   });
 
   it("round-trips a stored project and detects changes", () => {
-    const values = valuesFromInput({ ...toPayload(filled), sort_order: 10 });
-    expect(values.sort_order).toBe("10");
+    const values = valuesFromInput(toPayload(filled));
+    expect(values).toEqual(filled);
     expect(isDirty(values, { ...values })).toBe(false);
     expect(isDirty(values, { ...values, featured: true })).toBe(true);
   });

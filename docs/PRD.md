@@ -259,7 +259,7 @@ Semua item di bawah sengaja ditunda. Trigger = kondisi yang membuat item layak d
 | Testimoni | Belum ada klien freelance | Klien pertama memberi testimoni tertulis |
 | Blog/artikel | Beban konten besar, bukan kebutuhan konversi v1 | Portfolio stabil dan ada waktu konten rutin |
 | Layanan lain (SEO, design, dll.) | Belum ada bukti kerja | Ada project nyata di layanan tersebut |
-| Foto profesional | Belum tersedia; v1 pakai inisial | Foto siap, tinggal ganti aset |
+| Foto profesional | Diatur sendiri lewat admin (S-14, T-18b); tanpa foto tampil inisial | Upload foto di admin → Profile |
 |  |  |  |
 
 ## 8. Arah UI/UX & visual identity
@@ -454,7 +454,7 @@ Portfolio gagal kalau kodenya jadi tapi isinya kosong. Semua item ini tanggung j
 - [ ] Favicon + ikon aplikasi (dari inisial "RR" dengan warna aksen).
 - [ ] Teks kebijakan privasi singkat EN + ID (apa yang dilacak GA4, cara menolak, kontak).
 - [ ] Teks cookie consent banner EN + ID.
-- [ ] Foto profil (opsional untuk launch; v1 pakai inisial).
+- [ ] Foto profil (opsional untuk launch; upload di admin → Profile, tanpa foto tampil inisial).
 - [ ] Akun Google Analytics 4 + Google Search Console atas nama sendiri.
 - [x] Konfigurasi email hello@rifaldiradya.com aktif dan lolos SPF/DKIM/DMARC, supaya balasan ke klien tidak masuk spam (dicek 28 Sep 2026; DMARC masih `p=none`).
 
