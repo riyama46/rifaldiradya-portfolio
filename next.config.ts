@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { securityHeaders } from "./lib/security-headers";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
@@ -9,6 +10,15 @@ const nextConfig: NextConfig = {
     loaderFile: "./lib/images/loader.ts",
     deviceSizes: [640, 960, 1280, 1600],
     imageSizes: [],
+  },
+  // SDD section 6: CSP and the other security headers on every response.
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: securityHeaders({ dev: process.env.NODE_ENV === "development" }),
+      },
+    ];
   },
   experimental: {
     // Needed because the root layout lives in the dynamic app/[lang] segment; a nested

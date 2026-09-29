@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+// No `new Function` probe: under the CSP (no 'unsafe-eval', T-20) the caught attempt is still
+// reported as a violation in the admin form. The plain parser is plenty fast for one form.
+z.config({ jitless: true });
+
 // ProjectInput (App Flow section 10) with the field rules of sections 6 and 9 and the admin error
 // messages of section 11. Shared by the admin form (client, on blur) and API-03/04 (server), so it
 // must not import anything server-only. The position (sort_order) is not part of it: it is changed
