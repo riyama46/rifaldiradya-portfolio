@@ -30,6 +30,7 @@ Buka http://localhost:3000.
 | `npm run db:embed`                | Salin /drizzle ke modul bundel      |
 | `npm run hash-password`           | Buat hash password + salt admin     |
 | `npm run db:migrate`              | Terapkan migrasi (gagal jika error) |
+| `node scripts/og-images.mts`      | Render ulang gambar OG (public/og)  |
 
 Tes integrasi dan E2E butuh database Docker lokal. E2E juga butuh `E2E_ADMIN_EMAIL` dan `E2E_ADMIN_PASSWORD` di `.env.local` (admin lokal, bukan password produksi); tes menjalankan build produksi di port 3100 dan membersihkan data yang dibuatnya.
 

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Footer } from "@/components/site/Footer";
 import { HashFocus } from "@/components/site/HashFocus";
 import { SkipLink } from "@/components/site/SkipLink";
@@ -13,12 +12,6 @@ import "@/styles/globals.css";
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
-
-// Temporary: T-12 replaces this with buildMetadata() (titles, canonical, hreflang).
-export const metadata: Metadata = {
-  title: "Rifaldi Radya Pratama",
-  robots: { index: false, follow: false },
-};
 
 // App Flow G2 shell. The navbar is rendered by each page because it needs the page path.
 export default async function PublicLayout({ children, params }: LayoutProps<"/[lang]">) {

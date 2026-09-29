@@ -1,4 +1,6 @@
+import type { Metadata } from "next";
 import { EmptyState } from "@/components/site/EmptyState";
+import { JsonLd } from "@/components/site/JsonLd";
 import { ProjectGrid } from "@/components/site/ProjectGrid";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { Button } from "@/components/ui/Button";
@@ -8,8 +10,16 @@ import { resolveLocale } from "@/i18n/server";
 import { mailtoHref } from "@/lib/site-config";
 import { toPublicProject } from "@/lib/projects/public";
 import { getPublishedProjects } from "@/lib/projects/queries";
+import { workJsonLd } from "@/lib/seo/jsonld";
+import { buildMetadata, siteOrigin } from "@/lib/seo/metadata";
 
 export const revalidate = 300;
+
+export async function generateMetadata({ params }: PageProps<"/[lang]/work">): Promise<Metadata> {
+  const lang = await resolveLocale(params);
+  const dict = getDictionary(lang);
+  return buildMetadata({ lang, path: "/work", page: dict.seo.work, dict });
+}
 
 // S-02 (App Flow): every published project, no limit, pagination, or filters.
 export default async function WorkPage({ params }: PageProps<"/[lang]/work">) {
@@ -19,6 +29,7 @@ export default async function WorkPage({ params }: PageProps<"/[lang]/work">) {
 
   return (
     <>
+      <JsonLd data={workJsonLd(lang, siteOrigin(), dict.workPage.title, projects)} />
       <SiteHeader lang={lang} dict={dict} path="/work" />
       <main id="content" tabIndex={-1}>
         <Container className="pt-10 pb-16 lg:pt-18 lg:pb-24">

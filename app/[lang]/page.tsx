@@ -1,6 +1,8 @@
+import type { Metadata } from "next";
 import { About } from "@/components/site/About";
 import { Hero } from "@/components/site/Hero";
 import { HeroProofPanel, type ProofSlide } from "@/components/site/HeroProofPanel";
+import { JsonLd } from "@/components/site/JsonLd";
 import { ProjectGrid } from "@/components/site/ProjectGrid";
 import { SelectedWork } from "@/components/site/SelectedWork";
 import { Services } from "@/components/site/Services";
@@ -16,9 +18,17 @@ import {
 } from "@/lib/projects/public";
 import { getPublicAvatar } from "@/lib/images/store";
 import { getPublishedProjects } from "@/lib/projects/queries";
+import { homeJsonLd } from "@/lib/seo/jsonld";
+import { buildMetadata, siteOrigin } from "@/lib/seo/metadata";
 
 // Safety net; admin saves also revalidate on demand (T-15). SDD section 5.
 export const revalidate = 300;
+
+export async function generateMetadata({ params }: PageProps<"/[lang]">): Promise<Metadata> {
+  const lang = await resolveLocale(params);
+  const dict = getDictionary(lang);
+  return buildMetadata({ lang, path: "/", page: dict.seo.home, dict });
+}
 
 // S-01 (App Flow): Hero → 01 Services → 02 Selected work → 03 About; the 04 CTA is in the footer.
 export default async function HomePage({ params }: PageProps<"/[lang]">) {
@@ -45,6 +55,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
 
   return (
     <>
+      <JsonLd data={homeJsonLd(lang, siteOrigin())} />
       <SiteHeader lang={lang} dict={dict} path="/" />
       <main id="content" tabIndex={-1}>
         <Hero

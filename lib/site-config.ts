@@ -7,6 +7,8 @@ export const siteConfig = {
   availableForWork: true,
   timezoneLabel: "GMT+7",
   initials: "RR",
+  /** Matches "Last updated" on S-03; the privacy pages' sitemap lastmod. */
+  privacyUpdated: "2026-09-29",
   stack: ["Next.js", "React", "TypeScript", "Tailwind CSS", "HTML", "CSS", "JavaScript"],
   social: {
     linkedin: "https://www.linkedin.com/in/rifaldi-radya-070a44174/",
