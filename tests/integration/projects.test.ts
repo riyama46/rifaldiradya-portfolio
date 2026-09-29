@@ -145,6 +145,45 @@ describe("positions (T-18b: 1…n, new first, ↑/↓)", () => {
     const published = ours(await getPublishedProjects());
     expect(published.map((p) => p.id)).toEqual([first.id]);
   });
+
+  it("#1 published, #2 draft, #3 published: the site skips #2, which reappears in place once published", async () => {
+    const image = await newImage();
+    const publish = async (id: string, published: boolean) => {
+      const project = (await getProjectById(id))!;
+      const stored = await withStoredThumbnail(
+        projectInputSchema.parse({
+          ...toProjectInput(project),
+          published,
+          thumbnail: { public_id: image.id, url: "/x", width: 1, height: 1 },
+          thumbnail_alt_en: "a",
+          thumbnail_alt_id: "a",
+        }),
+      );
+      await updateProject(project, stored!);
+    };
+
+    const third = await createProject(input("gap 3"));
+    const second = await createProject(input("gap 2"));
+    const first = await createProject(input("gap 1"));
+    await publish(first.id, true);
+    await publish(second.id, false);
+    await publish(third.id, true);
+
+    const positions = Object.fromEntries(
+      ours(await getAllProjects()).map((p) => [p.titleEn.slice(run.length + 1), p.sortOrder]),
+    );
+    expect([positions["gap 1"], positions["gap 2"], positions["gap 3"]]).toEqual([1, 2, 3]);
+
+    const publicTitles = async () =>
+      ours(await getPublishedProjects())
+        .map((p) => p.titleEn.slice(run.length + 1))
+        .filter((title) => title.startsWith("gap"));
+    expect(await publicTitles()).toEqual(["gap 1", "gap 3"]);
+
+    await publish(second.id, true);
+    expect(await publicTitles()).toEqual(["gap 1", "gap 2", "gap 3"]);
+    await expectCompactPositions();
+  });
 });
 
 describe("create / update / delete", () => {
