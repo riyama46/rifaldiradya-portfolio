@@ -145,3 +145,13 @@ export async function updateProject(
   }
   return updated;
 }
+
+/** API-05: removes the project, then its image (App Flow UF-09). false = it was already gone. */
+export async function deleteProject(existing: Project): Promise<boolean> {
+  const [result] = await getDb().delete(projects).where(eq(projects.id, existing.id));
+  if (result.affectedRows === 0) return false;
+  await deleteImageIfUnused(existing.thumbnailPublicId).catch((error: Error) =>
+    console.error("[images] thumbnail cleanup after delete failed:", error.message),
+  );
+  return true;
+}
