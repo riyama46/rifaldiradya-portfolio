@@ -1,42 +1,10 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { email, hasCredentials, makePng, missingCredentials, password, signIn } from "./helpers";
 
 // UF-06 (login/logout), UF-07 (add a project with a real image), UF-09 (delete it).
-// Needs the local Docker DB and test credentials in .env.local:
-//   E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD = the local ADMIN_EMAIL and its password.
+// Needs the local Docker DB and the test credentials described in ./helpers.ts.
 
-const email = process.env.E2E_ADMIN_EMAIL;
-const password = process.env.E2E_ADMIN_PASSWORD;
-
-test.skip(!email || !password, "Set E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD in .env.local");
-
-async function signIn(page: Page, next = "/admin") {
-  await page.goto(next);
-  await expect(page).toHaveURL(/\/admin\/login\?next=/);
-  await page.getByLabel("Email").fill(email!);
-  await page.getByLabel("Password", { exact: true }).fill(password!);
-  await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page).toHaveURL(next);
-}
-
-/** A 2000 × 1400 PNG drawn in the browser, so the upload goes through the real compression. */
-async function makePng(page: Page): Promise<Buffer> {
-  const dataUrl = await page.evaluate(() => {
-    const canvas = document.createElement("canvas");
-    canvas.width = 2000;
-    canvas.height = 1400;
-    const context = canvas.getContext("2d")!;
-    const gradient = context.createLinearGradient(0, 0, 2000, 1400);
-    gradient.addColorStop(0, "#b45309");
-    gradient.addColorStop(1, "#1e3a8a");
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, 2000, 1400);
-    context.fillStyle = "#fff";
-    context.font = "bold 120px sans-serif";
-    context.fillText("E2E upload", 100, 200);
-    return canvas.toDataURL("image/png");
-  });
-  return Buffer.from(dataUrl.split(",")[1], "base64");
-}
+test.skip(!hasCredentials, missingCredentials);
 
 test("UF-06: sign in, reach the admin, sign out", async ({ page }, testInfo) => {
   await page.goto("/admin");

@@ -22,6 +22,9 @@ export function ProjectCard({ project, dict, sizes, priority }: ProjectCardProps
     <article className="group/card flex h-full flex-col overflow-hidden rounded-card border border-border bg-surface-raised shadow-card transition-[transform,box-shadow] duration-240 ease-out hover:shadow-card-hover motion-safe:hover:-translate-y-[3px]">
       <a
         href={project.liveUrl}
+        data-track="project_link_click"
+        data-slug={project.slug}
+        data-placement="card"
         target="_blank"
         rel="noopener noreferrer"
         tabIndex={-1}
@@ -46,6 +49,9 @@ export function ProjectCard({ project, dict, sizes, priority }: ProjectCardProps
         {project.tags.length > 0 && <TagList tags={project.tags} className="mt-0.5 mb-1.5" />}
         <Button
           href={project.liveUrl}
+          data-track="project_link_click"
+          data-slug={project.slug}
+          data-placement="card"
           external
           variant="secondary"
           aria-label={visitLabel}

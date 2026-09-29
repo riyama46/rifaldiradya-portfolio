@@ -119,6 +119,7 @@
     "dismiss": "Dismiss"
   },
   "consent": {
+    "label": "Cookie choice",
     "body": "I use Google Analytics to see which pages are useful. It only runs if you allow it.",
     "accept": "Accept",
     "reject": "Reject"

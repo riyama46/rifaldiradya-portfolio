@@ -36,6 +36,8 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 300_000,
     // The API's Origin check compares against SITE_URL, so it must be this server's address.
-    env: { SITE_URL: BASE_URL },
+    // A test Measurement ID so the consent banner and GA4 code are built in; requests to Google are
+    // intercepted in tests/e2e/consent.spec.ts.
+    env: { SITE_URL: BASE_URL, NEXT_PUBLIC_GA_MEASUREMENT_ID: "G-E2ETEST1" },
   },
 });

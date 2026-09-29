@@ -18,7 +18,13 @@ export function FooterCta({ dict }: { dict: Dictionary }) {
       </p>
       <h2 className="max-w-[14ch] text-display-cta">{richText(dict.cta.title)}</h2>
       <p className="mt-4 max-w-[44ch] text-balance text-text-muted">{dict.cta.sub}</p>
-      <Button href={mailtoHref(dict.email.subject)} size="lg" className="mt-8 lg:mt-10">
+      <Button
+        href={mailtoHref(dict.email.subject)}
+        size="lg"
+        className="mt-8 lg:mt-10"
+        data-track="contact_email_click"
+        data-location="footer"
+      >
         {dict.cta.button}
         <ArrowIcon direction="right" />
       </Button>

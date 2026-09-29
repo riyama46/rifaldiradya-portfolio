@@ -49,7 +49,14 @@ export function CopyEmailButton({ email, targetId, labels }: CopyEmailButtonProp
 
   return (
     <span className="inline-flex items-center gap-3">
-      <Button variant="secondary" size="sm" onClick={copy}>
+      <Button
+        variant="secondary"
+        size="sm"
+        onClick={copy}
+        data-track="contact_email_click"
+        data-location="footer"
+        data-method="copy"
+      >
         {status === "copied" ? labels.copied : labels.copy}
       </Button>
       <span role="status" aria-live="polite" className="text-small">

@@ -10,6 +10,12 @@ const ready = (page: Page) => page.waitForLoadState("networkidle");
 
 const banner = (page: Page) => page.getByRole("region", { name: "Also available in Indonesian." });
 
+// These flows are about language only: answer the cookie banner up front (it has its own spec),
+// otherwise on phones O-02 correctly waits for it.
+test.beforeEach(async ({ context }) => {
+  await context.addCookies([{ name: "consent", value: "denied", url: "http://localhost:3100" }]);
+});
+
 test.describe("UF-04: language toggle", () => {
   test("switches to the counterpart page, keeps the #anchor, stores the choice", async ({
     page,

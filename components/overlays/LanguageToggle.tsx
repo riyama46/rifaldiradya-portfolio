@@ -3,6 +3,7 @@
 import type { MouseEvent } from "react";
 import { localePath, type Locale } from "@/i18n";
 import { cn } from "@/lib/cn";
+import { track } from "@/lib/analytics/events";
 import { saveLangPref } from "@/lib/lang-pref";
 
 type LanguageToggleProps = {
@@ -28,6 +29,7 @@ export function LanguageToggle({ lang, path, label }: LanguageToggleProps) {
 
   function onSwitch(event: MouseEvent<HTMLAnchorElement>) {
     saveLangPref(target);
+    track("language_switch", { from: lang, to: target, source: "toggle" });
     const hash = path === null ? "" : window.location.hash;
     if (hash && isPlainClick(event)) {
       event.preventDefault();

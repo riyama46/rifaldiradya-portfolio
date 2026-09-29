@@ -119,6 +119,7 @@
     "dismiss": "Dismiss"
   },
   "consent": {
+    "label": "Pilihan cookie",
     "body": "Saya memakai Google Analytics untuk melihat halaman mana yang berguna. Hanya aktif jika kamu izinkan.",
     "accept": "Terima",
     "reject": "Tolak"

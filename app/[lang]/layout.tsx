@@ -1,3 +1,5 @@
+import { Analytics } from "@/components/overlays/Analytics";
+import { CookieConsent } from "@/components/overlays/CookieConsent";
 import { Footer } from "@/components/site/Footer";
 import { HashFocus } from "@/components/site/HashFocus";
 import { SkipLink } from "@/components/site/SkipLink";
@@ -25,6 +27,8 @@ export default async function PublicLayout({ children, params }: LayoutProps<"/[
         {children}
         <Footer lang={lang} dict={dict} />
         <HashFocus />
+        <CookieConsent lang={lang} dict={dict} />
+        <Analytics lang={lang} />
       </body>
     </html>
   );

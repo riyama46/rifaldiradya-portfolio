@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { CookieSettingsButton } from "@/components/overlays/CookieSettingsButton";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { Container } from "@/components/ui/Container";
 import { getDictionary } from "@/i18n";
@@ -24,8 +25,7 @@ export async function generateMetadata({
   return buildMetadata({ lang, path: "/privacy", page: dict.seo.privacy, dict });
 }
 
-// S-03 (App Flow): static privacy and cookie notice. The "Cookie settings" button (O-03) is added
-// with the consent banner in T-19.
+// S-03 (App Flow): static privacy and cookie notice, with a "Cookie settings" button (O-03).
 export default async function PrivacyPage({ params }: PageProps<"/[lang]/privacy">) {
   const lang = await resolveLocale(params);
   const dict = getDictionary(lang);
@@ -75,6 +75,10 @@ export default async function PrivacyPage({ params }: PageProps<"/[lang]/privacy
 
             <Section title={privacy.changeTitle}>
               <p>{privacy.changeBody}</p>
+              <CookieSettingsButton
+                label={dict.footer.cookies}
+                className="mt-4 inline-flex min-h-11 cursor-pointer items-center rounded-button border border-border bg-surface-raised px-3.5 font-medium text-text hover:border-text-muted"
+              />
             </Section>
 
             <Section title={privacy.emailTitle}>

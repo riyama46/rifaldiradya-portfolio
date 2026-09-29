@@ -59,10 +59,23 @@ export function SiteHeader({ lang, dict, path }: SiteHeaderProps) {
 
         <LanguageToggle lang={lang} path={path} label={dict.language.label} />
 
-        <Button href={mailto} size="icon" aria-label={dict.nav.email} className="md:hidden">
+        <Button
+          href={mailto}
+          size="icon"
+          aria-label={dict.nav.email}
+          className="md:hidden"
+          data-track="contact_email_click"
+          data-location="navbar"
+        >
           <MailIcon />
         </Button>
-        <Button href={mailto} size="sm" className="max-md:hidden">
+        <Button
+          href={mailto}
+          size="sm"
+          className="max-md:hidden"
+          data-track="contact_email_click"
+          data-location="navbar"
+        >
           {dict.nav.email}
         </Button>
       </Container>

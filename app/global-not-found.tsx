@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { Analytics } from "@/components/overlays/Analytics";
+import { CookieConsent } from "@/components/overlays/CookieConsent";
 import { Footer } from "@/components/site/Footer";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SkipLink } from "@/components/site/SkipLink";
@@ -40,6 +42,8 @@ export default async function GlobalNotFound() {
           </Container>
         </main>
         <Footer lang={lang} dict={dict} showCta={false} />
+        <CookieConsent lang={lang} dict={dict} />
+        <Analytics lang={lang} />
       </body>
     </html>
   );
