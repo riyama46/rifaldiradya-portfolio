@@ -1,4 +1,4 @@
-import { asc, desc, eq } from "drizzle-orm";
+import { asc, desc, eq, max } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { projects, type Project } from "@/lib/db/schema";
 
@@ -41,4 +41,13 @@ export async function getAllProjects(): Promise<Project[]> {
 export async function getProjectById(id: string): Promise<Project | null> {
   const [row] = await getDb().select().from(projects).where(eq(projects.id, id)).limit(1);
   return row ?? null;
+}
+
+/** Latest update of a published project, for the sitemap lastmod (SDD section 5). */
+export async function getLastPublishedUpdate(): Promise<Date | null> {
+  const [row] = await getDb()
+    .select({ last: max(projects.updatedAt) })
+    .from(projects)
+    .where(eq(projects.published, true));
+  return row?.last ?? null;
 }

@@ -1,8 +1,10 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { Container } from "@/components/ui/Container";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/i18n/server";
+import { buildMetadata } from "@/lib/seo/metadata";
 import { siteConfig } from "@/lib/site-config";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -12,6 +14,14 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
       <div className="mt-3 text-text-muted">{children}</div>
     </section>
   );
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps<"/[lang]/privacy">): Promise<Metadata> {
+  const lang = await resolveLocale(params);
+  const dict = getDictionary(lang);
+  return buildMetadata({ lang, path: "/privacy", page: dict.seo.privacy, dict });
 }
 
 // S-03 (App Flow): static privacy and cookie notice. The "Cookie settings" button (O-03) is added

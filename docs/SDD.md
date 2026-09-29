@@ -249,7 +249,8 @@ CSP sengaja tanpa nonce: nonce per request memaksa semua halaman dirender dinami
 - `metadataBase = new URL(SITE_URL)`; `SITE_URL` = `https://rifaldiradya.com` (non-www kanonik, disetujui 28 Sep 2026). Redirect www → non-www ditangani aturan 1 `proxy.ts` (bagian 5); DNS tetap perlu record `www` yang mengarah ke app yang sama supaya request www sampai ke proxy. Semua canonical, hreflang, sitemap, OG `url`, dan JSON-LD memakai versi non-www.
 - `lib/seo/jsonld.ts` → `personJsonLd(lang)`, `websiteJsonLd(lang)`, `collectionJsonLd(lang, projects)`; dirender sebagai `<script type="application/ld+json">` di Server Component (bukan ditambahkan via JS client), supaya terlihat di HTML awal.
 - `app/sitemap.ts`: 6 URL (home, work, privacy × 2 bahasa), masing-masing dengan `alternates.languages`, `lastModified`.
-- `app/robots.ts`: allow `/`, disallow `/admin` dan `/api`, `sitemap: SITE_URL/sitemap.xml`. Tidak ada blok khusus crawler AI (diizinkan).
+- `app/robots.ts`: allow `/`, disallow `/admin` dan `/api`, `sitemap: SITE_URL/sitemap.xml`. Tidak ada blok khusus crawler AI (diizinkan). **Hanya jika `SITE_URL` = `https://rifaldiradya.com`**; deployment lain (devstaging, lokal) mendapat `Disallow: /` dan semua halaman `noindex` (`isIndexable()` di `lib/seo/metadata.ts`).
+- Halaman statis, sitemap, dan robots memakai `SITE_URL` **saat build** (lalu diperbarui oleh revalidasi ≤ 5 menit). Karena itu langkah Fase 4 "ubah `SITE_URL`, lalu redeploy" wajib: redeploy membangun ulang dengan domain utama.
 - Admin: `metadata.robots = { index: false, follow: false }` + header dari proxy.
 - Gambar: `next/image` + loader `/media`, `sizes` diisi sesuai grid (`(min-width:1200px) 33vw, (min-width:768px) 50vw, 100vw`). Gambar prioritas (`loading="eager"` + `fetchPriority="high"`; prop `priority` sudah deprecated di Next.js 16) hanya untuk: slide pertama HeroProofPanel di S-01 (`sizes="(min-width:1024px) 560px, 100vw"`) dan kartu pertama di S-02. Slide panel ke-2 dan ke-3 dirender dengan `loading="lazy"` + `fetchPriority="low"` dan elemen `<img>`-nya baru dipasang setelah `requestIdleCallback` (fallback `setTimeout` 2 s), paling lambat sebelum rotasi pertama.
 
@@ -461,7 +462,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 - [x] **T-09** `getPublishedProjects()` + turunan `selectHomepageProjects()` (featured maks. 3, grid maks. 6 + total) + ProjectCard + Selected work + EmptyState + HeroProofPanel (rotasi, kontrol, E-21 s.d. E-24, pemuatan gambar bertahap); loader Cloudinary (diganti loader `/media` di T-16).
 - [x] **T-10** S-02 Work, S-03 Privacy, S-04 not-found per locale.
 - [x] **T-11** O-01 toggle (client, tetap `<a href>`; simpan `lang_pref`, bawa `#hash`) + O-02 banner saran bahasa (`lib/lang-pref.ts`) + cookie `lang_pref`; e2e UF-02/UF-04. Event `language_switch` dan koordinasi O-02/O-03 di mobile ditambahkan di T-19.
-- [ ] **T-12** SEO: `buildMetadata`, JSON-LD, `sitemap.ts`, `robots.ts`, gambar OG.
+- [x] **T-12** SEO: `buildMetadata` (canonical, hreflang + x-default, OG/Twitter), JSON-LD (Person + WebSite, CollectionPage + ItemList), `sitemap.ts`, `robots.ts`, gambar OG (`scripts/og-images.mts` → `public/og/{en,id}.png`); hanya `SITE_URL=https://rifaldiradya.com` yang boleh diindeks.
 
 ### Fase 3 — Admin
 

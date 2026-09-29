@@ -21,6 +21,22 @@
     "location": "Berbasis di Indonesia",
     "remote": "Kerja remote"
   },
+  "seo": {
+    "siteName": "Rifaldi Radya Pratama",
+    "ogAlt": "Rifaldi Radya Pratama, landing page siap pakai dalam hitungan hari, bukan minggu",
+    "home": {
+      "title": "Rifaldi Radya Pratama — Jasa Landing Page Cepat",
+      "description": "Landing page siap pakai dalam hitungan hari, bukan minggu. Web developer dari Indonesia. Lihat hasil kerjanya langsung."
+    },
+    "work": {
+      "title": "Hasil Kerja — Landing Page oleh Rifaldi Radya Pratama",
+      "description": "Kumpulan landing page yang sudah live, dibuat oleh Rifaldi Radya Pratama. Klik dan lihat situs aslinya."
+    },
+    "privacy": {
+      "title": "Privasi — Rifaldi Radya Pratama",
+      "description": "Cara rifaldiradya.com menangani cookie analitik, pilihan bahasa, dan email. Tanpa akun, tanpa formulir, tanpa pelacakan tanpa izin."
+    }
+  },
   "slider": {
     "pause": "Jeda slideshow",
     "play": "Putar slideshow"
@@ -46,10 +62,10 @@
   },
   "steps": {
     "1": "Brief",
-    "1d": "Kamu kirim tujuannya",
     "2": "Pengerjaan",
-    "2d": "Saya desain dan coding",
     "3": "Live",
+    "1d": "Kamu kirim tujuannya",
+    "2d": "Saya desain dan coding",
     "3d": "Online, siap dibagikan"
   },
   "work": {

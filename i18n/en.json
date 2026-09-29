@@ -21,6 +21,22 @@
     "location": "Based in Indonesia",
     "remote": "Works remotely"
   },
+  "seo": {
+    "siteName": "Rifaldi Radya Pratama",
+    "ogAlt": "Rifaldi Radya Pratama, landing pages that launch in days, not weeks",
+    "home": {
+      "title": "Rifaldi Radya Pratama — Fast Landing Page Developer",
+      "description": "Landing pages that launch in days, not weeks. Web developer based in Indonesia, working with clients worldwide. See live work."
+    },
+    "work": {
+      "title": "Work — Landing Pages by Rifaldi Radya Pratama",
+      "description": "Live landing pages built by Rifaldi Radya Pratama. Click through to see real, working sites."
+    },
+    "privacy": {
+      "title": "Privacy — Rifaldi Radya Pratama",
+      "description": "How rifaldiradya.com handles analytics cookies, your language choice, and email. No accounts, no forms, no tracking without consent."
+    }
+  },
   "slider": {
     "pause": "Pause slideshow",
     "play": "Play slideshow"
@@ -46,10 +62,10 @@
   },
   "steps": {
     "1": "Brief",
-    "1d": "You send the goal",
     "2": "Build",
-    "2d": "I design and code",
     "3": "Live",
+    "1d": "You send the goal",
+    "2d": "I design and code",
     "3d": "Online, ready to share"
   },
   "work": {
