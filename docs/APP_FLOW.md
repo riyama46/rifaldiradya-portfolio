@@ -304,7 +304,7 @@ Setiap edge case di bawah wajib ditangani persis seperti kolom "Perilaku"; tidak
 | E-07 | Semua publik | JavaScript mati | Semua konten, link, toggle (link biasa), dan mailto tetap berfungsi; O-02, O-03, GA4, Copy email tidak muncul. |
 | E-08 | S-11 | Featured > 3 | Peringatan kuning (lihat S-11), tidak memblokir simpan. |
 | E-09 | Footer | Clipboard API tidak tersedia/ditolak | Alamat email terseleksi otomatis + tooltip "Press Ctrl/Cmd+C to copy". |
-| E-10 | S-10 | 5 login gagal dalam 15 menit | 429 + pesan rate limit; tombol disabled sampai waktu habis. |
+| E-10 | S-10 | 5 login gagal dalam 15 menit dari satu IP, atau 20 dari semua IP | 429 + pesan rate limit; tombol disabled sampai waktu habis. |
 | E-11 | S-12, S-13 | Sesi habis saat submit | 401, input dipertahankan, pesan + link login di tab baru (UF-10). |
 | E-12 | S-12, S-13 | Upload gagal (jaringan, file rusak, > 5 MB, tipe salah) | Pesan spesifik di bawah uploader (bagian 11), tombol Retry; field lain tidak terganggu; Save disabled selama upload berjalan. |
 | E-13 | S-12, S-13 | Save gagal karena error server (500) | Toast merah "Couldn't save. Your changes are still here — try again.", input dipertahankan. |
@@ -388,7 +388,7 @@ Hanya admin yang menulis data; halaman publik membaca langsung di server saat re
 
 | ID | Method & path | Request | Sukses | Error |
 | --- | --- | --- | --- | --- |
-| API-01 | `POST /api/admin/login` | `{ email, password }` | `200 { ok: true }` + Set-Cookie sesi | `400 VALIDATION_FAILED` · `401 INVALID_CREDENTIALS` · `429 RATE_LIMITED` + `retryAfterSeconds` |
+| API-01 | `POST /api/admin/login` | `{ email, password }` | `200 { ok: true }` + Set-Cookie sesi | `400 VALIDATION_FAILED` · `401 INVALID_CREDENTIALS` · `403 FORBIDDEN_ORIGIN` · `429 RATE_LIMITED` + `retryAfterSeconds` (+ header `Retry-After`) · `503 ADMIN_NOT_CONFIGURED` (env admin tidak valid) · `500 SERVER_ERROR` |
 | API-02 | `POST /api/admin/logout` | — | `204` + cookie dihapus | — (selalu sukses) |
 | API-03 | `POST /api/admin/projects` | `ProjectInput` | `201 { project, revalidated: boolean }` | `401` · `422 VALIDATION_FAILED` + `fields` · `500 SERVER_ERROR` |
 | API-04 | `PATCH /api/admin/projects/:id` | `ProjectInput` parsial | `200 { project, revalidated }` | `401` · `404 NOT_FOUND` · `422` · `500` |

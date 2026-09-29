@@ -10,10 +10,15 @@ export async function register() {
     process.env.NEXT_PHASE !== "phase-production-build";
   if (!isProductionServer) return;
 
-  const { assertServerEnv, databaseEnv } = await import("./lib/env");
+  const { assertServerEnv, CHECKED_AT_START, databaseEnv, envProblems } = await import("./lib/env");
 
   // SKIP_ENV_VALIDATION=1 is only for trying a production build locally without real secrets.
-  if (process.env.SKIP_ENV_VALIDATION !== "1") assertServerEnv();
+  if (process.env.SKIP_ENV_VALIDATION !== "1") {
+    assertServerEnv();
+    for (const problem of envProblems(CHECKED_AT_START)) {
+      console.warn(`[env] admin login disabled until fixed: ${problem}`);
+    }
+  }
 
   if (process.env.SKIP_MIGRATIONS === "1") return;
 

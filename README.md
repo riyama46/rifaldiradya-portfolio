@@ -26,9 +26,10 @@ Buka http://localhost:3000.
 | `npm run format` / `format:check` | Format / cek format dengan Prettier |
 | `npm run db:generate`             | Buat file migrasi SQL dari skema    |
 | `npm run db:embed`                | Salin /drizzle ke modul bundel      |
+| `npm run hash-password`           | Buat hash password + salt admin     |
 | `npm run db:migrate`              | Terapkan migrasi (gagal jika error) |
 
-Script e2e dan `hash-password` ditambahkan di task yang membutuhkannya (SDD bagian 12).
+Script e2e ditambahkan di task yang membutuhkannya (SDD bagian 12).
 
 ## Database lokal
 
