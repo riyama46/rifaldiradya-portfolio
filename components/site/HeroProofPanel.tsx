@@ -9,7 +9,7 @@ import type { PublicProject } from "@/lib/projects/public";
 
 export type ProofSlide = Pick<
   PublicProject,
-  "id" | "title" | "liveUrl" | "liveHost" | "thumbnail"
+  "id" | "slug" | "title" | "liveUrl" | "liveHost" | "thumbnail"
 > & {
   /** "Visit {title} (opens in new tab)", resolved on the server so the dictionary stays there. */
   ariaLabel: string;
@@ -71,6 +71,9 @@ export function HeroProofPanel({ slides, labels }: HeroProofPanelProps) {
       <div className="proof-stack relative">
         <a
           href={current.liveUrl}
+          data-track="project_link_click"
+          data-slug={current.slug}
+          data-placement="hero_panel"
           target="_blank"
           rel="noopener noreferrer"
           aria-label={current.ariaLabel}
@@ -121,6 +124,9 @@ export function HeroProofPanel({ slides, labels }: HeroProofPanelProps) {
         </span>
         <a
           href={current.liveUrl}
+          data-track="project_link_click"
+          data-slug={current.slug}
+          data-placement="hero_panel"
           target="_blank"
           rel="noopener noreferrer"
           aria-label={current.ariaLabel}

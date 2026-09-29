@@ -256,13 +256,10 @@ CSP sengaja tanpa nonce: nonce per request memaksa semua halaman dirender dinami
 
 ### Analytics & consent (implementasi F8)
 
-- Komponen `<Analytics />` di layout publik (tidak di admin):
-  1. Skrip inline `beforeInteractive` pertama: `gtag('consent','default',{ analytics_storage:'denied', ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied' })`.
-  2. Jika cookie `consent=granted` sudah ada: `gtag('consent','update',{ analytics_storage:'granted' })`.
-  3. `next/script` `afterInteractive` memuat `gtag/js?id=GA_MEASUREMENT_ID` dan `gtag('config', ID, { send_page_view: true })`.
-- Karena default denied, GA4 tidak menulis cookie `_ga` sebelum Accept. Iklan tidak dipakai, jadi semua `ad_*` tetap denied selamanya.
+- Komponen `<Analytics />` (client) di layout publik dan 404 (tidak di admin). **Mode dasar (DECISIONS T-19):** `gtag.js` baru diminta setelah `consent=granted`, baik saat halaman dibuka dengan cookie itu maupun tepat setelah Accept. Urutannya: `gtag('consent','default', semua denied)` → `gtag('consent','update',{ analytics_storage:'granted' })` → `gtag('config', ID)` (mengirim `page_view` halaman saat ini) → skrip `gtag/js?id=…` disisipkan. Tanpa consent tidak ada skrip, cookie, maupun ping tanpa cookie ke Google. Iklan tidak dipakai, jadi semua `ad_*` tetap denied selamanya.
+- Navigasi client (Link) dihitung oleh GA4 Enhanced measurement "Page changes based on browser history events" (biarkan aktif di pengaturan stream).
 - `<CookieConsent />` (client): baca/tulis cookie `consent` (180 hari, `sameSite=lax`, `secure`), panggil `gtag('consent','update', ...)`. Reject setelah sebelumnya granted → hapus cookie `_ga`, `_ga_<ID>` di domain `.rifaldiradya.com` dan path `/`.
-- `lib/analytics/events.ts` → `track(name, params)` dengan tipe ketat untuk 4 event App Flow bagian 11 (termasuk `placement: 'hero_panel' | 'card'` di `project_link_click`); fungsi tidak melakukan apa-apa jika `window.gtag` tidak ada atau consent bukan granted.
+- `lib/analytics/events.ts` → `track(name, params)` dengan tipe ketat untuk 4 event App Flow bagian 11 (termasuk `placement: 'hero_panel' | 'card'` di `project_link_click`); fungsi tidak melakukan apa-apa jika ID kosong, `window.gtag` tidak ada, atau consent bukan granted. Tautan yang dirender server menandai event lewat atribut (`data-track`, `data-location`, `data-method`, `data-slug`, `data-placement`) dan satu listener klik di `<Analytics />` mengubahnya jadi `track()`, jadi tautan tetap Server Component. `language_switch` dipanggil langsung oleh O-01/O-02.
 - Di GA4: tandai `contact_email_click` sebagai key event; aktifkan data retention 14 bulan; tidak perlu Google Signals.
 - Search Console: verifikasi via DNS TXT di hPanel; submit sitemap setelah launch.
 
@@ -476,7 +473,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 
 ### Fase 4 — Launch (gate: Lighthouse ≥ 90, semua AC lolos)
 
-- [ ] **T-19** GA4 + Consent Mode v2 + O-03 + `track()` 4 event + S-03 tombol Cookie settings. Banner consent di mobile maks. ~130 px tingginya: di 375 × 667 tombol hero "See the Work" berakhir di y = 537 px dan harus tetap terlihat saat banner tampil (PRD F1).
+- [x] **T-19** GA4 + Consent Mode v2 + O-03 + `track()` 4 event + S-03 tombol Cookie settings (gtag.js baru dimuat setelah Accept; event lewat atribut `data-track`; O-02 menunggu O-03 di HP; e2e UF-05 dengan request Google dicegat). Banner consent di mobile maks. ~130 px tingginya: di 375 × 667 tombol hero "See the Work" berakhir di y = 537 px dan harus tetap terlihat saat banner tampil (PRD F1).
 - [ ] **T-20** Header keamanan + CSP; uji securityheaders.com.
 - [ ] **T-21** Isi konten nyata lewat admin (2 project), copy final EN/ID; QA checklist bagian 11.
 - [ ] **T-22** Pindah ke domain utama, Search Console, submit sitemap, tempel link di profil Upwork.

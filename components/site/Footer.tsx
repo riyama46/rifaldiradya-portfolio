@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CookieSettingsButton } from "@/components/overlays/CookieSettingsButton";
 import { FooterCta } from "@/components/site/FooterCta";
 import { ArrowIcon } from "@/components/ui/ArrowIcon";
 import { Container } from "@/components/ui/Container";
@@ -12,9 +13,10 @@ type FooterProps = {
   showCta?: boolean;
 };
 
-const linkClass = "inline-flex min-h-11 items-center rounded-sm hover:text-text hover:underline";
+const linkClass =
+  "inline-flex min-h-11 cursor-pointer items-center rounded-sm hover:text-text hover:underline";
 
-// "Cookie settings" joins this row in T-19 together with the consent banner (O-03).
+// App Flow G2 footer. "Cookie settings" appears only with JS and a configured GA4 ID (O-03).
 export function Footer({ lang, dict, showCta = true }: FooterProps) {
   return (
     <footer>
@@ -24,6 +26,7 @@ export function Footer({ lang, dict, showCta = true }: FooterProps) {
           <Link href={localePath("/privacy", lang)} className={linkClass}>
             {dict.footer.privacy}
           </Link>
+          <CookieSettingsButton label={dict.footer.cookies} className={linkClass} />
           <a
             href={siteConfig.social.linkedin}
             target="_blank"

@@ -42,11 +42,17 @@ export default async function WorkPage({ params }: PageProps<"/[lang]/work">) {
                 <ProjectGrid projects={projects} dict={dict} priorityFirst />
                 <div className="mt-12 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-border pt-8">
                   <p className="font-display text-card font-semibold">{dict.workPage.cta}</p>
-                  <Button href={mailtoHref(dict.email.subject)}>{dict.cta.button}</Button>
+                  <Button
+                    href={mailtoHref(dict.email.subject)}
+                    data-track="contact_email_click"
+                    data-location="work_page"
+                  >
+                    {dict.cta.button}
+                  </Button>
                 </div>
               </>
             ) : (
-              <EmptyState dict={dict} />
+              <EmptyState dict={dict} trackLocation="work_page" />
             )}
           </div>
         </Container>

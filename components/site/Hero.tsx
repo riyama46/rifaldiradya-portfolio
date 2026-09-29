@@ -32,7 +32,12 @@ export function Hero({ dict, proofPanel, avatar }: HeroProps) {
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 lg:mt-9">
             <Button href="#work">{dict.hero.ctaPrimary}</Button>
-            <Button href={mailtoHref(dict.email.subject)} variant="ghost">
+            <Button
+              href={mailtoHref(dict.email.subject)}
+              variant="ghost"
+              data-track="contact_email_click"
+              data-location="hero"
+            >
               {dict.hero.ctaSecondary}
             </Button>
           </div>

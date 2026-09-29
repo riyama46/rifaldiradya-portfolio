@@ -41,6 +41,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
 
   const slides: ProofSlide[] = heroPanel.map((project) => ({
     id: project.id,
+    slug: project.slug,
     title: project.title,
     liveUrl: project.liveUrl,
     liveHost: project.liveHost,

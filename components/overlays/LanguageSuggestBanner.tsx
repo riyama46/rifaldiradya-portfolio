@@ -3,6 +3,9 @@
 import { useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/Button";
 import { localePath, type Dictionary, type Locale } from "@/i18n";
+import { analyticsEnabled } from "@/lib/analytics/config";
+import { CONSENT_CHANGE_EVENT, getConsent } from "@/lib/analytics/consent";
+import { track } from "@/lib/analytics/events";
 import { readLangPref, saveLangPref, shouldSuggestIndonesian } from "@/lib/lang-pref";
 
 type LanguageSuggestBannerProps = {
@@ -12,7 +15,22 @@ type LanguageSuggestBannerProps = {
   labels: Dictionary["langBanner"];
 };
 
-const subscribe = () => () => {};
+const PHONE = "(max-width: 767px)";
+
+/** Re-evaluate when the cookie choice changes or the viewport crosses the phone breakpoint. */
+function subscribe(onChange: () => void) {
+  const media = window.matchMedia(PHONE);
+  window.addEventListener(CONSENT_CHANGE_EVENT, onChange);
+  media.addEventListener("change", onChange);
+  return () => {
+    window.removeEventListener(CONSENT_CHANGE_EVENT, onChange);
+    media.removeEventListener("change", onChange);
+  };
+}
+
+/** On phones both banners sit at the bottom: O-02 waits until O-03 has an answer (App Flow O-02). */
+const waitingForConsent = () =>
+  analyticsEnabled && getConsent() === null && window.matchMedia(PHONE).matches;
 
 function CloseIcon() {
   return (
@@ -42,6 +60,7 @@ export function LanguageSuggestBanner({ lang, path, labels }: LanguageSuggestBan
   const suggest = useSyncExternalStore(
     subscribe,
     () =>
+      !waitingForConsent() &&
       shouldSuggestIndonesian({
         pageLocale: lang,
         langPref: readLangPref(document.cookie),
@@ -72,6 +91,7 @@ export function LanguageSuggestBanner({ lang, path, labels }: LanguageSuggestBan
           className="min-h-9 shrink-0 max-[419px]:mr-auto"
           onClick={(event) => {
             saveLangPref("id");
+            track("language_switch", { from: "en", to: "id", source: "banner" });
             // Keep the anchor, like the toggle (/#work → /id#work).
             if (window.location.hash) {
               event.preventDefault();
