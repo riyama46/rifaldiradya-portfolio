@@ -1,5 +1,9 @@
+"use client";
+
+import type { MouseEvent } from "react";
 import { localePath, type Locale } from "@/i18n";
 import { cn } from "@/lib/cn";
+import { saveLangPref } from "@/lib/lang-pref";
 
 type LanguageToggleProps = {
   lang: Locale;
@@ -10,12 +14,29 @@ type LanguageToggleProps = {
 
 const LOCALE_LABELS: Record<Locale, string> = { en: "EN", id: "ID" };
 
-// O-01: real <a href> links (work without JS, crawlable). T-11 adds the lang_pref cookie,
-// carrying the #hash, and the language_switch event on top of these links.
+/** A plain left click (not a new-tab / new-window / download click). */
+const isPlainClick = (event: MouseEvent) =>
+  event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+
+// O-01: real <a href> links (work without JS, crawlable). With JS a click also stores lang_pref
+// and carries the #hash to the counterpart page (/#work → /id#work). The href comes from the server
+// (no usePathname: it mismatches with proxy rewrites on static pages).
 export function LanguageToggle({ lang, path, label }: LanguageToggleProps) {
   const target: Locale = lang === "en" ? "id" : "en";
   // Pages without a counterpart (404) switch to the other locale's home (App Flow O-01).
   const targetHref = localePath(path ?? "/", target);
+
+  function onSwitch(event: MouseEvent<HTMLAnchorElement>) {
+    saveLangPref(target);
+    const hash = path === null ? "" : window.location.hash;
+    if (hash && isPlainClick(event)) {
+      event.preventDefault();
+      // Switching locale changes the root layout param, which is a full page load anyway; router.push
+      // doubled the hash on that path (/#work#work, caught by e2e), so navigate directly.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.assign(`${targetHref}${hash}`);
+    }
+  }
 
   return (
     <div role="group" aria-label={label} className="flex items-center text-small font-medium">
@@ -26,6 +47,7 @@ export function LanguageToggle({ lang, path, label }: LanguageToggleProps) {
             {index > 0 && <span aria-hidden="true" className="h-3.5 w-px bg-border" />}
             <a
               href={isActive ? undefined : targetHref}
+              onClick={isActive ? undefined : onSwitch}
               lang={locale}
               hrefLang={locale}
               aria-current={isActive ? "true" : undefined}
