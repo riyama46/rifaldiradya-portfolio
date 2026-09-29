@@ -120,3 +120,6 @@ jobs:
           fi
           query "SHOW INDEX FROM projects WHERE Key_name = 'projects_public_order_idx'" | grep -q published \
             || { echo "::error::projects_public_order_idx is missing"; exit 1; }
+
+      - name: Integration tests (real MySQL)
+        run: npm run test:integration

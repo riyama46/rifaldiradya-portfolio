@@ -23,13 +23,15 @@ Buka http://localhost:3000.
 | `npm run lint`                    | ESLint                              |
 | `npm run typecheck`               | Cek tipe TypeScript                 |
 | `npm test` / `test:watch`         | Unit test (Vitest)                  |
+| `npm run test:integration`        | Tes integrasi ke MySQL lokal        |
+| `npm run test:e2e`                | Tes E2E Playwright (Edge terpasang) |
 | `npm run format` / `format:check` | Format / cek format dengan Prettier |
 | `npm run db:generate`             | Buat file migrasi SQL dari skema    |
 | `npm run db:embed`                | Salin /drizzle ke modul bundel      |
 | `npm run hash-password`           | Buat hash password + salt admin     |
 | `npm run db:migrate`              | Terapkan migrasi (gagal jika error) |
 
-Script e2e ditambahkan di task yang membutuhkannya (SDD bagian 12).
+Tes integrasi dan E2E butuh database Docker lokal. E2E juga butuh `E2E_ADMIN_EMAIL` dan `E2E_ADMIN_PASSWORD` di `.env.local` (admin lokal, bukan password produksi); tes menjalankan build produksi di port 3100 dan membersihkan data yang dibuatnya.
 
 ## Database lokal
 
@@ -52,7 +54,7 @@ lib/          Helper bersama (fonts, cn, env, header locale), db/ (skema, klien,
 drizzle/      File migrasi SQL (dibuat dengan npm run db:generate)
 scripts/      Script Node (migrate.mts)
 styles/       globals.css: token desain, Tailwind, motion
-tests/unit/   Unit test Vitest (i18n, richText, proxy)
+tests/        unit/ (Vitest), integration/ (Vitest + MySQL), e2e/ (Playwright)
 docs/         PRD, App Flow, SDD, DECISIONS, dan mockup desain
   design/     homepage-mockup.html (referensi visual); archive/ berisi versi lama
 proxy.ts      Routing: www → non-www, /en → /, locale rewrite, guard admin
