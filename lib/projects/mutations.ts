@@ -1,4 +1,4 @@
-import { eq, like, or } from "drizzle-orm";
+import { asc, desc, eq, gt, like, or, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { projects, type Project } from "@/lib/db/schema";
 import { mediaUrl } from "@/lib/images/rules";
@@ -7,7 +7,11 @@ import { getProjectById } from "./queries";
 import { slugify, uniqueSlug } from "./slug";
 import type { ProjectInput, ProjectInputRaw } from "./validation";
 
-// Writes for API-03/04 (SDD section 4: DB access stays in lib/projects, lib/images and lib/auth).
+// Writes for API-03/04/05/08 (SDD section 4: DB access stays in lib/projects, lib/images, lib/auth).
+//
+// Positions (column sort_order) are always 1…n with no duplicates (DECISIONS T-18b): a new project
+// takes position 1 and the others move back one, a deleted one closes its gap, and ↑/↓ swaps two
+// neighbours. The form never sends a position.
 
 /** Stored project → ProjectInput shape, the base that API-04 merges a partial body over. */
 export function toProjectInput(project: Project): ProjectInputRaw {
@@ -34,7 +38,6 @@ export function toProjectInput(project: Project): ProjectInputRaw {
       : null,
     thumbnail_alt_en: project.thumbnailAltEn,
     thumbnail_alt_id: project.thumbnailAltId,
-    sort_order: project.sortOrder,
     featured: project.featured,
     published: project.published,
   };
@@ -65,7 +68,6 @@ function toColumns(input: ProjectInput) {
     thumbnailHeight: input.thumbnail?.height ?? null,
     thumbnailAltEn: input.thumbnail_alt_en,
     thumbnailAltId: input.thumbnail_alt_id,
-    sortOrder: input.sort_order,
     featured: input.featured,
     published: input.published,
   };
@@ -84,6 +86,12 @@ async function freeSlug(title: string): Promise<string> {
   );
 }
 
+/**
+ * Moving a project is not an edit of its content: keep updated_at (shown on S-11, used for the
+ * sitemap lastmod) instead of letting the schema's $onUpdateFn stamp every shifted row.
+ */
+const keepUpdatedAt = { updatedAt: sql`${projects.updatedAt}` };
+
 const isDuplicateKey = (error: unknown) =>
   (error as { cause?: { code?: string }; code?: string })?.cause?.code === "ER_DUP_ENTRY" ||
   (error as { code?: string })?.code === "ER_DUP_ENTRY";
@@ -96,10 +104,16 @@ export async function createProject(input: ProjectInput): Promise<Project> {
   for (let attempt = 1; ; attempt++) {
     const slug = await freeSlug(input.title_en);
     try {
-      const [{ id }] = await getDb()
-        .insert(projects)
-        .values({ ...toColumns(input), slug })
-        .$returningId();
+      const id = await getDb().transaction(async (tx) => {
+        await tx
+          .update(projects)
+          .set({ sortOrder: sql`${projects.sortOrder} + 1`, ...keepUpdatedAt });
+        const [row] = await tx
+          .insert(projects)
+          .values({ ...toColumns(input), slug, sortOrder: 1 })
+          .$returningId();
+        return row.id;
+      });
       return (await getProjectById(id))!;
     } catch (error) {
       if (attempt >= 3 || !isDuplicateKey(error)) throw error;
@@ -148,10 +162,52 @@ export async function updateProject(
 
 /** API-05: removes the project, then its image (App Flow UF-09). false = it was already gone. */
 export async function deleteProject(existing: Project): Promise<boolean> {
-  const [result] = await getDb().delete(projects).where(eq(projects.id, existing.id));
-  if (result.affectedRows === 0) return false;
+  const deleted = await getDb().transaction(async (tx) => {
+    const [result] = await tx.delete(projects).where(eq(projects.id, existing.id));
+    if (result.affectedRows === 0) return false;
+    await tx
+      .update(projects)
+      .set({ sortOrder: sql`${projects.sortOrder} - 1`, ...keepUpdatedAt })
+      .where(gt(projects.sortOrder, existing.sortOrder));
+    return true;
+  });
+  if (!deleted) return false;
   await deleteImageIfUnused(existing.thumbnailPublicId).catch((error: Error) =>
     console.error("[images] thumbnail cleanup after delete failed:", error.message),
   );
   return true;
+}
+
+export type MoveDirection = "up" | "down";
+
+/**
+ * API-08: swaps a project with its neighbour above or below. Every position is rewritten as 1…n in
+ * the current order at the same time, so any older gaps or duplicates heal on the first move.
+ * Returns the new position (unchanged at the top/bottom edge), or null when the project is gone.
+ */
+export async function moveProject(id: string, direction: MoveDirection): Promise<number | null> {
+  return getDb().transaction(async (tx) => {
+    const rows = await tx
+      .select({ id: projects.id, sortOrder: projects.sortOrder })
+      .from(projects)
+      .orderBy(asc(projects.sortOrder), desc(projects.createdAt))
+      .for("update");
+    const index = rows.findIndex((row) => row.id === id);
+    if (index === -1) return null;
+
+    const target = direction === "up" ? index - 1 : index + 1;
+    const order = [...rows];
+    if (target >= 0 && target < order.length) {
+      [order[index], order[target]] = [order[target], order[index]];
+    }
+    for (const [position, row] of order.entries()) {
+      if (row.sortOrder !== position + 1) {
+        await tx
+          .update(projects)
+          .set({ sortOrder: position + 1, ...keepUpdatedAt })
+          .where(eq(projects.id, row.id));
+      }
+    }
+    return order.findIndex((row) => row.id === id) + 1;
+  });
 }

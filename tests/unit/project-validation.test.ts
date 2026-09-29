@@ -25,7 +25,6 @@ const valid = {
   thumbnail,
   thumbnail_alt_en: "Homepage of a coffee shop site",
   thumbnail_alt_id: "Beranda situs kedai kopi",
-  sort_order: 10,
   featured: true,
   published: true,
 };
@@ -49,14 +48,12 @@ describe("projectInputSchema: valid input", () => {
       thumbnail_alt_en: undefined,
       thumbnail_alt_id: undefined,
       tags: undefined,
-      sort_order: undefined,
       featured: undefined,
       published: undefined,
     });
     expect(draft).toMatchObject({
       tags: [],
       thumbnail: null,
-      sort_order: 100,
       featured: false,
       published: false,
     });
@@ -146,10 +143,10 @@ describe("projectInputSchema: App Flow section 11 messages", () => {
     expect(Object.keys(errors).sort()).toEqual(["live_url", "thumbnail", "title_id"]);
   });
 
-  it.each([-1, 1000, 1.5, "10", null])("rejects sort_order %s", (sort_order) => {
-    expect(errorsFor({ ...valid, sort_order }).sort_order).toBe(
-      "Use a whole number from 0 to 999.",
-    );
+  it("ignores a position sent with the project (only API-08 changes it)", () => {
+    const parsed = projectInputSchema.parse({ ...valid, sort_order: 1 });
+    expect(parsed).not.toHaveProperty("sort_order");
+    expect(pickProjectFields({ sort_order: 1, featured: false })).toEqual({ featured: false });
   });
 
   it.each([
@@ -198,7 +195,7 @@ describe("pickProjectFields (API-04 merge)", () => {
       ...valid,
       ...pickProjectFields({ title_en: "New" }),
     });
-    expect(renamed).toMatchObject({ title_en: "New", sort_order: 10, featured: true });
+    expect(renamed).toMatchObject({ title_en: "New", featured: true });
   });
 });
 

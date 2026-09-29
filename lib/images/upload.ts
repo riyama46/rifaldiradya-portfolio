@@ -1,15 +1,16 @@
 import { inspectImage } from "./inspect";
 import {
   heightFor,
+  KINDS,
   MAX_VARIANT_BYTES,
-  MIN_SOURCE_WIDTH,
   variantWidthsFor,
   type ImageFormat,
+  type ImageKind,
 } from "./rules";
 
 // API-06 body check: the browser sends every width it made from one source image. The server
 // trusts nothing about them: format and size are read from the bytes, and the set of widths and
-// the 16:10 shape must be exactly what the admin compression produces.
+// the shape (16:10 thumbnail, 1:1 avatar) must be exactly what the admin compression produces.
 
 export type Variant = { width: number; height: number; bytes: Uint8Array };
 
@@ -25,12 +26,15 @@ export type UploadCheck =
 export const uploadMessages = {
   tooLarge: "This image is too large after compression. Try a smaller image.",
   type: "Use a JPG, PNG, or WebP image.",
-  tooSmall: (width: number) =>
-    `This image is ${width} px wide. Use one at least ${MIN_SOURCE_WIDTH} px wide.`,
+  tooSmall: (width: number, minimum: number) =>
+    `This image is ${width} px wide. Use one at least ${minimum} px wide.`,
   malformed: "Upload failed. Check your connection and try again.",
 } as const;
 
-export function checkVariants(parts: readonly Uint8Array[]): UploadCheck {
+export function checkVariants(
+  parts: readonly Uint8Array[],
+  kind: ImageKind = "thumbnail",
+): UploadCheck {
   const malformed = {
     ok: false,
     status: 422,
@@ -55,19 +59,21 @@ export function checkVariants(parts: readonly Uint8Array[]): UploadCheck {
 
   variants.sort((a, b) => a.width - b.width);
   const largest = variants.at(-1)!;
-  if (largest.width < MIN_SOURCE_WIDTH) {
+  const { minSourceWidth } = KINDS[kind];
+  // The largest stored width equals the crop (thumbnail, max 1600) or 320 (avatar).
+  if (largest.width < minSourceWidth) {
     return {
       ok: false,
       status: 422,
       code: "IMAGE_TOO_SMALL",
-      message: uploadMessages.tooSmall(largest.width),
+      message: uploadMessages.tooSmall(largest.width, minSourceWidth),
     };
   }
 
-  const expected = variantWidthsFor(largest.width);
+  const expected = variantWidthsFor(largest.width, kind);
   const widthsMatch =
     expected.length === variants.length && expected.every((w, i) => variants[i].width === w);
-  const shapesMatch = variants.every((v) => Math.abs(v.height - heightFor(v.width)) <= 1);
+  const shapesMatch = variants.every((v) => Math.abs(v.height - heightFor(v.width, kind)) <= 1);
   if (!widthsMatch || !shapesMatch) return malformed;
 
   return { ok: true, format: format!, variants };

@@ -1,3 +1,4 @@
+import { AdminNav } from "@/components/admin/AdminNav";
 import { LogoutButton } from "@/components/admin/LogoutButton";
 import { adminStrings } from "@/components/admin/strings";
 import { ArrowIcon } from "@/components/ui/ArrowIcon";
@@ -26,6 +27,7 @@ export default async function AdminPanelLayout({ children }: LayoutProps<"/admin
           <LogoutButton />
         </Container>
       </header>
+      <AdminNav />
       <main>
         <Container className="py-10">{children}</Container>
       </main>

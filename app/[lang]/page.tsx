@@ -14,6 +14,7 @@ import {
   selectHomepageProjects,
   toPublicProject,
 } from "@/lib/projects/public";
+import { getPublicAvatar } from "@/lib/images/store";
 import { getPublishedProjects } from "@/lib/projects/queries";
 
 // Safety net; admin saves also revalidate on demand (T-15). SDD section 5.
@@ -24,7 +25,8 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
   const lang = await resolveLocale(params);
   const dict = getDictionary(lang);
 
-  const published = (await getPublishedProjects()).map((project) => toPublicProject(project, lang));
+  const [projects, avatar] = await Promise.all([getPublishedProjects(), getPublicAvatar()]);
+  const published = projects.map((project) => toPublicProject(project, lang));
   const { heroPanel, grid, total } = selectHomepageProjects(published);
 
   const slides: ProofSlide[] = heroPanel.map((project) => ({
@@ -47,6 +49,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
       <main id="content" tabIndex={-1}>
         <Hero
           dict={dict}
+          avatar={avatar}
           proofPanel={
             slides.length > 0 ? (
               <HeroProofPanel

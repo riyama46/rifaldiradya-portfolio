@@ -46,6 +46,7 @@ export default async function AdminProjectsPage({ searchParams }: PageProps<"/ad
               </p>
             )}
             <p>{strings.gridInfo}</p>
+            <p>{strings.orderHelp}</p>
           </div>
           <div className="mt-6">
             <ProjectList projects={projects} now={new Date()} />

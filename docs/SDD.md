@@ -66,8 +66,10 @@ Hostinger menyatakan hanya menyediakan MySQL di paket shared/managed, dan app No
 
 | Tabel | Kolom | Catatan |
 | --- | --- | --- |
-| `projects` | `id` varchar(26) PK (cuid2/ulid) · `slug` varchar(100) unique · `title_en`, `title_id` varchar(80) · `summary_en`, `summary_id` varchar(160) · `live_url` varchar(300) · `tags` JSON (array string) · `thumbnail_public_id` varchar(255) null · `thumbnail_url` varchar(500) null · `thumbnail_width`, `thumbnail_height` int null · `thumbnail_alt_en`, `thumbnail_alt_id` varchar(140) null · `sort_order` smallint default 100 · `featured`, `published` boolean default false · `created_at`, `updated_at` datetime(3) UTC | Index: (`published`, `sort_order`, `created_at`). Charset `utf8mb4`, collation `utf8mb4_unicode_ci`. |
+| `projects` | `id` varchar(26) PK (cuid2/ulid) · `slug` varchar(100) unique · `title_en`, `title_id` varchar(80) · `summary_en`, `summary_id` varchar(160) · `live_url` varchar(300) · `tags` JSON (array string) · `thumbnail_public_id` varchar(255) null · `thumbnail_url` varchar(500) null · `thumbnail_width`, `thumbnail_height` int null · `thumbnail_alt_en`, `thumbnail_alt_id` varchar(140) null · `sort_order` smallint default 1 (posisi 1…n, unik, dijaga `lib/projects/mutations.ts`) · `featured`, `published` boolean default false · `created_at`, `updated_at` datetime(3) UTC | Index: (`published`, `sort_order`, `created_at`). Charset `utf8mb4`, collation `utf8mb4_unicode_ci`. |
 | `admin_sessions` | `id` varchar(26) PK · `token_hash` char(64) unique (SHA-256 dari token) · `created_at` · `expires_at` · `last_seen_at` · `user_agent` varchar(255) | Token asli hanya ada di cookie; DB menyimpan hash. Sesi kedaluwarsa dibersihkan saat login. |
+| `site_settings` | `key` varchar(50) PK · `value` varchar(255) null · `updated_at` | Pengaturan kecil dari admin; saat ini hanya `profile_photo` = id gambar (S-14). |
+| `images` / `image_variants` | lihat "Gambar (MySQL)" di bawah | Gambar project (16:10) dan foto profil (1:1). |
 | `login_attempts` | `id` bigint PK auto · `ip_hash` char(64) · `success` boolean · `created_at` | Untuk rate limit 5 gagal / 15 menit / IP. Baris > 7 hari dihapus saat login. IP disimpan sebagai hash, bukan mentah. |
 
 Kredensial admin **tidak** disimpan di tabel: `ADMIN_EMAIL` dan `ADMIN_PASSWORD_HASH` di environment variable Hostinger (bagian 9). Ganti password = generate hash baru dengan skrip `npm run hash-password` lalu update env dan restart app.
@@ -107,6 +109,7 @@ Repo GitHub private `rifaldiradya-portfolio`, satu branch produksi `main`. Struk
 │  │  ├─ login/page.tsx        # S-10 (di luar grup, tanpa sesi)
 │  │  └─ (panel)/              # route group: layout.tsx = requireAdmin() + header G3
 │  │     ├─ page.tsx           # S-11 (/admin)
+│  │     ├─ profile/page.tsx   # S-14 (foto profil, T-18b)
 │  │     └─ projects/
 │  │        ├─ new/page.tsx    # S-12
 │  │        └─ [id]/page.tsx   # S-13
@@ -467,6 +470,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 - [x] **T-15** Skema Zod bersama (`lib/projects/validation.ts`) + API-03/04 + `revalidate.ts`; revalidasi diverifikasi di `next start` (4 halaman berubah di kunjungan pertama setelah simpan).
 - [x] **T-16** Penyimpanan gambar di MySQL (tabel `images` + `image_variants`, migrasi 0002), kompresi di browser, API-06/07, route `/media`, loader; ImageUploader (dipasang di form T-17); kelompok env Cloudinary dihapus.
 - [x] **T-17** S-12/S-13 ProjectForm lengkap (validasi, dialog discard, `beforeunload`) + API-05 hapus + ConfirmDialog; Toggle, ImageUploader terpasang, varian Button `danger`.
+- [x] **T-18b** (tambahan, permintaan Pal) Urutan project dengan tombol ↑/↓ di S-11 (API-08, posisi 1…n tanpa kembar, project baru di #1, field Sort order dihapus dari form) + foto profil hero lewat admin S-14 (API-09, `site_settings`, upload `kind=avatar`); migrasi 0003 menomori ulang urutan lama.
 - [x] **T-18** Test integrasi (`npm run test:integration`, juga di CI job `database`) + e2e UF-06, UF-07, UF-09 (`npm run test:e2e`, Playwright di Edge terpasang, desktop + 375 px).
 
 ### Fase 4 — Launch (gate: Lighthouse ≥ 90, semua AC lolos)

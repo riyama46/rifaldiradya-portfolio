@@ -6,7 +6,7 @@ import { adminStrings } from "@/components/admin/strings";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { compressImage, isSourceProblem, type SourceProblem } from "@/lib/images/compress";
-import { ACCEPTED_TYPES, extensionFor } from "@/lib/images/rules";
+import { ACCEPTED_TYPES, extensionFor, type ImageKind } from "@/lib/images/rules";
 
 export type UploadedImage = { public_id: string; url: string; width: number; height: number };
 
@@ -27,6 +27,8 @@ type ImageUploaderProps = {
   onBusyChange?: (busy: boolean) => void;
   describedBy?: string;
   invalid?: boolean;
+  /** "thumbnail" (16:10 project image, default) or "avatar" (square profile photo, S-14). */
+  imageKind?: ImageKind;
 };
 
 const strings = adminStrings.uploader;
@@ -38,7 +40,7 @@ function problemMessage(problem: SourceProblem): string {
     case "size":
       return strings.errors.size(problem.megabytes);
     case "width":
-      return strings.errors.width(problem.width);
+      return strings.errors.width(problem.width, problem.minimum);
     case "short":
       return strings.errors.short(problem.height);
     case "tooLarge":
@@ -86,7 +88,9 @@ export function ImageUploader({
   onBusyChange,
   describedBy,
   invalid = false,
+  imageKind = "thumbnail",
 }: ImageUploaderProps) {
+  const avatar = imageKind === "avatar";
   const input = useRef<HTMLInputElement>(null);
   const [lastFile, setLastFile] = useState<File | null>(null);
   const [status, setStatus] = useState<Status>({ kind: "idle" });
@@ -109,13 +113,14 @@ export function ImageUploader({
     setLastFile(file);
     update({ kind: "preparing" });
 
-    const compressed = await compressImage(file);
+    const compressed = await compressImage(file, imageKind);
     if (isSourceProblem(compressed)) {
       update({ kind: "error", message: problemMessage(compressed) });
       return;
     }
 
     const form = new FormData();
+    form.append("kind", imageKind);
     for (const variant of compressed.variants) {
       form.append("variant", variant.blob, `${variant.width}.${extensionFor(compressed.format)}`);
     }
@@ -172,7 +177,10 @@ export function ImageUploader({
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         className={cn(
-          "relative grid aspect-[16/10] w-full max-w-[480px] place-items-center overflow-hidden rounded-card border bg-surface",
+          "relative grid w-full place-items-center overflow-hidden border bg-surface",
+          avatar
+            ? "aspect-square max-w-[240px] rounded-card"
+            : "aspect-[16/10] max-w-[480px] rounded-card",
           value ? "border-border" : "border-dashed",
           dragging ? "border-accent bg-accent-soft" : invalid ? "border-danger" : "border-border",
         )}
@@ -182,9 +190,9 @@ export function ImageUploader({
             src={value.url}
             width={value.width}
             height={value.height}
-            sizes="(min-width: 1024px) 480px, 100vw"
+            sizes={avatar ? "240px" : "(min-width: 1024px) 480px, 100vw"}
             alt={strings.previewAlt}
-            className="size-full object-cover"
+            className={cn("size-full object-cover", avatar && "rounded-full")}
           />
         ) : (
           <div className="grid justify-items-center gap-2 p-6 text-center text-small text-text-muted">
@@ -201,7 +209,7 @@ export function ImageUploader({
                 {strings.choose}
               </button>
             </p>
-            <p>{strings.hint}</p>
+            <p>{avatar ? strings.hintAvatar : strings.hint}</p>
           </div>
         )}
 
@@ -247,7 +255,9 @@ export function ImageUploader({
         </div>
       )}
 
-      <p className="text-small text-text-muted">{strings.cropNote}</p>
+      <p className="text-small text-text-muted">
+        {avatar ? strings.cropNoteAvatar : strings.cropNote}
+      </p>
 
       <div aria-live="polite">
         {status.kind === "error" && (

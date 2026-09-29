@@ -94,7 +94,6 @@ test("UF-07 + UF-09: add a published project with an image, see it on /work, del
 
   await page.getByLabel("Thumbnail alt (EN)").fill("Gradient test image");
   await page.getByLabel("Thumbnail alt (ID)").fill("Gambar uji gradasi");
-  await page.getByLabel("Sort order").fill("999");
   await page.getByRole("switch", { name: "Published" }).click();
   await expect(page.getByRole("switch", { name: "Published" })).toHaveAttribute(
     "aria-checked",
@@ -105,6 +104,16 @@ test("UF-07 + UF-09: add a published project with an image, see it on /work, del
   await expect(page).toHaveURL(/\/admin(\?|$)/);
   await expect(page.getByRole("status")).toHaveText("Project created");
   await expect(page.getByRole("link", { name: title, exact: true }).first()).toBeVisible();
+
+  // A new project is placed first; ↓ moves it to #2 and keyboard focus stays on the button.
+  const up = page.getByRole("button", { name: `Move ${title} up` });
+  const down = page.getByRole("button", { name: `Move ${title} down` });
+  await expect(up).toBeDisabled();
+  await down.click();
+  await expect(up).toBeEnabled();
+  await expect(down).toBeFocused();
+  await up.click();
+  await expect(up).toBeDisabled();
 
   // On the public Work page after on-demand revalidation (first visit after the save).
   await page.goto("/work");

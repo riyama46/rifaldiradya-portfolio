@@ -2,7 +2,8 @@ import { z } from "zod";
 
 // ProjectInput (App Flow section 10) with the field rules of sections 6 and 9 and the admin error
 // messages of section 11. Shared by the admin form (client, on blur) and API-03/04 (server), so it
-// must not import anything server-only.
+// must not import anything server-only. The position (sort_order) is not part of it: it is changed
+// only with the ↑/↓ buttons on S-11 (API-08) and kept as 1…n by lib/projects/mutations.ts.
 
 export const TITLE_MAX = 80;
 export const SUMMARY_MAX = 160;
@@ -10,7 +11,6 @@ export const LIVE_URL_MAX = 300;
 export const TAGS_MAX = 4;
 export const TAG_MAX = 24;
 export const ALT_MAX = 140;
-export const SORT_ORDER_DEFAULT = 100;
 
 export const fieldLabels = {
   title_en: "Title (EN)",
@@ -22,7 +22,6 @@ export const fieldLabels = {
   thumbnail: "Thumbnail",
   thumbnail_alt_en: "Thumbnail alt (EN)",
   thumbnail_alt_id: "Thumbnail alt (ID)",
-  sort_order: "Sort order",
   featured: "Featured",
   published: "Published",
 } as const;
@@ -35,7 +34,6 @@ export const messages = {
   url: "URL must start with https:// and be a full address.",
   tooManyTags: `Use up to ${TAGS_MAX} tags.`,
   duplicateTag: (tag: string) => `"${tag}" is already added. Each tag must be unique.`,
-  sortOrder: "Use a whole number from 0 to 999.",
   publishIncomplete:
     "Add a thumbnail and alt text to publish, or turn off Published to save as draft.",
   invalid: (field: ProjectField) => `${fieldLabels[field]} is not valid.`,
@@ -133,12 +131,6 @@ const projectShape = {
   thumbnail: thumbnailSchema.nullish().transform((value) => value ?? null),
   thumbnail_alt_en: optionalAlt(),
   thumbnail_alt_id: optionalAlt(),
-  sort_order: z
-    .number({ error: messages.sortOrder })
-    .int(messages.sortOrder)
-    .min(0, messages.sortOrder)
-    .max(999, messages.sortOrder)
-    .default(SORT_ORDER_DEFAULT),
   featured: z.boolean({ error: messages.invalid("featured") }).default(false),
   published: z.boolean({ error: messages.invalid("published") }).default(false),
 };
