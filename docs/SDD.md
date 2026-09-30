@@ -395,20 +395,22 @@ Alurnya: kode di GitHub → Hostinger menarik repo → install, build, start oto
 
 ### Pindah ke domain utama (Fase 4)
 
-1. Hapus/lepas website lama di rifaldiradya.com hanya setelah backup dan setelah versi uji lolos QA. Dokumentasi Hostinger menyebut alur deploy Node.js membuat slot baru, jadi domain yang sudah terpasang harus dilepas dulu ([Hostinger docs](https://docs.hostinger.com/node.js/creating-an-app)).
-2. Hubungkan domain rifaldiradya.com ke app Node.js; pastikan SSL aktif untuk `rifaldiradya.com` dan `www.rifaldiradya.com`; cek `https://www.rifaldiradya.com/work` → 301 ke `https://rifaldiradya.com/work`.
-3. Ubah `SITE_URL` ke domain utama, redeploy.
-4. Cek ulang: canonical, sitemap, hreflang memakai domain utama; email di hello@rifaldiradya.com tetap berfungsi (record MX tidak boleh berubah).
-5. Periksa otomatis dari luar: `node scripts/check-deploy.mts https://rifaldiradya.com --production` (dan tanpa `--production` untuk devstaging).
+Dijalankan 30 Sep 2026 (DECISIONS T-22):
+
+1. Kosongkan website lama di rifaldiradya.com (WordPress, kontennya tidak dibutuhkan) setelah versi uji lolos QA. Jangan pakai dialog "Connect domain" yang menawarkan reset email; website Node.js baru di domain yang sama tetap mendapat email gratis, dan record MX tidak berubah.
+2. hPanel → Databases: buat database + user baru untuk produksi. Di Hostinger setiap database berpasangan dengan user-nya sendiri, jadi `DATABASE_NAME` dan `DATABASE_USER` harus pasangan yang sama persis (salah nama database = login 500 dan `/media` 503, log runtime: `Access denied … to database`). Salin isi database devstaging lewat phpMyAdmin (Export → Import).
+3. Add Website → Node.js web app di rifaldiradya.com, branch `main`, env produksi: `SITE_URL=https://rifaldiradya.com`, `DATABASE_HOST=127.0.0.1`, database baru, GA4 diisi. Pastikan SSL aktif untuk `rifaldiradya.com` dan `www`.
+4. Website devstaging lama pindah ke branch `staging`, tetap memakai database lamanya; kosongkan GA4 lalu redeploy.
+5. Periksa otomatis dari luar: `node scripts/check-deploy.mts https://rifaldiradya.com --production` (24 pemeriksaan) dan tanpa `--production` untuk devstaging (23). Cek juga: login dengan kredensial salah → 401 (bukan 500/403), `/media/<id-tidak-ada>.webp` → 404 (bukan 503), record MX/SPF/DKIM/DMARC sama seperti sebelum pindah.
 
 ### Dua lingkungan setelah launch (keputusan Pal, T-22)
 
 | | Produksi | Staging |
 | --- | --- | --- |
 | Domain | `rifaldiradya.com` (+ `www` → 301) | `devstaging.rifaldiradya.com` |
-| Website Hostinger | App Node.js yang dipakai devstaging sampai T-22, domainnya diganti | Website Node.js baru |
+| Website Hostinger | Website Node.js baru di domain utama | Website Node.js yang dipakai sejak Fase 1 |
 | Branch deploy | `main` | `staging` |
-| Database | Database yang sudah ada (berisi konten asli) | Database baru, salinan sekali dari produksi (export/import phpMyAdmin) |
+| Database | Database baru, salinan sekali dari devstaging (export/import phpMyAdmin) | Database lama devstaging |
 | `SITE_URL` | `https://rifaldiradya.com` (terindeks) | `https://devstaging.rifaldiradya.com` (noindex otomatis) |
 | GA4 | ID diisi | Kosong (tanpa banner, tidak mengotori data) |
 
@@ -492,7 +494,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 - [x] **T-19** GA4 + Consent Mode v2 + O-03 + `track()` 4 event + S-03 tombol Cookie settings (gtag.js baru dimuat setelah Accept; event lewat atribut `data-track`; O-02 menunggu O-03 di HP; e2e UF-05 dengan request Google dicegat). Banner consent di mobile maks. ~130 px tingginya: di 375 × 667 tombol hero "See the Work" berakhir di y = 537 px dan harus tetap terlihat saat banner tampil (PRD F1).
 - [x] **T-20** Header keamanan + CSP (`lib/security-headers.ts`); e2e merekam pelanggaran CSP (0 di halaman publik, 404, GA setelah Accept, admin + upload). Uji securityheaders.com di devstaging setelah deploy.
 - [x] **T-21** Isi konten nyata lewat admin (Pal, di devstaging), copy final EN/ID; QA otomatis di devstaging: PageSpeed mobile homepage 98/100/100 (SEO 61 karena staging sengaja noindex), 6 halaman × 5 lebar (360–1440) tanpa scroll samping/gambar rusak, 1 H1 per halaman. Perbaikan: CSP juga lewat `<meta>` (CDN Hostinger menimpa header CSP), bahasa aktif di toggle bukan link, favicon + ikon aplikasi. Sisa manual sebelum launch: HP Android/iPhone nyata + pembaca layar, securityheaders.com dan Rich Results Test setelah domain utama.
-- [ ] **T-22** Pindah ke domain utama, Search Console, submit sitemap, tempel link di profil Upwork.
+- [ ] **T-22** Pindah ke domain utama, Search Console, submit sitemap, tempel link di profil Upwork. Selesai 30 Sep 2026: produksi live di rifaldiradya.com (branch `main`, database sendiri, check-deploy 24/24, login 401, `/media` 404, DNS email utuh), devstaging di branch `staging` (23/23). Sisa: Search Console + sitemap, link Upwork, key event GA4 `contact_email_click` + retensi 14 bulan, uji kirim/balas email hello@, QA manual HP + pembaca layar, securityheaders.com + Rich Results Test di produksi.
 
 ## 13. Aturan kerja dengan coding AI
 
@@ -556,7 +558,7 @@ Eksekusi kode, testing, dan push ke Git dikerjakan di setup terpisah (vibe-codin
 
 Empat hal perlu dijawab atau diuji sebelum/selama Fase 1; sisanya sudah dikunci.
 
-- [ ] Status rifaldiradya.com di hPanel: **WordPress masih aktif, kontennya tidak dibutuhkan** (dikonfirmasi 28 Sep 2026); tetap ikuti alur "Pindah ke domain utama" di bagian 10 (backup dulu sebagai jaring pengaman, lalu lepas). Masih perlu dicek: apakah staging0/staging1 terdaftar sebagai website terpisah.
+- [x] Status rifaldiradya.com di hPanel: WordPress (kontennya tidak dibutuhkan) dikosongkan Pal dan diganti website Node.js baru pada 30 Sep 2026 (bagian 10, "Pindah ke domain utama").
 - [ ] Apakah server build Hostinger bisa menjangkau MySQL saat `next build` (diuji di T-06; desain sudah aman untuk kedua kemungkinan).
 - [x] Migrasi di perintah `start`: **tidak bisa diandalkan**, karena Hostinger menjalankan Next.js langsung. Solusi: migrasi di `instrumentation.ts` (bagian 3). Sebelumnya: jalankan manual via phpMyAdmin setiap ada perubahan skema.
 - [x] Link sosial di footer: LinkedIn (disimpan di `lib/site-config.ts`, bagian 9).
