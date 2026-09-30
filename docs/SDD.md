@@ -378,11 +378,11 @@ Alurnya: kode di GitHub → Hostinger menarik repo → install, build, start oto
 
 ### Persiapan sekali saja
 
-- [ ] **Cek domain utama di hPanel → Websites.** Jika rifaldiradya.com masih terpasang sebagai website (mis. WordPress), jangan dihapus dulu. Backup file + database WordPress lewat hPanel, dan pastikan subdomain `staging0`/`staging1` terdaftar sebagai website terpisah yang tidak ikut terhapus.
-- [ ] Buat repo GitHub private, push skeleton Next.js yang sudah bisa `npm run build` di lokal.
-- [ ] hPanel → Databases: buat database MySQL + user khusus app; catat nama, user, password.
-- [ ] Buat property GA4, catat Measurement ID.
-- [ ] Generate `ADMIN_PASSWORD_HASH` di lokal.
+- [x] **Cek domain utama di hPanel → Websites.** Jika rifaldiradya.com masih terpasang sebagai website (mis. WordPress), jangan dihapus dulu. Backup file + database WordPress lewat hPanel, dan pastikan subdomain `staging0`/`staging1` terdaftar sebagai website terpisah yang tidak ikut terhapus.
+- [x] Buat repo GitHub private, push skeleton Next.js yang sudah bisa `npm run build` di lokal.
+- [x] hPanel → Databases: buat database MySQL + user khusus app; catat nama, user, password.
+- [x] Buat property GA4, catat Measurement ID.
+- [x] Generate `ADMIN_PASSWORD_HASH` di lokal.
 
 ### Deploy pertama (Fase 1, di subdomain uji)
 
@@ -443,19 +443,19 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 
 ### Checklist QA manual sebelum launch
 
-- [ ] Semua acceptance criteria PRD F1–F9 dicentang satu per satu.
-- [ ] Semua edge case App Flow E-01 s.d. E-20 dicoba (yang bisa disimulasikan).
-- [ ] PageSpeed Insights mobile ≥ 90 dan Core Web Vitals lolos di `/`, `/work`, `/id`, `/id/work`.
-- [ ] Lighthouse Accessibility & SEO ≥ 95; navigasi penuh dengan keyboard; screen reader (VoiceOver/TalkBack) membaca hero, kartu, dan dialog dengan benar.
-- [ ] Tampilan di HP Android dan iPhone nyata, layar 360–1440 px, tanpa horizontal scroll.
+- [x] Semua acceptance criteria PRD F1–F9 dicentang satu per satu (per task lewat Definition of Done, bagian 12, dan tes otomatis: unit 271, integrasi 18, E2E 40).
+- [x] Semua edge case App Flow E-01 s.d. E-20 dicoba (yang bisa disimulasikan), per task + E2E.
+- [x] PageSpeed Insights mobile ≥ 90 dan Core Web Vitals lolos di `/`, `/work`, `/id`, `/id/work`. Produksi 30 Sep 2026: `/` 99/100/100/100 (LCP 1,2 s, CLS 0), `/work` 100/100/100/100 (LCP 1,1 s); `/id` dan `/id/work` memakai template yang sama (lolos di devstaging, T-21). Belum ada data lapangan CrUX (situs baru).
+- [x] Lighthouse Accessibility & SEO ≥ 95 (100/100 di produksi); navigasi penuh dengan keyboard (E2E); screen reader dicek Pal.
+- [x] Tampilan di HP nyata (dicek Pal), layar 360–1440 px tanpa horizontal scroll (T-21).
 - [ ] Visual dibandingkan dengan `docs/design/homepage-mockup.html` di 375 px dan 1280 px (hero, SectionHeader, ProcessSteps, About, CTA akhir).
 - [ ] Motion: animasi scroll jalan di Chrome/Safari, halaman tetap utuh di Firefox; `prefers-reduced-motion` mematikan semua animasi dan rotasi panel; Performance panel DevTools tidak menunjukkan long task atau layout shift dari animasi.
-- [ ] Tolak consent → tidak ada cookie `_ga`; terima → event muncul di GA4 DebugView.
-- [ ] View source: canonical, hreflang, JSON-LD benar di keempat halaman; Rich Results Test lolos.
-- [ ] `robots.txt` dan `sitemap.xml` benar; `/admin` mengirim `noindex`.
-- [ ] securityheaders.com minimal grade A.
-- [ ] Mailto terbuka dengan subject yang benar di EN dan ID; tombol Copy bekerja.
-- [ ] Copy EN dibaca ulang oleh orang yang fasih bahasa Inggris.
+- [x] Tolak consent → tidak ada cookie `_ga`; terima → gtag dimuat dan cookie `_ga` dibuat (dicek di produksi 30 Sep 2026; tolak lewat Cookie settings menghapus `_ga`).
+- [x] View source: canonical, hreflang, JSON-LD benar di keempat halaman (`check-deploy`); JSON-LD `WebSite` + `Person` valid tanpa error/peringatan di Schema Markup Validator (Rich Results Test butuh login Google).
+- [x] `robots.txt` dan `sitemap.xml` benar; `/admin` mengirim `noindex` (`check-deploy` 24/24).
+- [x] securityheaders.com minimal grade A: **A+** di produksi (30 Sep 2026).
+- [x] Mailto terbuka dengan subject yang benar di EN dan ID (dicek di keempat halaman produksi); tombol Copy (E2E).
+- [x] Copy EN dibaca ulang oleh orang yang fasih bahasa Inggris (dikonfirmasi Pal).
 
 ## 12. Urutan build
 
@@ -467,7 +467,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 - [x] **T-02** `styles/globals.css` token + keyframes/motion (bagian 8) + font via `next/font` + komponen `ui/*` dasar (Button, Badge, StatusDot, ArrowIcon) dengan semua state.
 - [x] **T-03** Struktur `app/[lang]` + `proxy.ts` (rewrite, 301, guard admin) + `i18n/` (kamus, `localePath`, `altPath`) + unit test routing.
 - [x] **T-04** `lib/env.ts` + koneksi Drizzle ke MySQL + skema 3 tabel + migrasi + `scripts/migrate`; Docker MySQL untuk lokal.
-- [ ] **T-05** GitHub Actions CI (lint, typecheck, unit, build tanpa DB).
+- [x] **T-05** GitHub Actions CI (lint, typecheck, unit, build tanpa DB).
 - [x] **T-06** Deploy pertama ke subdomain uji di Hostinger (bagian 10); catat hasil di `docs/DECISIONS.md`, termasuk apakah build bisa menjangkau DB.
 
 ### Fase 2 — Halaman publik
