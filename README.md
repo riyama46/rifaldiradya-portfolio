@@ -15,22 +15,23 @@ Buka http://localhost:3000.
 
 ## Script
 
-| Script                            | Fungsi                              |
-| --------------------------------- | ----------------------------------- |
-| `npm run dev`                     | Server development                  |
-| `npm run build`                   | Build produksi (webpack)            |
-| `npm run start`                   | Jalankan hasil build                |
-| `npm run lint`                    | ESLint                              |
-| `npm run typecheck`               | Cek tipe TypeScript                 |
-| `npm test` / `test:watch`         | Unit test (Vitest)                  |
-| `npm run test:integration`        | Tes integrasi ke MySQL lokal        |
-| `npm run test:e2e`                | Tes E2E Playwright (Edge terpasang) |
-| `npm run format` / `format:check` | Format / cek format dengan Prettier |
-| `npm run db:generate`             | Buat file migrasi SQL dari skema    |
-| `npm run db:embed`                | Salin /drizzle ke modul bundel      |
-| `npm run hash-password`           | Buat hash password + salt admin     |
-| `npm run db:migrate`              | Terapkan migrasi (gagal jika error) |
-| `node scripts/og-images.mts`      | Render ulang gambar OG (public/og)  |
+| Script                            | Fungsi                               |
+| --------------------------------- | ------------------------------------ |
+| `npm run dev`                     | Server development                   |
+| `npm run build`                   | Build produksi (webpack)             |
+| `npm run start`                   | Jalankan hasil build                 |
+| `npm run lint`                    | ESLint                               |
+| `npm run typecheck`               | Cek tipe TypeScript                  |
+| `npm test` / `test:watch`         | Unit test (Vitest)                   |
+| `npm run test:integration`        | Tes integrasi ke MySQL lokal         |
+| `npm run test:e2e`                | Tes E2E Playwright (Edge terpasang)  |
+| `npm run format` / `format:check` | Format / cek format dengan Prettier  |
+| `npm run db:generate`             | Buat file migrasi SQL dari skema     |
+| `npm run db:embed`                | Salin /drizzle ke modul bundel       |
+| `npm run hash-password`           | Buat hash password + salt admin      |
+| `npm run db:migrate`              | Terapkan migrasi (gagal jika error)  |
+| `node scripts/og-images.mts`      | Render ulang gambar OG (public/og)   |
+| `node scripts/icons.mts`          | Render ulang favicon + ikon aplikasi |
 
 Tes integrasi dan E2E butuh database Docker lokal. E2E juga butuh `E2E_ADMIN_EMAIL` dan `E2E_ADMIN_PASSWORD` di `.env.local` (admin lokal, bukan password produksi); tes menjalankan build produksi di port 3100 dan membersihkan data yang dibuatnya.
 

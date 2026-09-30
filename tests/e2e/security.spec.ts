@@ -13,8 +13,14 @@ async function recordViolations(page: Page) {
     );
   });
 }
-const violations = (page: Page) =>
-  page.evaluate(() => (window as unknown as { __csp?: string[] }).__csp ?? []);
+// Security software on the test machine (Kaspersky injects a form checker into login pages) is
+// correctly blocked by the CSP; it is not the site's code, so it doesn't count here.
+const LOCAL_SECURITY_SOFTWARE = /kaspersky-labs\.com/;
+
+const violations = async (page: Page) =>
+  (await page.evaluate(() => (window as unknown as { __csp?: string[] }).__csp ?? [])).filter(
+    (entry) => !LOCAL_SECURITY_SOFTWARE.test(entry),
+  );
 
 test("security headers are on every response", async ({ request }) => {
   for (const path of ["/", "/id/work", "/admin/login", "/robots.txt", "/og/en.png"]) {
@@ -71,4 +77,46 @@ test.describe("admin", () => {
     await page.goto("/admin");
     expect(await violations(page)).toEqual([]);
   });
+});
+
+test("every page type also carries the CSP in <meta> (the CDN overwrites the header)", async ({
+  request,
+}) => {
+  for (const path of ["/", "/id/work", "/does-not-exist", "/admin/login"]) {
+    const html = await (await request.get(path)).text();
+    const head = html.slice(0, html.indexOf("</head>"));
+    const meta = /<meta http-equiv="Content-Security-Policy" content="([^"]+)"/
+      .exec(head)?.[1]
+      ?.replaceAll("&#x27;", "'"); // the attribute is HTML-escaped; browsers read it as '
+    expect(meta, path).toContain("default-src 'self'");
+    expect(meta, path).toContain("object-src 'none'");
+    expect(meta, path).not.toContain("frame-ancestors");
+  }
+});
+
+test("with the CDN's header instead of ours, the <meta> CSP still blocks a foreign script", async ({
+  page,
+}) => {
+  // Replay Hostinger: the page as served, but its CSP header replaced by upgrade-insecure-requests.
+  await page.route("http://localhost:3100/", async (route) => {
+    const response = await route.fetch();
+    const headers = {
+      ...response.headers(),
+      "content-security-policy": "upgrade-insecure-requests",
+    };
+    await route.fulfill({ response, headers });
+  });
+  await recordViolations(page);
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+  expect(await violations(page)).toEqual([]); // the site itself still runs
+
+  await page.evaluate(() => {
+    const script = document.createElement("script");
+    script.src = "https://evil.example.com/steal.js";
+    document.head.append(script);
+  });
+  await expect
+    .poll(() => violations(page))
+    .toContainEqual(expect.stringContaining("https://evil.example.com/steal.js"));
 });

@@ -1,3 +1,4 @@
+import { CspMeta } from "@/components/site/CspMeta";
 import type { Metadata } from "next";
 import { adminStrings } from "@/components/admin/strings";
 import { fontVariables } from "@/lib/fonts";
@@ -12,6 +13,9 @@ export const metadata: Metadata = {
 export default function AdminRootLayout({ children }: LayoutProps<"/admin">) {
   return (
     <html lang="en" className={fontVariables}>
+      <head>
+        <CspMeta />
+      </head>
       <body>{children}</body>
     </html>
   );

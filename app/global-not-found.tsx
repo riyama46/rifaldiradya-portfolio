@@ -1,3 +1,4 @@
+import { CspMeta } from "@/components/site/CspMeta";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Analytics } from "@/components/overlays/Analytics";
@@ -26,6 +27,9 @@ export default async function GlobalNotFound() {
 
   return (
     <html lang={lang} className={fontVariables}>
+      <head>
+        <CspMeta />
+      </head>
       <body>
         <SkipLink label={dict.nav.skip} />
         <SiteHeader lang={lang} dict={dict} path={null} />

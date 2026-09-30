@@ -451,7 +451,7 @@ Portfolio gagal kalau kodenya jadi tapi isinya kosong. Semua item ini tanggung j
 - [ ] Untuk tiap project (staging0, staging1): judul EN/ID, deskripsi singkat ≤ 160 karakter EN/ID, tag tech stack, screenshot thumbnail 1600 × 1000 px (16:10), alt text EN/ID.
 - [ ] Diputuskan: 2 project demo sementara tetap di subdomain `staging*` untuk v1; ganti nama yang lebih meyakinkan bisa menyusul (nama "staging" terkesan belum jadi di mata klien).
 - [ ] Gambar Open Graph 1200 × 630 px untuk EN dan ID.
-- [ ] Favicon + ikon aplikasi (dari inisial "RR" dengan warna aksen).
+- [x] Favicon + ikon aplikasi (dari inisial "RR" dengan warna aksen; `scripts/icons.mts`).
 - [ ] Teks kebijakan privasi singkat EN + ID (apa yang dilacak GA4, cara menolak, kontak).
 - [ ] Teks cookie consent banner EN + ID.
 - [ ] Foto profil (opsional untuk launch; upload di admin → Profile, tanpa foto tampil inisial).

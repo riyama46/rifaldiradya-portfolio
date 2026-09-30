@@ -85,3 +85,19 @@ test.describe("UF-01: other browsers", () => {
     await expect(banner(page)).toHaveCount(0);
   });
 });
+
+test("the current language is marked but is not a link; every link can be crawled", async ({
+  page,
+}) => {
+  for (const path of ["/", "/id/work", "/privacy"]) {
+    await page.goto(path);
+    const group = page.getByRole("group", { name: path.startsWith("/id") ? "Bahasa" : "Language" });
+    await expect(group.getByRole("link")).toHaveCount(1);
+    await expect(group.locator("[aria-current=true]")).toHaveCount(1);
+    // Lighthouse SEO "Links are not crawlable": no <a> without a real href.
+    const uncrawlable = await page
+      .locator("a:not([href]), a[href=''], a[href^='javascript:']")
+      .count();
+    expect(uncrawlable, path).toBe(0);
+  }
+});
