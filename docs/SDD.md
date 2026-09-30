@@ -399,10 +399,26 @@ Alurnya: kode di GitHub → Hostinger menarik repo → install, build, start oto
 2. Hubungkan domain rifaldiradya.com ke app Node.js; pastikan SSL aktif untuk `rifaldiradya.com` dan `www.rifaldiradya.com`; cek `https://www.rifaldiradya.com/work` → 301 ke `https://rifaldiradya.com/work`.
 3. Ubah `SITE_URL` ke domain utama, redeploy.
 4. Cek ulang: canonical, sitemap, hreflang memakai domain utama; email di hello@rifaldiradya.com tetap berfungsi (record MX tidak boleh berubah).
+5. Periksa otomatis dari luar: `node scripts/check-deploy.mts https://rifaldiradya.com --production` (dan tanpa `--production` untuk devstaging).
+
+### Dua lingkungan setelah launch (keputusan Pal, T-22)
+
+| | Produksi | Staging |
+| --- | --- | --- |
+| Domain | `rifaldiradya.com` (+ `www` → 301) | `devstaging.rifaldiradya.com` |
+| Website Hostinger | App Node.js yang dipakai devstaging sampai T-22, domainnya diganti | Website Node.js baru |
+| Branch deploy | `main` | `staging` |
+| Database | Database yang sudah ada (berisi konten asli) | Database baru, salinan sekali dari produksi (export/import phpMyAdmin) |
+| `SITE_URL` | `https://rifaldiradya.com` (terindeks) | `https://devstaging.rifaldiradya.com` (noindex otomatis) |
+| GA4 | ID diisi | Kosong (tanpa banner, tidak mengotori data) |
+
+Kedua lingkungan **tidak boleh** memakai database yang sama: admin staging akan mengubah konten situs asli, dan migrasi dari branch staging akan berjalan di data asli.
 
 ### Alur kerja sehari-hari
 
-- Branch fitur (`feat/...`) → PR → CI GitHub Actions (lint, typecheck, unit test, build) harus hijau → merge ke `main` → deploy otomatis.
+- Perubahan kecil: branch fitur (`feat/...`) → PR ke `main` → CI hijau → merge → produksi deploy otomatis.
+- Perubahan besar (fitur baru, migrasi database): branch fitur → PR ke `staging` → cek di devstaging → PR `staging` → `main`. Setelah itu samakan `staging` dengan `main` (merge `main` → `staging`).
+- CI berjalan di PR dan push ke `main` maupun `staging`.
 - Jangan push langsung ke `main` kecuali hotfix kecil.
 - Migrasi database: generate di lokal, commit file SQL, dijalankan otomatis saat start. Backup database di hPanel sebelum merge perubahan skema.
 
