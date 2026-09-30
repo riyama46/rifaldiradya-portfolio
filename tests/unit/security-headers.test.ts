@@ -56,3 +56,12 @@ describe("other security headers", () => {
     expect(byName(true)).not.toHaveProperty("Strict-Transport-Security");
   });
 });
+
+describe("CSP in <meta> (Hostinger's CDN replaces the header)", () => {
+  it("is the header policy minus frame-ancestors, which browsers ignore in meta", () => {
+    const header = contentSecurityPolicy();
+    const meta = contentSecurityPolicy({ meta: true });
+    expect(meta).not.toContain("frame-ancestors");
+    expect(header.replace("; frame-ancestors 'none'", "")).toBe(meta);
+  });
+});

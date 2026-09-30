@@ -1,3 +1,4 @@
+import { CspMeta } from "@/components/site/CspMeta";
 import { Analytics } from "@/components/overlays/Analytics";
 import { CookieConsent } from "@/components/overlays/CookieConsent";
 import { Footer } from "@/components/site/Footer";
@@ -22,6 +23,9 @@ export default async function PublicLayout({ children, params }: LayoutProps<"/[
 
   return (
     <html lang={lang} className={fontVariables}>
+      <head>
+        <CspMeta />
+      </head>
       <body>
         <SkipLink label={dict.nav.skip} />
         {children}

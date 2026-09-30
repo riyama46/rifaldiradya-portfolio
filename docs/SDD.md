@@ -475,7 +475,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 
 - [x] **T-19** GA4 + Consent Mode v2 + O-03 + `track()` 4 event + S-03 tombol Cookie settings (gtag.js baru dimuat setelah Accept; event lewat atribut `data-track`; O-02 menunggu O-03 di HP; e2e UF-05 dengan request Google dicegat). Banner consent di mobile maks. ~130 px tingginya: di 375 × 667 tombol hero "See the Work" berakhir di y = 537 px dan harus tetap terlihat saat banner tampil (PRD F1).
 - [x] **T-20** Header keamanan + CSP (`lib/security-headers.ts`); e2e merekam pelanggaran CSP (0 di halaman publik, 404, GA setelah Accept, admin + upload). Uji securityheaders.com di devstaging setelah deploy.
-- [ ] **T-21** Isi konten nyata lewat admin (2 project), copy final EN/ID; QA checklist bagian 11.
+- [x] **T-21** Isi konten nyata lewat admin (Pal, di devstaging), copy final EN/ID; QA otomatis di devstaging: PageSpeed mobile homepage 98/100/100 (SEO 61 karena staging sengaja noindex), 6 halaman × 5 lebar (360–1440) tanpa scroll samping/gambar rusak, 1 H1 per halaman. Perbaikan: CSP juga lewat `<meta>` (CDN Hostinger menimpa header CSP), bahasa aktif di toggle bukan link, favicon + ikon aplikasi. Sisa manual sebelum launch: HP Android/iPhone nyata + pembaca layar, securityheaders.com dan Rich Results Test setelah domain utama.
 - [ ] **T-22** Pindah ke domain utama, Search Console, submit sitemap, tempel link di profil Upwork.
 
 ## 13. Aturan kerja dengan coding AI

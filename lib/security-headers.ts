@@ -8,7 +8,11 @@
 const GOOGLE_TAG = "https://www.googletagmanager.com";
 const GA_COLLECT = ["https://*.google-analytics.com", "https://*.analytics.google.com"];
 
-export function contentSecurityPolicy({ dev = false } = {}): string {
+/**
+ * `meta: true` for the <meta http-equiv> copy (CspMeta): browsers ignore frame-ancestors there
+ * (X-Frame-Options covers framing), so it is left out instead of logging a warning on every page.
+ */
+export function contentSecurityPolicy({ dev = false, meta = false } = {}): string {
   const directives: Record<string, string[]> = {
     "default-src": ["'self'"],
     // Development only: React uses eval for readable server error stacks (Next.js CSP guide).
@@ -20,7 +24,7 @@ export function contentSecurityPolicy({ dev = false } = {}): string {
     "object-src": ["'none'"],
     "base-uri": ["'self'"],
     "form-action": ["'self'"],
-    "frame-ancestors": ["'none'"],
+    ...(meta ? {} : { "frame-ancestors": ["'none'"] }),
   };
   return Object.entries(directives)
     .map(([name, sources]) => `${name} ${sources.join(" ")}`)
