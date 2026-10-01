@@ -448,8 +448,8 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 - [x] PageSpeed Insights mobile ≥ 90 dan Core Web Vitals lolos di `/`, `/work`, `/id`, `/id/work`. Produksi 30 Sep 2026: `/` 99/100/100/100 (LCP 1,2 s, CLS 0), `/work` 100/100/100/100 (LCP 1,1 s); `/id` dan `/id/work` memakai template yang sama (lolos di devstaging, T-21). Belum ada data lapangan CrUX (situs baru).
 - [x] Lighthouse Accessibility & SEO ≥ 95 (100/100 di produksi); navigasi penuh dengan keyboard (E2E); screen reader dicek Pal.
 - [x] Tampilan di HP nyata (dicek Pal), layar 360–1440 px tanpa horizontal scroll (T-21).
-- [ ] Visual dibandingkan dengan `docs/design/homepage-mockup.html` di 375 px dan 1280 px (hero, SectionHeader, ProcessSteps, About, CTA akhir).
-- [ ] Motion: animasi scroll jalan di Chrome/Safari, halaman tetap utuh di Firefox; `prefers-reduced-motion` mematikan semua animasi dan rotasi panel; Performance panel DevTools tidak menunjukkan long task atau layout shift dari animasi.
+- [x] Visual dibandingkan dengan `docs/design/homepage-mockup.html` di 375 px dan 1280 px (hero, SectionHeader, ProcessSteps, About, CTA akhir).
+- [x] Motion: animasi scroll jalan di Chrome/Safari, halaman tetap utuh di Firefox; `prefers-reduced-motion` mematikan semua animasi dan rotasi panel; Performance panel DevTools tidak menunjukkan long task atau layout shift dari animasi. Dicek di produksi 1 Okt 2026 (Playwright + Edge): `reduce` → 0 elemen beranimasi, panel hero tetap di slide 01 setelah 8 s; tanpa `reduce` → 24 elemen beranimasi dan panel pindah ke slide 02. CLS 0 di PageSpeed. Visual vs mockup dicek Pal.
 - [x] Tolak consent → tidak ada cookie `_ga`; terima → gtag dimuat dan cookie `_ga` dibuat (dicek di produksi 30 Sep 2026; tolak lewat Cookie settings menghapus `_ga`).
 - [x] View source: canonical, hreflang, JSON-LD benar di keempat halaman (`check-deploy`); JSON-LD `WebSite` + `Person` valid tanpa error/peringatan di Schema Markup Validator (Rich Results Test butuh login Google).
 - [x] `robots.txt` dan `sitemap.xml` benar; `/admin` mengirim `noindex` (`check-deploy` 24/24).
