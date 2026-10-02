@@ -424,6 +424,15 @@ Kedua lingkungan **tidak boleh** memakai database yang sama: admin staging akan 
 - Jangan push langsung ke `main` kecuali hotfix kecil.
 - Migrasi database: generate di lokal, commit file SQL, dijalankan otomatis saat start. Backup database di hPanel sebelum merge perubahan skema.
 
+### Versi & rilis (DECISIONS 2026-10-02)
+
+- Versi memakai SemVer dan ditandai dengan **tag git** di `main` (`v1.0.0` = rilis pertama, 2 Okt 2026) plus GitHub Release berisi ringkasan dan hasil QA. Tidak ada branch versi permanen (`v1`, `v2`); kode versi lama dibuka lewat tag-nya.
+- Mulai rilis berikutnya, `version` di `package.json` dinaikkan di PR rilis supaya sama dengan tag (saat `v1.0.0` dibuat nilainya masih `0.1.0`).
+- Versi mayor (redesign, mis. v2): `main` tetap versi yang live; v2 dirakit di `staging` (branch `feat/v2-...` → PR ke `staging`, dilihat di devstaging). Perbaikan untuk versi live: `fix/...` → PR ke `main`, lalu **selalu** merge `main` → `staging` supaya tidak hilang saat v2 dirilis.
+- Rilis: PR `staging` → `main` → CI hijau → merge → tag `vX.Y.Z` + GitHub Release → cek `node scripts/check-deploy.mts https://rifaldiradya.com --production`.
+- Rollback rilis mayor: revert merge commit rilis di `main`. Darurat: buat branch `release/v1` dari tag `v1.0.0` dan arahkan sementara branch deploy produksi di hPanel ke branch itu.
+- **Rencana v2** (dikerjakan setelah Pal memperbarui design system-nya): redesign tampilan mengikuti design system Pal; nomor versi aplikasi tampil kecil di admin (hanya untuk Pal, tidak di halaman publik), diambil dari `version` di `package.json` saat build. Detail layar dan teksnya ditulis di PRD/App Flow saat v2 direncanakan.
+
 ### Rollback
 
 - Kode: `git revert` commit bermasalah → push ke `main` → deploy ulang otomatis.
