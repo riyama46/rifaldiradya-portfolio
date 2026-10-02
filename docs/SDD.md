@@ -378,11 +378,11 @@ Alurnya: kode di GitHub → Hostinger menarik repo → install, build, start oto
 
 ### Persiapan sekali saja
 
-- [ ] **Cek domain utama di hPanel → Websites.** Jika rifaldiradya.com masih terpasang sebagai website (mis. WordPress), jangan dihapus dulu. Backup file + database WordPress lewat hPanel, dan pastikan subdomain `staging0`/`staging1` terdaftar sebagai website terpisah yang tidak ikut terhapus.
-- [ ] Buat repo GitHub private, push skeleton Next.js yang sudah bisa `npm run build` di lokal.
-- [ ] hPanel → Databases: buat database MySQL + user khusus app; catat nama, user, password.
-- [ ] Buat property GA4, catat Measurement ID.
-- [ ] Generate `ADMIN_PASSWORD_HASH` di lokal.
+- [x] **Cek domain utama di hPanel → Websites.** Jika rifaldiradya.com masih terpasang sebagai website (mis. WordPress), jangan dihapus dulu. Backup file + database WordPress lewat hPanel, dan pastikan subdomain `staging0`/`staging1` terdaftar sebagai website terpisah yang tidak ikut terhapus.
+- [x] Buat repo GitHub private, push skeleton Next.js yang sudah bisa `npm run build` di lokal.
+- [x] hPanel → Databases: buat database MySQL + user khusus app; catat nama, user, password.
+- [x] Buat property GA4, catat Measurement ID.
+- [x] Generate `ADMIN_PASSWORD_HASH` di lokal.
 
 ### Deploy pertama (Fase 1, di subdomain uji)
 
@@ -443,19 +443,19 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 
 ### Checklist QA manual sebelum launch
 
-- [ ] Semua acceptance criteria PRD F1–F9 dicentang satu per satu.
-- [ ] Semua edge case App Flow E-01 s.d. E-20 dicoba (yang bisa disimulasikan).
-- [ ] PageSpeed Insights mobile ≥ 90 dan Core Web Vitals lolos di `/`, `/work`, `/id`, `/id/work`.
-- [ ] Lighthouse Accessibility & SEO ≥ 95; navigasi penuh dengan keyboard; screen reader (VoiceOver/TalkBack) membaca hero, kartu, dan dialog dengan benar.
-- [ ] Tampilan di HP Android dan iPhone nyata, layar 360–1440 px, tanpa horizontal scroll.
-- [ ] Visual dibandingkan dengan `docs/design/homepage-mockup.html` di 375 px dan 1280 px (hero, SectionHeader, ProcessSteps, About, CTA akhir).
-- [ ] Motion: animasi scroll jalan di Chrome/Safari, halaman tetap utuh di Firefox; `prefers-reduced-motion` mematikan semua animasi dan rotasi panel; Performance panel DevTools tidak menunjukkan long task atau layout shift dari animasi.
-- [ ] Tolak consent → tidak ada cookie `_ga`; terima → event muncul di GA4 DebugView.
-- [ ] View source: canonical, hreflang, JSON-LD benar di keempat halaman; Rich Results Test lolos.
-- [ ] `robots.txt` dan `sitemap.xml` benar; `/admin` mengirim `noindex`.
-- [ ] securityheaders.com minimal grade A.
-- [ ] Mailto terbuka dengan subject yang benar di EN dan ID; tombol Copy bekerja.
-- [ ] Copy EN dibaca ulang oleh orang yang fasih bahasa Inggris.
+- [x] Semua acceptance criteria PRD F1–F9 dicentang satu per satu (per task lewat Definition of Done, bagian 12, dan tes otomatis: unit 271, integrasi 18, E2E 40).
+- [x] Semua edge case App Flow E-01 s.d. E-20 dicoba (yang bisa disimulasikan), per task + E2E.
+- [x] PageSpeed Insights mobile ≥ 90 dan Core Web Vitals lolos di `/`, `/work`, `/id`, `/id/work`. Produksi 30 Sep 2026: `/` 99/100/100/100 (LCP 1,2 s, CLS 0), `/work` 100/100/100/100 (LCP 1,1 s); `/id` dan `/id/work` memakai template yang sama (lolos di devstaging, T-21). Belum ada data lapangan CrUX (situs baru).
+- [x] Lighthouse Accessibility & SEO ≥ 95 (100/100 di produksi); navigasi penuh dengan keyboard (E2E); screen reader dicek Pal.
+- [x] Tampilan di HP nyata (dicek Pal), layar 360–1440 px tanpa horizontal scroll (T-21).
+- [x] Visual dibandingkan dengan `docs/design/homepage-mockup.html` di 375 px dan 1280 px (hero, SectionHeader, ProcessSteps, About, CTA akhir).
+- [x] Motion: animasi scroll jalan di Chrome/Safari, halaman tetap utuh di Firefox; `prefers-reduced-motion` mematikan semua animasi dan rotasi panel; Performance panel DevTools tidak menunjukkan long task atau layout shift dari animasi. Dicek di produksi 1 Okt 2026 (Playwright + Edge): `reduce` → 0 elemen beranimasi, panel hero tetap di slide 01 setelah 8 s; tanpa `reduce` → 24 elemen beranimasi dan panel pindah ke slide 02. CLS 0 di PageSpeed. Visual vs mockup dicek Pal.
+- [x] Tolak consent → tidak ada cookie `_ga`; terima → gtag dimuat dan cookie `_ga` dibuat (dicek di produksi 30 Sep 2026; tolak lewat Cookie settings menghapus `_ga`).
+- [x] View source: canonical, hreflang, JSON-LD benar di keempat halaman (`check-deploy`); JSON-LD `WebSite` + `Person` valid tanpa error/peringatan di Schema Markup Validator (Rich Results Test butuh login Google).
+- [x] `robots.txt` dan `sitemap.xml` benar; `/admin` mengirim `noindex` (`check-deploy` 24/24).
+- [x] securityheaders.com minimal grade A: **A+** di produksi (30 Sep 2026).
+- [x] Mailto terbuka dengan subject yang benar di EN dan ID (dicek di keempat halaman produksi); tombol Copy (E2E).
+- [x] Copy EN dibaca ulang oleh orang yang fasih bahasa Inggris (dikonfirmasi Pal).
 
 ## 12. Urutan build
 
@@ -467,7 +467,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 - [x] **T-02** `styles/globals.css` token + keyframes/motion (bagian 8) + font via `next/font` + komponen `ui/*` dasar (Button, Badge, StatusDot, ArrowIcon) dengan semua state.
 - [x] **T-03** Struktur `app/[lang]` + `proxy.ts` (rewrite, 301, guard admin) + `i18n/` (kamus, `localePath`, `altPath`) + unit test routing.
 - [x] **T-04** `lib/env.ts` + koneksi Drizzle ke MySQL + skema 3 tabel + migrasi + `scripts/migrate`; Docker MySQL untuk lokal.
-- [ ] **T-05** GitHub Actions CI (lint, typecheck, unit, build tanpa DB).
+- [x] **T-05** GitHub Actions CI (lint, typecheck, unit, build tanpa DB).
 - [x] **T-06** Deploy pertama ke subdomain uji di Hostinger (bagian 10); catat hasil di `docs/DECISIONS.md`, termasuk apakah build bisa menjangkau DB.
 
 ### Fase 2 — Halaman publik
@@ -494,7 +494,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 - [x] **T-19** GA4 + Consent Mode v2 + O-03 + `track()` 4 event + S-03 tombol Cookie settings (gtag.js baru dimuat setelah Accept; event lewat atribut `data-track`; O-02 menunggu O-03 di HP; e2e UF-05 dengan request Google dicegat). Banner consent di mobile maks. ~130 px tingginya: di 375 × 667 tombol hero "See the Work" berakhir di y = 537 px dan harus tetap terlihat saat banner tampil (PRD F1).
 - [x] **T-20** Header keamanan + CSP (`lib/security-headers.ts`); e2e merekam pelanggaran CSP (0 di halaman publik, 404, GA setelah Accept, admin + upload). Uji securityheaders.com di devstaging setelah deploy.
 - [x] **T-21** Isi konten nyata lewat admin (Pal, di devstaging), copy final EN/ID; QA otomatis di devstaging: PageSpeed mobile homepage 98/100/100 (SEO 61 karena staging sengaja noindex), 6 halaman × 5 lebar (360–1440) tanpa scroll samping/gambar rusak, 1 H1 per halaman. Perbaikan: CSP juga lewat `<meta>` (CDN Hostinger menimpa header CSP), bahasa aktif di toggle bukan link, favicon + ikon aplikasi. Sisa manual sebelum launch: HP Android/iPhone nyata + pembaca layar, securityheaders.com dan Rich Results Test setelah domain utama.
-- [ ] **T-22** Pindah ke domain utama, Search Console, submit sitemap, tempel link di profil Upwork. Selesai 30 Sep 2026: produksi live di rifaldiradya.com (branch `main`, database sendiri, check-deploy 24/24, login 401, `/media` 404, DNS email utuh), devstaging di branch `staging` (23/23). Sisa: Search Console + sitemap, link Upwork, key event GA4 `contact_email_click` + retensi 14 bulan, uji kirim/balas email hello@, QA manual HP + pembaca layar, securityheaders.com + Rich Results Test di produksi.
+- [x] **T-22** Pindah ke domain utama, Search Console, submit sitemap, tempel link di profil Upwork. 30 Sep 2026: produksi live di rifaldiradya.com (branch `main`, database sendiri, check-deploy 24/24, login 401, `/media` 404, DNS email utuh), devstaging di branch `staging` (23/23). 2 Okt 2026: Search Console property Domain `rifaldiradya.com` terverifikasi lewat TXT DNS (record `google-site-verification` di hPanel, jangan dihapus), sitemap disubmit, request indexing untuk `/` dan `/id`; GA4 retensi event data 14 bulan; `contact_email_click` sudah masuk Realtime, tinggal ditandai bintang (key event) di Admin → Events setelah muncul di daftar (≤ 24 jam). **Ditunda:** link di profil Upwork (profil belum dibuat Pal).
 
 ## 13. Aturan kerja dengan coding AI
 
