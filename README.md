@@ -68,7 +68,7 @@ URL: bahasa Inggris tanpa prefix (`/`, `/work`), bahasa Indonesia di `/id` (`/id
 
 ## Dokumen
 
-- [docs/PRD.md](docs/PRD.md): apa yang dibangun dan kenapa, copy, visual, motion
-- [docs/APP_FLOW.md](docs/APP_FLOW.md): layar, flow, state, edge case, kontrak API
-- [docs/SDD.md](docs/SDD.md): arsitektur, stack, struktur repo, deploy, urutan task
-- [docs/DECISIONS.md](docs/DECISIONS.md): log keputusan
+- [docs/specs/PRD.md](docs/specs/PRD.md): apa yang dibangun dan kenapa, copy, visual, motion
+- [docs/specs/APP_FLOW.md](docs/specs/APP_FLOW.md): layar, flow, state, edge case, kontrak API
+- [docs/specs/SDD.md](docs/specs/SDD.md): arsitektur, stack, struktur repo, deploy, urutan task
+- [docs/decisions/DECISIONS.md](docs/decisions/DECISIONS.md): log keputusan

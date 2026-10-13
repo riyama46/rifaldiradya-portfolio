@@ -1,3 +1,12 @@
+---
+doc: PRD
+app: rifaldiradya.com
+tier: full
+version: 1.0.0
+status: current
+last_updated: 2026-09-30
+---
+
 # PRD — rifaldiradya.com Portfolio v1
 
 Sep 27, 2026 · @Pal

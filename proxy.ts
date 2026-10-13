@@ -15,7 +15,7 @@ function withLocale(request: NextRequest, locale: "en" | "id") {
   return { request: { headers } };
 }
 
-// Rules follow docs/SDD.md section 5. Trailing slashes are handled earlier by Next.js (308).
+// Rules follow docs/specs/SDD.md section 5. Trailing slashes are handled earlier by Next.js (308).
 // Locale never comes from Accept-Language, IP, or cookies (App Flow G1).
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;

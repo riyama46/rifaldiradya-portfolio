@@ -14,7 +14,7 @@ import {
 } from "drizzle-orm/mysql-core";
 import { ulid } from "ulid";
 
-// docs/SDD.md section 3. All datetimes are stored as UTC (the pool uses timezone "Z").
+// docs/specs/SDD.md section 3. All datetimes are stored as UTC (the pool uses timezone "Z").
 // Column builders are created per table; sharing one builder instance between tables is unsafe.
 const createdAt = () =>
   datetime("created_at", { fsp: 3, mode: "date" })
