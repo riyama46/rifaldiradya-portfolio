@@ -13,7 +13,7 @@
   --color-accent-hover: oklch(47% 0.14 48);
   --color-accent-soft: oklch(93% 0.05 75);
   --color-on-accent: oklch(100% 0 0);
-  /* L51 instead of PRD's L55: 14px "Live" text needs 4.5:1 on bg and surface (see docs/DECISIONS.md). */
+  /* L51 instead of PRD's L55: 14px "Live" text needs 4.5:1 on bg and surface (see docs/decisions/DECISIONS.md). */
   --color-success: oklch(51% 0.13 150);
   --color-danger: oklch(55% 0.18 28);
 

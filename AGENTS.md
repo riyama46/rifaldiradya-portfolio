@@ -1,10 +1,20 @@
 # AGENTS.md — rifaldiradya.com
 
+## Specs (source of truth)
+
+- Current: docs/specs/ (cek `version` dan `status: current` di header tiap file). Live: v1.0.0 (tag git di `main`).
+- Active change: none
+  → Implement ONLY what the active change describes. Where it conflicts with docs/specs, the change wins.
+- docs/changes/archive/ is history only — never use it as requirements.
+- Versions: PATCH = fix/tidy (builder directly) · MINOR = something new · MAJOR = direction/structure change. MINOR/MAJOR are planned as a CHANGE.md first (docs/changes/vX.Y.Z-name/CHANGE.md).
+- Alur branch: semua perubahan → PR ke `staging` → cek di devstaging → PR `staging` → `main` (SDD bagian 10). Jangan PR langsung ke `main`.
+- Riwayat rilis: docs/CHANGELOG.md. Log keputusan: docs/decisions/DECISIONS.md.
+
 ## Sumber kebenaran
 
-1. docs/APP_FLOW.md — layar, flow, state, edge case, kontrak API. Paling mengikat.
-2. docs/SDD.md — arsitektur, stack, struktur repo, keamanan.
-3. docs/PRD.md — alasan produk, copy, visual, tabel Motion.
+1. docs/specs/APP_FLOW.md — layar, flow, state, edge case, kontrak API. Paling mengikat.
+2. docs/specs/SDD.md — arsitektur, stack, struktur repo, keamanan.
+3. docs/specs/PRD.md — alasan produk, copy, visual, tabel Motion.
 4. docs/design/homepage-mockup.html — referensi visual saja (tampilan & motion). Kalau berbeda dengan docs, docs yang menang. Abaikan docs/design/archive/ (versi lama).
    Kalau semuanya tidak menjawab: BERHENTI dan tanya. Jangan mengarang.
 
@@ -30,7 +40,7 @@
 3. Implementasi kecil dan fokus.
 4. Jalankan: npm run lint, npm run typecheck, npm run format:check, npm test (+ test:e2e bila relevan), npm run build.
 5. Laporkan: apa yang dibuat, AC mana yang lolos, apa yang belum.
-6. Keputusan yang menyimpang dari docs dicatat di docs/DECISIONS.md, lalu docs diperbarui.
+6. Keputusan yang menyimpang dari docs dicatat di docs/decisions/DECISIONS.md, lalu docs diperbarui.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

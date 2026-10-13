@@ -1,3 +1,12 @@
+---
+doc: APP_FLOW
+app: rifaldiradya.com
+tier: full
+version: 1.0.0
+status: current
+last_updated: 2026-09-30
+---
+
 # App Flow Document — rifaldiradya.com v1
 
 Sep 27, 2026 · @Pal

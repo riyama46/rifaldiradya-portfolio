@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// docs/SDD.md section 9. Groups are validated on first use so builds and local dev work without
+// docs/specs/SDD.md section 9. Groups are validated on first use so builds and local dev work without
 // every secret; instrumentation.ts validates all required groups when the production server starts.
 
 type Source = Record<string, string | undefined>;
