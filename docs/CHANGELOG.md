@@ -7,6 +7,7 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versi
 ### Changed
 
 - Dokumen dipindah ke layout `docs/specs/` (PRD, APP_FLOW, SDD) dan `docs/decisions/DECISIONS.md`, dengan header versi; CHANGELOG ini ditambahkan.
+- Alur kerja: semua perubahan masuk `staging` dulu, baru `staging` → `main` (SDD bagian 10, DECISIONS 2026-10-13).
 
 ## [1.0.0] - 2026-10-02
 

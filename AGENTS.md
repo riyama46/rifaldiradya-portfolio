@@ -7,6 +7,7 @@
   → Implement ONLY what the active change describes. Where it conflicts with docs/specs, the change wins.
 - docs/changes/archive/ is history only — never use it as requirements.
 - Versions: PATCH = fix/tidy (builder directly) · MINOR = something new · MAJOR = direction/structure change. MINOR/MAJOR are planned as a CHANGE.md first (docs/changes/vX.Y.Z-name/CHANGE.md).
+- Alur branch: semua perubahan → PR ke `staging` → cek di devstaging → PR `staging` → `main` (SDD bagian 10). Jangan PR langsung ke `main`.
 - Riwayat rilis: docs/CHANGELOG.md. Log keputusan: docs/decisions/DECISIONS.md.
 
 ## Sumber kebenaran
