@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     // Needed because the root layout lives in the dynamic app/[lang] segment; a nested
-    // not-found.tsx there only renders client-side. See docs/DECISIONS.md (T-03).
+    // not-found.tsx there only renders client-side. See docs/decisions/DECISIONS.md (T-03).
     globalNotFound: true,
   },
 };

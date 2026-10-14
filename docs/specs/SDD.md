@@ -1,3 +1,12 @@
+---
+doc: SDD
+app: rifaldiradya.com
+tier: full
+version: 1.0.0
+status: current
+last_updated: 2026-10-13
+---
+
 # SDD — rifaldiradya.com v1
 
 Sep 27, 2026 · @Pal
@@ -418,17 +427,16 @@ Kedua lingkungan **tidak boleh** memakai database yang sama: admin staging akan 
 
 ### Alur kerja sehari-hari
 
-- Perubahan kecil: branch fitur (`feat/...`) → PR ke `main` → CI hijau → merge → produksi deploy otomatis.
-- Perubahan besar (fitur baru, migrasi database): branch fitur → PR ke `staging` → cek di devstaging → PR `staging` → `main`. Setelah itu samakan `staging` dengan `main` (merge `main` → `staging`).
+- **Semua perubahan lewat `staging` dulu** (DECISIONS 2026-10-13), termasuk perbaikan kecil: branch (`fix/...`, `feat/...`, `docs/...`) → PR ke `staging` → CI hijau → merge → cek di devstaging → PR `staging` → `main` → CI hijau → merge → produksi deploy otomatis.
 - CI berjalan di PR dan push ke `main` maupun `staging`.
-- Jangan push langsung ke `main` kecuali hotfix kecil.
+- Jangan push langsung ke `main`; `main` hanya menerima PR dari `staging`. Pengecualian hanya untuk hotfix darurat saat produksi rusak, lalu segera merge `main` → `staging`.
 - Migrasi database: generate di lokal, commit file SQL, dijalankan otomatis saat start. Backup database di hPanel sebelum merge perubahan skema.
 
 ### Versi & rilis (DECISIONS 2026-10-02)
 
 - Versi memakai SemVer dan ditandai dengan **tag git** di `main` (`v1.0.0` = rilis pertama, 2 Okt 2026) plus GitHub Release berisi ringkasan dan hasil QA. Tidak ada branch versi permanen (`v1`, `v2`); kode versi lama dibuka lewat tag-nya.
 - Mulai rilis berikutnya, `version` di `package.json` dinaikkan di PR rilis supaya sama dengan tag (saat `v1.0.0` dibuat nilainya masih `0.1.0`).
-- Versi mayor (redesign, mis. v2): `main` tetap versi yang live; v2 dirakit di `staging` (branch `feat/v2-...` → PR ke `staging`, dilihat di devstaging). Perbaikan untuk versi live: `fix/...` → PR ke `main`, lalu **selalu** merge `main` → `staging` supaya tidak hilang saat v2 dirilis.
+- Versi mayor (redesign, mis. v2): `main` tetap versi yang live; v2 dirakit di `staging` (branch `feat/v2-...` → PR ke `staging`, dilihat di devstaging). Selama versi mayor dirakit di `staging`, perbaikan untuk versi live dibuat dari `main` (`fix/...`) lalu PR ke `staging` dan dicek di devstaging lebih dulu; kalau `staging` sedang berisi pekerjaan versi mayor yang belum siap rilis, perbaikan itu dibawa ke `main` dengan PR terpisah dari branch yang sama setelah lolos cek di devstaging.
 - Rilis: PR `staging` → `main` → CI hijau → merge → tag `vX.Y.Z` + GitHub Release → cek `node scripts/check-deploy.mts https://rifaldiradya.com --production`.
 - Rollback rilis mayor: revert merge commit rilis di `main`. Darurat: buat branch `release/v1` dari tag `v1.0.0` dan arahkan sementara branch deploy produksi di hPanel ke branch itu.
 - **Rencana v2** (dikerjakan setelah Pal memperbarui design system-nya): redesign tampilan mengikuti design system Pal; nomor versi aplikasi tampil kecil di admin (hanya untuk Pal, tidak di halaman publik), diambil dari `version` di `package.json` saat build. Detail layar dan teksnya ditulis di PRD/App Flow saat v2 direncanakan.
