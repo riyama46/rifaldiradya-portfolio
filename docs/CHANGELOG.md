@@ -4,6 +4,12 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versi
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-17
+
+### Fixed
+
+- URL LinkedIn diganti ke `https://www.linkedin.com/in/rifaldiradya` (footer dan `sameAs` JSON-LD Person).
+
 ### Changed
 
 - Dokumen dipindah ke layout `docs/specs/` (PRD, APP_FLOW, SDD) dan `docs/decisions/DECISIONS.md`, dengan header versi; CHANGELOG ini ditambahkan.
@@ -20,5 +26,6 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versi
 - Keamanan: CSP, HSTS, X-Frame-Options, cek Origin pada penulisan admin.
 - Dua lingkungan: `main` → rifaldiradya.com, `staging` → devstaging.rifaldiradya.com, database terpisah; CI di keduanya.
 
-[Unreleased]: https://github.com/riyama46/rifaldiradya-portfolio/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/riyama46/rifaldiradya-portfolio/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/riyama46/rifaldiradya-portfolio/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/riyama46/rifaldiradya-portfolio/releases/tag/v1.0.0
