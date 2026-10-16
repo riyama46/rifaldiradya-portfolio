@@ -11,7 +11,7 @@ export const siteConfig = {
   privacyUpdated: "2026-09-29",
   stack: ["Next.js", "React", "TypeScript", "Tailwind CSS", "HTML", "CSS", "JavaScript"],
   social: {
-    linkedin: "https://www.linkedin.com/in/rifaldi-radya-070a44174/",
+    linkedin: "https://www.linkedin.com/in/rifaldiradya",
   },
 } as const;
 

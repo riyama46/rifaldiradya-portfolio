@@ -98,7 +98,7 @@ describe("JSON-LD", () => {
       name: "Rifaldi Radya Pratama",
       jobTitle: "Web Developer",
       url: "https://rifaldiradya.com/id",
-      sameAs: ["https://www.linkedin.com/in/rifaldi-radya-070a44174/"],
+      sameAs: ["https://www.linkedin.com/in/rifaldiradya"],
     });
     expect(website).toMatchObject({ "@type": "WebSite", inLanguage: "id-ID" });
   });

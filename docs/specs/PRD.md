@@ -2,9 +2,9 @@
 doc: PRD
 app: rifaldiradya.com
 tier: full
-version: 1.0.0
+version: 1.0.1
 status: current
-last_updated: 2026-09-30
+last_updated: 2026-10-17
 ---
 
 # PRD — rifaldiradya.com Portfolio v1
@@ -400,7 +400,7 @@ SEO v1 = level **standard**: fondasi teknis yang benar untuk 2 bahasa, on-page p
 
 **Structured data (JSON-LD)**
 
-- Homepage: `Person` (name, url, jobTitle "Web Developer", email, knowsAbout: landing page development, web development, Next.js; `sameAs`: `https://www.linkedin.com/in/rifaldi-radya-070a44174/`; Upwork/GitHub ditambahkan saat profilnya siap) + `WebSite` (name, url, inLanguage).
+- Homepage: `Person` (name, url, jobTitle "Web Developer", email, knowsAbout: landing page development, web development, Next.js; `sameAs`: `https://www.linkedin.com/in/rifaldiradya`; Upwork/GitHub ditambahkan saat profilnya siap) + `WebSite` (name, url, inLanguage).
 - Halaman Work: `CollectionPage` dengan `ItemList` project (name, url situs live).
 - Isi schema harus sama dengan konten yang terlihat di halaman.
 
@@ -493,7 +493,7 @@ Portfolio gagal kalau kodenya jadi tapi isinya kosong. Semua item ini tanggung j
 - [x] Apakah rifaldiradya.com saat ini masih terpasang sebagai website WordPress di Hostinger? **Ya, masih WordPress**, dan **tidak ada kontennya yang dibutuhkan** (dikonfirmasi 28 Sep 2026). WordPress tetap di-backup sebagai jaring pengaman, lalu diganti di Fase 4 setelah versi uji lolos QA (SDD bagian 10).
 - [ ] Subdomain demo tetap `staging0/1` untuk v1 (diputuskan). Ganti nama nanti cukup edit URL project di admin.
 - [x] Versi kanonik: **`rifaldiradya.com` (non-www)**, disetujui 28 Sep 2026.
-- [x] Link sosial di footer: **LinkedIn** `https://www.linkedin.com/in/rifaldi-radya-070a44174/` (diputuskan 28 Sep 2026). GitHub menyusul jika diinginkan.
+- [x] Link sosial di footer: **LinkedIn** `https://www.linkedin.com/in/rifaldiradya` (diputuskan 28 Sep 2026). GitHub menyusul jika diinginkan.
 - [x] Zona waktu di blok fakta About: **GMT+7 (WIB)**, dikonfirmasi 28 Sep 2026.
 
 ## 14. Rencana rilis & milestone
