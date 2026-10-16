@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Portfolio Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+/* Admin v2 mockup: same tokens as option-b.html, tuned for work (Operate mode): denser, borders for structure, one accent. */
+.ad, .ad[data-theme="dark"] {
+  --bg: #0b0b0b; --panel: #121212; --field: #0e0e0e; --ink: #f1f1ef; --soft: rgba(241, 241, 239, 0.62); --faint: rgba(241, 241, 239, 0.12); --line: rgba(241, 241, 239, 0.16);
+  --accent: #7b93ff; --accent-ink: #0b0b0b; --ok: #3fbf6f; --warn: #e2b24a; --danger: #ff6b6b;
+  color-scheme: dark;
+}
+.ad[data-theme="light"] {
+  --bg: #f6f6f3; --panel: #ffffff; --field: #ffffff; --ink: #111111; --soft: rgba(17, 17, 17, 0.64); --faint: rgba(17, 17, 17, 0.08); --line: rgba(17, 17, 17, 0.16);
+  --accent: #2f4fe0; --accent-ink: #ffffff; --ok: #1d8a4b; --warn: #a06b00; --danger: #c62828;
+  color-scheme: light;
+}
+.ad { --font: "Archivo", "Helvetica Neue", Arial, sans-serif; --ease: cubic-bezier(0.23, 1, 0.32, 1); --win: 100svh; min-height: var(--win); background: var(--bg); color: var(--ink); font: 15px/1.5 var(--font); transition: background-color 300ms var(--ease), color 300ms var(--ease); }
+.ad *, .ad *::before, .ad *::after { box-sizing: border-box; }
+body { margin: 0; }
+.ad h1, .ad h2, .ad h3, .ad p, .ad ul { margin: 0; }
+.ad a { color: inherit; text-decoration: none; }
+.ad button, .ad input, .ad textarea, .ad select { font: inherit; color: inherit; }
+.ad ::selection { background: var(--accent); color: var(--accent-ink); }
+.ad :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.ad .muted { color: var(--soft); }
+.ad .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- shell ---------- */
+.top { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 28px; height: 60px; padding: 0 28px; border-bottom: 1px solid var(--faint); background: var(--bg); }
+.brand { display: flex; align-items: baseline; gap: 10px; font-weight: 600; font-size: 15px; white-space: nowrap; }
+.brand span { font-weight: 500; color: var(--soft); }
+.nav { display: flex; gap: 4px; }
+.nav a { padding: 8px 12px; border-radius: 6px; color: var(--soft); }
+.nav a:hover { color: var(--ink); }
+.nav a[aria-current="page"] { color: var(--ink); background: var(--faint); }
+.top .right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.ghost { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px; border: 0; border-radius: 6px; background: none; color: var(--soft); cursor: pointer; }
+.ghost:hover { color: var(--ink); background: var(--faint); }
+.ghost svg { width: 15px; height: 15px; }
+.ad[data-av="login"] .top .nav, .ad[data-av="login"] .top .right .in { display: none; }
+.page { max-width: 1240px; margin: 0 auto; padding: 40px 28px 120px; }
+.v { display: none; }
+.ad[data-av="login"] .v-login, .ad[data-av="projects"] .v-projects, .ad[data-av="edit"] .v-edit, .ad[data-av="profile"] .v-profile { display: block; }
+
+/* ---------- controls ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 16px; border: 1px solid transparent; border-radius: 6px; background: var(--accent); color: var(--accent-ink); font-weight: 500; cursor: pointer; transition: background-color 160ms var(--ease), transform 120ms var(--ease); }
+.btn:hover { background: color-mix(in srgb, var(--accent) 86%, var(--ink)); }
+.btn:active { transform: scale(0.97); }
+.btn.sec { background: none; color: var(--ink); border-color: var(--line); }
+.btn.sec:hover { background: var(--faint); }
+.btn.danger { background: none; color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, transparent); }
+.btn.danger:hover { background: color-mix(in srgb, var(--danger) 10%, transparent); }
+.icon-btn { display: inline-grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--soft); cursor: pointer; }
+.icon-btn:hover:not(:disabled) { color: var(--ink); background: var(--faint); }
+.icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.badge { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 9px; border-radius: 999px; font-size: 12.5px; font-weight: 500; white-space: nowrap; background: var(--faint); color: var(--soft); }
+.badge.pub { color: var(--ok); background: color-mix(in srgb, var(--ok) 13%, transparent); }
+.badge.home { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.badge i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+.field { display: grid; gap: 6px; }
+.field > label, .field > .lab { display: flex; justify-content: space-between; gap: 12px; font-size: 13.5px; font-weight: 500; }
+.field > label small, .field > .lab small { font-weight: 400; color: var(--soft); font-variant-numeric: tabular-nums; }
+.inp { width: 100%; min-height: 42px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--field); font-size: 16px; transition: border-color 160ms var(--ease), box-shadow 160ms var(--ease); }
+.inp:hover { border-color: color-mix(in srgb, var(--ink) 30%, transparent); }
+.inp:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+textarea.inp { min-height: 78px; resize: vertical; line-height: 1.5; }
+.help { font-size: 13px; color: var(--soft); }
+.err { font-size: 13px; color: var(--danger); }
+.inp.bad { border-color: var(--danger); }
+
+.switch { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; }
+.switch button { flex: none; position: relative; width: 40px; height: 24px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--ink) 22%, transparent); cursor: pointer; transition: background-color 200ms var(--ease); }
+.switch button::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform 220ms var(--ease); }
+.switch button[aria-checked="true"] { background: var(--accent); }
+.switch button[aria-checked="true"]::after { transform: translateX(16px); }
+.switch b { display: block; font-weight: 500; }
+.switch span { font-size: 13px; color: var(--soft); }
+
+.seg { display: inline-flex; justify-self: start; padding: 3px; border-radius: 8px; background: var(--faint); }
+.seg button { min-height: 34px; padding: 0 14px; border: 0; border-radius: 6px; background: none; color: var(--soft); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+
+.chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 42px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--field); }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 6px 0 10px; border-radius: 5px; background: var(--faint); font-size: 14px; }
+.chip button { width: 20px; height: 20px; border: 0; border-radius: 4px; background: none; color: var(--soft); cursor: pointer; }
+.chips input { flex: 1; min-width: 120px; border: 0; background: none; font-size: 16px; padding: 4px; }
+.chips input:focus { outline: none; }
+
+/* ---------- login ---------- */
+.v-login .page { max-width: 420px; padding-top: 14vh; }
+.v-login h1 { font-size: 32px; letter-spacing: -0.02em; font-weight: 600; }
+.v-login .sub { margin-top: 6px; color: var(--soft); }
+.v-login form { margin-top: 32px; display: grid; gap: 18px; }
+.pw { position: relative; }
+.pw .inp { padding-right: 72px; }
+.pw button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); min-height: 32px; padding: 0 10px; border: 0; border-radius: 5px; background: none; color: var(--soft); cursor: pointer; }
+.pw button:hover { color: var(--ink); background: var(--faint); }
+.v-login .btn { width: 100%; min-height: 46px; margin-top: 6px; }
+
+/* ---------- projects ---------- */
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+.head h1 { font-size: 34px; line-height: 1.1; letter-spacing: -0.02em; font-weight: 600; }
+.head p { margin-top: 6px; color: var(--soft); }
+.notes { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 13.5px; color: var(--soft); }
+.notes b { color: var(--ink); font-weight: 500; }
+.tabs { margin-top: 28px; display: flex; gap: 4px; border-bottom: 1px solid var(--faint); }
+.tabs button { position: relative; padding: 10px 12px; border: 0; background: none; color: var(--soft); cursor: pointer; }
+.tabs button span { margin-left: 6px; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.tabs button[aria-pressed="true"] { color: var(--ink); }
+.tabs button[aria-pressed="true"]::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: -1px; height: 2px; background: var(--accent); }
+.ad[data-f="panasonic"] .tr:not([data-g="panasonic"]), .ad[data-f="web"] .tr:not([data-g="web"]), .ad[data-f="ai"] .tr:not([data-g="ai"]) { display: none; }
+.table { margin-top: 8px; }
+.tr { display: grid; grid-template-columns: 36px 88px minmax(0, 1fr) 150px 220px 110px 84px 64px; align-items: center; gap: 16px; padding: 12px 8px; border-bottom: 1px solid var(--faint); }
+.tr.th { padding-top: 10px; padding-bottom: 10px; font-size: 12.5px; color: var(--soft); }
+.tr:not(.th):hover { background: color-mix(in srgb, var(--ink) 3%, transparent); }
+.pos { color: var(--soft); font-variant-numeric: tabular-nums; font-size: 14px; }
+.thumb { width: 88px; aspect-ratio: 16 / 10; border-radius: 4px; overflow: hidden; background: color-mix(in srgb, var(--accent) 16%, var(--bg)); display: flex; align-items: flex-end; padding: 6px 8px; font-weight: 500; font-size: 15px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; margin: -6px -8px; width: calc(100% + 16px); height: calc(100% + 12px); max-width: none; }
+.ttl a { font-weight: 500; font-size: 15.5px; }
+.ttl a:hover { color: var(--accent); }
+.ttl small { display: block; margin-top: 2px; color: var(--soft); font-size: 13px; }
+.grp { color: var(--soft); font-size: 14px; }
+.st { display: flex; flex-wrap: wrap; gap: 6px; }
+.upd { color: var(--soft); font-size: 13.5px; }
+.move { display: flex; gap: 6px; }
+.empty { display: none; }
+
+/* ---------- edit ---------- */
+.crumb { display: inline-flex; gap: 8px; color: var(--soft); font-size: 14px; }
+.crumb:hover { color: var(--ink); }
+.edit-head { margin-top: 14px; }
+.edit-grid { margin-top: 28px; display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 40px; align-items: start; }
+.sec { padding: 28px 0; border-top: 1px solid var(--faint); }
+.sec:first-child { border-top: 0; padding-top: 0; }
+.sec h2 { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+.sec > .help { margin-top: 4px; }
+.sec .body { margin-top: 20px; display: grid; gap: 18px; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.lines { display: grid; gap: 8px; }
+.line { display: flex; gap: 8px; }
+.line .inp { min-height: 40px; }
+.addline { justify-self: start; min-height: 34px; padding: 0 10px; border: 0; border-radius: 6px; background: none; color: var(--accent); cursor: pointer; }
+.addline:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.choice { display: grid; gap: 8px; }
+.radio { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+.radio:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.radio input { margin: 3px 0 0; accent-color: var(--accent); width: 16px; height: 16px; }
+.radio b { display: block; font-weight: 500; }
+.radio span { font-size: 13px; color: var(--soft); }
+.drop { display: grid; place-items: center; gap: 6px; aspect-ratio: 16 / 10; max-width: 420px; border: 1.5px dashed var(--line); border-radius: 8px; color: var(--soft); text-align: center; padding: 20px; }
+.drop b { color: var(--ink); font-weight: 500; }
+.ad[data-vis="card"] .vis-shot, .ad[data-vis="shot"] .vis-card { display: none; }
+.danger-zone { margin-top: 12px; padding: 24px 0 0; border-top: 1px solid var(--faint); display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.danger-zone b { display: block; font-weight: 500; }
+.savebar { position: sticky; bottom: 0; z-index: 5; display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 24px; padding: 14px 0; border-top: 1px solid var(--faint); background: var(--bg); }
+.savebar .help { margin-right: auto; }
+
+/* live preview of how the project shows on the site */
+.side { position: sticky; top: 84px; display: grid; gap: 14px; }
+.side h3 { font-size: 13px; font-weight: 500; color: var(--soft); }
+.pv { border: 1px solid var(--faint); border-radius: 10px; padding: 20px; background: var(--panel); }
+.pv .meta { font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); }
+.pv .t { margin-top: 10px; font-size: 34px; line-height: 1; letter-spacing: -0.035em; font-weight: 600; }
+.pv .d { margin-top: 10px; font-size: 13.5px; color: var(--soft); }
+.pv-card { aspect-ratio: 16 / 10; border-radius: 6px; padding: 16px; display: flex; flex-direction: column; justify-content: flex-end; background: color-mix(in srgb, var(--accent) 16%, var(--bg)); }
+.pv-card b { font-size: 40px; line-height: 1; letter-spacing: -0.03em; font-weight: 500; }
+.pv-card span { margin-top: 6px; font-size: 13px; color: var(--soft); }
+
+/* ---------- profile ---------- */
+.prof { margin-top: 32px; display: grid; gap: 0; max-width: 760px; }
+.avatar-row { display: flex; align-items: center; gap: 20px; }
+.avatar-row > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.avatar-row > div .help { flex-basis: 100%; }
+.avatar { flex: none; width: 96px; height: 96px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1px var(--line); }
+
+/* ---------- toast ---------- */
+.toast { position: fixed; left: 50%; bottom: 24px; z-index: 30; transform: translate(-50%, 20px); display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 8px; background: var(--ink); color: var(--bg); font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 200ms var(--ease), transform 300ms var(--ease); }
+.toast i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+.ad.toast-on .toast { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- phone ---------- */
+@media (max-width: 900px) {
+  .edit-grid { grid-template-columns: minmax(0, 1fr); }
+  .side { position: static; order: -1; }
+}
+@media (max-width: 767px) {
+  .top { gap: 8px; padding: 0 12px; }
+  .brand, .ghost .lbl { display: none; }
+  .ad[data-av="login"] .brand { display: flex; }
+  .top .ghost { padding: 0 10px; }
+  .tabs button { white-space: nowrap; }
+  .side .pv-card, .side h3:nth-of-type(2) { display: none; }
+  .nav a { padding: 8px 10px; }
+  .page { padding: 28px 16px 120px; }
+  .head { flex-direction: column; align-items: stretch; }
+  .head .btn { width: 100%; }
+  .tabs { overflow-x: auto; }
+  .tr.th { display: none; }
+  .tr { grid-template-columns: 72px minmax(0, 1fr) auto; grid-template-areas: "th tt mv" "th st mv"; gap: 6px 12px; padding: 14px 0; }
+  .tr .pos, .tr .grp, .tr .upd, .tr .ed { display: none; }
+  .tr .thumb { grid-area: th; width: 72px; font-size: 13px; }
+  .tr .ttl { grid-area: tt; }
+  .tr .st { grid-area: st; }
+  .tr .move { grid-area: mv; flex-direction: column; }
+  .pair { grid-template-columns: 1fr; }
+  .danger-zone { flex-direction: column; align-items: stretch; }
+  .savebar .help { display: none; }
+  .savebar .btn { flex: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .ad *, .ad *::before, .ad *::after { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="ad" data-theme="dark" data-av="projects" data-vis="card" data-f="all">
+  <header class="top">
+    <a class="brand" href="#/projects" data-go="projects">Rifaldi Radya Pratama <span>Admin</span></a>
+    <nav class="nav" aria-label="Admin">
+      <a href="#/projects" data-go="projects" aria-current="page">Projects</a>
+      <a href="#/profile" data-go="profile">Profile</a>
+    </nav>
+    <div class="right">
+      <a class="ghost in" href="option-b.html" target="_blank" rel="noopener noreferrer"><span class="lbl">View site</span> ↗</a>
+      <button class="ghost" type="button" data-theme-toggle aria-label="Switch to light mode">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"></path></svg>
+      </button>
+      <a class="ghost in" href="#/login" data-go="login"><span class="lbl">Log out</span><span class="sr">Log out</span></a>
+    </div>
+  </header>
+
+  <main>
+    <!-- ======== S-10 Sign in ======== -->
+    <section class="v v-login" aria-labelledby="login-h">
+      <div class="page">
+        <h1 id="login-h">Sign in</h1>
+        <p class="sub">Portfolio admin for rifaldiradya.com.</p>
+        <form action="#" data-go="projects">
+          <div class="field">
+            <label for="em">Email</label>
+            <input class="inp" id="em" type="email" autocomplete="username" required value="hello@rifaldiradya.com">
+          </div>
+          <div class="field">
+            <label for="pw">Password</label>
+            <div class="pw"><input class="inp" id="pw" type="password" autocomplete="current-password" required value="placeholder"><button type="button" data-showpw>Show</button></div>
+          </div>
+          <button class="btn" type="submit">Sign in</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ======== S-11 Projects ======== -->
+    <section class="v v-projects" aria-labelledby="proj-h">
+      <div class="page">
+        <div class="head">
+          <div>
+            <h1 id="proj-h">Projects</h1>
+            <p>7 projects · 7 published · 0 drafts</p>
+          </div>
+          <a class="btn" href="#/edit" data-go="edit">New project</a>
+        </div>
+        <div class="notes">
+          <p><b>Selected work on the homepage: 5 of 5.</b> Turn one off before adding another.</p>
+          <p>The order here is the order on the site. Use ↑ and ↓ to move a project.</p>
+        </div>
+        <div class="tabs" role="group" aria-label="Filter by group">
+          <button type="button" data-f="all" aria-pressed="true">All<span>7</span></button>
+          <button type="button" data-f="panasonic" aria-pressed="false">Panasonic<span>3</span></button>
+          <button type="button" data-f="web" aria-pressed="false">Websites<span>3</span></button>
+          <button type="button" data-f="ai" aria-pressed="false">AI tools<span>1</span></button>
+        </div>
+        <div class="table" role="table" aria-label="Projects">
+          <div class="tr th" role="row"><span role="columnheader">#</span><span role="columnheader">Visual</span><span role="columnheader">Title</span><span role="columnheader">Group</span><span role="columnheader">Status</span><span role="columnheader">Updated</span><span role="columnheader">Order</span><span role="columnheader"><span class="sr">Edit</span></span></div>
+          <div class="tr" role="row" data-g="panasonic"><span class="pos">1</span><span class="thumb">13</span><span class="ttl"><a href="#/edit" data-go="edit">HR System</a><small>Panasonic · 13 companies · 2022–now</small></span><span class="grp">Panasonic</span><span class="st"><span class="badge pub"><i></i>Published</span><span class="badge home">Homepage</span></span><span class="upd">Today</span><span class="move"><button class="icon-btn" type="button" disabled aria-label="Move HR System up">↑</button><button class="icon-btn" type="button" aria-label="Move HR System down">↓</button></span><a class="btn sec ed" href="#/edit" data-go="edit">Edit</a></div>
+          <div class="tr" role="row" data-g="panasonic"><span class="pos">2</span><span class="thumb">5 → 1</span><span class="ttl"><a href="#/edit" data-go="edit">Single Sign-On</a><small>Panasonic · Live since early 2023</small></span><span class="grp">Panasonic</span><span class="st"><span class="badge pub"><i></i>Published</span><span class="badge home">Homepage</span></span><span class="upd">Today</span><span class="move"><button class="icon-btn" type="button" aria-label="Move Single Sign-On up">↑</button><button class="icon-btn" type="button" aria-label="Move Single Sign-On down">↓</button></span><a class="btn sec ed" href="#/edit" data-go="edit">Edit</a></div>
+          <div class="tr" role="row" data-g="panasonic"><span class="pos">3</span><span class="thumb">57 → 4</span><span class="ttl"><a href="#/edit" data-go="edit">Teams Approvals</a><small>Panasonic · Proposal, not live</small></span><span class="grp">Panasonic</span><span class="st"><span class="badge pub"><i></i>Published</span><span class="badge home">Homepage</span></span><span class="upd">Today</span><span class="move"><button class="icon-btn" type="button" aria-label="Move Teams Approvals up">↑</button><button class="icon-btn" type="button" aria-label="Move Teams Approvals down">↓</button></span><a class="btn sec ed" href="#/edit" data-go="edit">Edit</a></div>
+          <div class="tr" role="row" data-g="web"><span class="pos">4</span><span class="thumb"><img src="assets/01M3PWWDDZSNSTHSW24Y62BXRC-1600.webp" alt=""></span><span class="ttl"><a href="#/edit" data-go="edit">SwiftPay</a><small>Concept · Fintech · WordPress</small></span><span class="grp">Websites</span><span class="st"><span class="badge pub"><i></i>Published</span><span class="badge home">Homepage</span></span><span class="upd">2 weeks ago</span><span class="move"><button class="icon-btn" type="button" aria-label="Move SwiftPay up">↑</button><button class="icon-btn" type="button" aria-label="Move SwiftPay down">↓</button></span><a class="btn sec ed" href="#/edit" data-go="edit">Edit</a></div>
+          <div class="tr" role="row" data-g="web"><span class="pos">5</span><span class="thumb"><img src="assets/01M3RYC83KNE6FCBQEW6QK2DT8-1600.webp" alt=""></span><span class="ttl"><a href="#/edit" data-go="edit">Bloom Studio</a><small>Bali · Studio site · WordPress</small></span><span class="grp">Websites</span><span class="st"><span class="badge pub"><i></i>Published</span><span class="badge home">Homepage</span></span><span class="upd">2 weeks ago</span><span class="move"><button class="icon-btn" type="button" aria-label="Move Bloom Studio up">↑</button><button class="icon-btn" type="button" aria-label="Move Bloom Studio down">↓</button></span><a class="btn sec ed" href="#/edit" data-go="edit">Edit</a></div>
+          <div class="tr" role="row" data-g="web"><span class="pos">6</span><span class="thumb">Next.js</span><span class="ttl"><a href="#/edit" data-go="edit">rifaldiradya.com</a><small>Personal · Next.js</small></span><span class="grp">Websites</span><span class="st"><span class="badge pub"><i></i>Published</span><span class="badge">Work page only</span></span><span class="upd">Today</span><span class="move"><button class="icon-btn" type="button" aria-label="Move rifaldiradya.com up">↑</button><button class="icon-btn" type="button" aria-label="Move rifaldiradya.com down">↓</button></span><a class="btn sec ed" href="#/edit" data-go="edit">Edit</a></div>
+          <div class="tr" role="row" data-g="ai"><span class="pos">7</span><span class="thumb">4</span><span class="ttl"><a href="#/edit" data-go="edit">AI workflow automation</a><small>Personal · LLM agents</small></span><span class="grp">AI tools</span><span class="st"><span class="badge pub"><i></i>Published</span><span class="badge">Work page only</span></span><span class="upd">Today</span><span class="move"><button class="icon-btn" type="button" aria-label="Move AI workflow automation up">↑</button><button class="icon-btn" type="button" disabled aria-label="Move AI workflow automation down">↓</button></span><a class="btn sec ed" href="#/edit" data-go="edit">Edit</a></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== S-13 Edit project ======== -->
+    <section class="v v-edit" aria-labelledby="edit-h">
+      <div class="page">
+        <a class="crumb" href="#/projects" data-go="projects">← Back to projects</a>
+        <div class="head edit-head">
+          <div><h1 id="edit-h">Edit project</h1><p>Every text has an English and an Indonesian field side by side.</p></div>
+        </div>
+        <div class="edit-grid">
+          <form action="#" data-go="projects" data-toast="Changes saved">
+            <div class="sec">
+              <h2>Basics</h2>
+              <div class="body">
+                <div class="pair">
+                  <div class="field"><label for="t-en">Title (EN) <small>9/80</small></label><input class="inp" id="t-en" value="HR System" data-bind="t"></div>
+                  <div class="field"><label for="t-id">Title (ID) <small>9/80</small></label><input class="inp" id="t-id" value="Sistem HR"></div>
+                </div>
+                <div class="field"><span class="lab">Group</span>
+                  <div class="seg" role="group" aria-label="Group"><button type="button" aria-pressed="true">Panasonic</button><button type="button" aria-pressed="false">Websites</button><button type="button" aria-pressed="false">AI tools</button></div>
+                  <p class="help">Sets the filter on the Work page.</p>
+                </div>
+                <div class="pair">
+                  <div class="field"><label for="m-en">Meta line (EN) <small>36/60</small></label><input class="inp" id="m-en" value="Panasonic · 13 companies · 2022–now" data-bind="m"></div>
+                  <div class="field"><label for="m-id">Meta line (ID) <small>42/60</small></label><input class="inp" id="m-id" value="Panasonic · 13 perusahaan · 2022–sekarang"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="sec">
+              <h2>Homepage</h2>
+              <p class="help">How the project appears in Selected work.</p>
+              <div class="body">
+                <div class="pair">
+                  <div class="field"><label for="d-en">Short description (EN) <small>121/160</small></label><textarea class="inp" id="d-en" data-bind="d">The HR system 13 Panasonic group companies run on: onboarding, attendance, overtime, payroll, welfare and resource booking.</textarea></div>
+                  <div class="field"><label for="d-id">Short description (ID) <small>118/160</small></label><textarea class="inp" id="d-id">Sistem HR yang dipakai 13 perusahaan grup Panasonic: onboarding, absensi, lembur, payroll, kesejahteraan, dan booking ruangan.</textarea></div>
+                </div>
+                <label class="switch"><button type="button" role="switch" aria-checked="true" aria-label="Show in Selected work"></button><span><b>Show in Selected work</b><span>The homepage shows up to 5 projects, in the order of the list.</span></span></label>
+              </div>
+            </div>
+
+            <div class="sec">
+              <h2>Case on the Work page</h2>
+              <p class="help">Facts only. Visitors open this row to read it.</p>
+              <div class="body">
+                <div class="pair">
+                  <div class="field"><label for="w-en">What it is (EN) <small>186/220</small></label><textarea class="inp" id="w-en">A legacy HRMS that 13 Panasonic group companies in Indonesia run on. Hundreds of HR and admin staff use it, and it holds the records of thousands of employees, about 2,000 at the main site alone.</textarea></div>
+                  <div class="field"><label for="w-id">What it is (ID) <small>176/220</small></label><textarea class="inp" id="w-id">HRMS lama yang dipakai 13 perusahaan grup Panasonic di Indonesia. Penggunanya ratusan staf HR dan admin, dan isinya data ribuan karyawan, sekitar 2.000 di site utama saja.</textarea></div>
+                </div>
+                <div class="pair">
+                  <div class="field"><span class="lab">What I did (EN) <small>4 lines, max 8</small></span>
+                    <div class="lines">
+                      <div class="line"><input class="inp" aria-label="Line 1 (EN)" value="One of three developers on the system since November 2022."><button class="icon-btn" type="button" aria-label="Remove line 1">×</button></div>
+                      <div class="line"><input class="inp" aria-label="Line 2 (EN)" value="Features from requirements to installation on client servers."><button class="icon-btn" type="button" aria-label="Remove line 2">×</button></div>
+                      <div class="line"><input class="inp" aria-label="Line 3 (EN)" value="Excel mass upload for overtime and new-employee data."><button class="icon-btn" type="button" aria-label="Remove line 3">×</button></div>
+                      <div class="line"><input class="inp" aria-label="Line 4 (EN)" value="End-to-end delivery for 6 of the 13 companies."><button class="icon-btn" type="button" aria-label="Remove line 4">×</button></div>
+                    </div>
+                    <button class="addline" type="button">+ Add a line</button>
+                  </div>
+                  <div class="field"><span class="lab">What I did (ID) <small>4 lines, max 8</small></span>
+                    <div class="lines">
+                      <div class="line"><input class="inp" aria-label="Line 1 (ID)" value="Satu dari tiga developer di sistem ini sejak November 2022."><button class="icon-btn" type="button" aria-label="Remove line 1">×</button></div>
+                      <div class="line"><input class="inp" aria-label="Line 2 (ID)" value="Fitur dari analisis kebutuhan sampai instalasi di server klien."><button class="icon-btn" type="button" aria-label="Remove line 2">×</button></div>
+                      <div class="line"><input class="inp" aria-label="Line 3 (ID)" value="Upload massal Excel untuk data lembur dan karyawan baru."><button class="icon-btn" type="button" aria-label="Remove line 3">×</button></div>
+                      <div class="line"><input class="inp" aria-label="Line 4 (ID)" value="Memegang penuh enam dari 13 perusahaan itu."><button class="icon-btn" type="button" aria-label="Remove line 4">×</button></div>
+                    </div>
+                    <button class="addline" type="button">+ Add a line</button>
+                  </div>
+                </div>
+                <div class="field"><label for="stack-in">Stack <small>4 of 6</small></label>
+                  <div class="chips"><span class="chip">ASP.NET Web Forms<button type="button" aria-label="Remove ASP.NET Web Forms">×</button></span><span class="chip">C#<button type="button" aria-label="Remove C#">×</button></span><span class="chip">SQL Server<button type="button" aria-label="Remove SQL Server">×</button></span><span class="chip">Azure<button type="button" aria-label="Remove Azure">×</button></span><input id="stack-in" placeholder="Add, then press Enter"></div>
+                </div>
+                <div class="pair">
+                  <div class="field"><label for="s-en">Status (EN)</label><input class="inp" id="s-en" value="Live, 2022–now"></div>
+                  <div class="field"><label for="s-id">Status (ID)</label><input class="inp" id="s-id" value="Berjalan, 2022–sekarang"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="sec">
+              <h2>Button on the case</h2>
+              <p class="help">A live URL is now optional, so internal systems can be shown too.</p>
+              <div class="body">
+                <div class="choice" role="radiogroup" aria-label="Button on the case">
+                  <label class="radio"><input type="radio" name="act"><span><b>Open the live site</b><span>Needs a live URL starting with https://</span></span></label>
+                  <label class="radio"><input type="radio" name="act" checked><span><b>Email to ask for a walkthrough</b><span>For internal work that can't be shown. Opens an email with a prefilled subject.</span></span></label>
+                  <label class="radio"><input type="radio" name="act"><span><b>No button</b><span>The case ends with the status.</span></span></label>
+                </div>
+                <div class="field"><label for="url">Live URL <small>optional</small></label><input class="inp" id="url" type="url" placeholder="https://"></div>
+              </div>
+            </div>
+
+            <div class="sec">
+              <h2>Visual</h2>
+              <p class="help">Used for the homepage picture and the preview next to the cursor on the Work page.</p>
+              <div class="body">
+                <div class="seg" role="group" aria-label="Visual type"><button type="button" data-vis="shot" aria-pressed="false">Screenshot</button><button type="button" data-vis="card" aria-pressed="true">Number card</button></div>
+                <div class="vis-card pair">
+                  <div class="field"><label for="n">Number</label><input class="inp" id="n" value="13" data-bind="n"><p class="help">A short real figure, e.g. 13 or 5 → 1.</p></div>
+                  <div></div>
+                  <div class="field"><label for="c-en">Caption (EN) <small>32/60</small></label><input class="inp" id="c-en" value="group companies on one HR system" data-bind="c"></div>
+                  <div class="field"><label for="c-id">Caption (ID) <small>33/60</small></label><input class="inp" id="c-id" value="perusahaan grup di satu sistem HR"></div>
+                </div>
+                <div class="vis-shot field">
+                  <div class="drop"><b>Drop a screenshot here or choose a file</b><span>JPG, PNG or WebP, up to 5 MB, at least 1200 px wide. Cropped to 16:10 from the top.</span><button class="btn sec" type="button">Choose file</button></div>
+                  <div class="pair"><div class="field"><label for="a-en">Alt text (EN)</label><input class="inp" id="a-en" placeholder="Describe what the image shows"></div><div class="field"><label for="a-id">Alt text (ID)</label><input class="inp" id="a-id"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="sec">
+              <h2>Publishing</h2>
+              <div class="body">
+                <label class="switch"><button type="button" role="switch" aria-checked="true" aria-label="Published"></button><span><b>Published</b><span>Off keeps it as a draft. Drafts never appear on the site.</span></span></label>
+              </div>
+              <div class="danger-zone">
+                <div><b>Delete project</b><span class="help">Removes it from the site and deletes its image. This can't be undone.</span></div>
+                <button class="btn danger" type="button">Delete project</button>
+              </div>
+            </div>
+
+            <div class="savebar">
+              <p class="help">Saving updates the site within a minute.</p>
+              <a class="btn sec" href="#/projects" data-go="projects">Cancel</a>
+              <button class="btn" type="submit">Save changes</button>
+            </div>
+          </form>
+
+          <aside class="side" aria-label="Preview">
+            <h3>Preview on the homepage</h3>
+            <div class="pv">
+              <p class="meta" data-out="m">Panasonic · 13 companies · 2022–now</p>
+              <p class="t" data-out="t">HR System</p>
+              <p class="d" data-out="d">The HR system 13 Panasonic group companies run on: onboarding, attendance, overtime, payroll, welfare and resource booking.</p>
+            </div>
+            <h3>Preview next to the cursor</h3>
+            <div class="pv-card"><b data-out="n">13</b><span data-out="c">group companies on one HR system</span></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== S-14 Profile ======== -->
+    <section class="v v-profile" aria-labelledby="prof-h">
+      <div class="page">
+        <div class="head"><div><h1 id="prof-h">Profile</h1><p>What the homepage hero shows about you.</p></div></div>
+        <form class="prof" action="#" data-go="profile" data-toast="Profile saved">
+          <div class="sec">
+            <h2>Photo</h2>
+            <p class="help">Shown as a small circle next to your role in the hero. Upload at least 640 × 640 px so it stays sharp on every screen.</p>
+            <div class="body">
+              <div class="avatar-row"><img class="avatar" src="assets/01M3Q0CCXMAP13F1SYC2T01D76-320.webp" alt="Current profile photo"><div><button class="btn sec" type="button">Replace</button><button class="btn sec" type="button">Remove</button><p class="help">Current file is 320 px. A larger one is recommended.</p></div></div>
+            </div>
+          </div>
+          <div class="sec">
+            <h2>Availability</h2>
+            <p class="help">The green line under your role in the hero.</p>
+            <div class="body">
+              <label class="switch"><button type="button" role="switch" aria-checked="true" aria-label="Show availability"></button><span><b>Show availability</b><span>Hide it when you are not taking new work.</span></span></label>
+              <div class="pair">
+                <div class="field"><label for="av-en">Text (EN) <small>36/48</small></label><input class="inp" id="av-en" value="Open to full-time roles and projects"></div>
+                <div class="field"><label for="av-id">Text (ID) <small>40/48</small></label><input class="inp" id="av-id" value="Terbuka untuk posisi full-time dan proyek"></div>
+              </div>
+            </div>
+          </div>
+          <div class="savebar"><a class="btn sec" href="#/projects" data-go="projects">Cancel</a><button class="btn" type="submit">Save profile</button></div>
+        </form>
+      </div>
+    </section>
+  </main>
+  <div class="toast" role="status" aria-live="polite"><i></i><span data-toast-text>Changes saved</span></div>
+</div>
+
+<script>
+/* admin:start */
+function initAdmin(root) {
+  const go = v => {
+    root.dataset.av = v;
+    root.querySelectorAll(".nav a").forEach(a => a.toggleAttribute("aria-current", a.dataset.go === v || (v === "edit" && a.dataset.go === "projects")));
+    (root.classList.contains("is-window") ? root : document.scrollingElement).scrollTo(0, 0);
+  };
+  let timer = 0;
+  const toast = msg => {
+    root.querySelector("[data-toast-text]").textContent = msg;
+    root.classList.add("toast-on"); clearTimeout(timer);
+    timer = setTimeout(() => root.classList.remove("toast-on"), 2400);
+  };
+  root.addEventListener("click", e => {
+    const t = e.target;
+    const link = t.closest("a[data-go]");
+    if (link) { e.preventDefault(); go(link.dataset.go); return; }
+    const sw = t.closest(".switch");
+    if (sw) { e.preventDefault(); const b = sw.querySelector("button"); b.setAttribute("aria-checked", String(b.getAttribute("aria-checked") !== "true")); return; }
+    const segb = t.closest(".seg button");
+    if (segb) {
+      segb.parentNode.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b === segb)));
+      if (segb.dataset.vis) root.dataset.vis = segb.dataset.vis;
+      return;
+    }
+    const tab = t.closest(".tabs button");
+    if (tab) { root.dataset.f = tab.dataset.f; tab.parentNode.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b === tab))); return; }
+    if (t.closest("[data-showpw]")) { const i = root.querySelector("#pw"), b = t.closest("[data-showpw]"); const show = i.type === "password"; i.type = show ? "text" : "password"; b.textContent = show ? "Hide" : "Show"; return; }
+    if (t.closest("[data-theme-toggle]")) { const b = t.closest("[data-theme-toggle]"); const dark = root.dataset.theme !== "light"; root.dataset.theme = dark ? "light" : "dark"; b.setAttribute("aria-label", dark ? "Switch to dark mode" : "Switch to light mode"); }
+  });
+  root.addEventListener("submit", e => {
+    e.preventDefault();
+    const f = e.target; go(f.dataset.go);
+    if (f.dataset.toast) toast(f.dataset.toast);
+  });
+  /* the preview follows the fields */
+  root.addEventListener("input", e => {
+    const k = e.target.dataset && e.target.dataset.bind;
+    if (!k) return;
+    root.querySelectorAll('[data-out="' + k + '"]').forEach(o => { o.textContent = e.target.value; });
+    const lab = e.target.closest(".field") && e.target.closest(".field").querySelector("label small");
+    if (lab && /\/\d+$/.test(lab.textContent)) lab.textContent = e.target.value.length + "/" + lab.textContent.split("/")[1];
+  });
+}
+/* admin:end */
+initAdmin(document.querySelector(".ad"));
+</script>
+</body>
+</html>
