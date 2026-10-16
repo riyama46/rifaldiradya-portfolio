@@ -1,0 +1,959 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rifaldi Radya Pratama</title>
+<meta name="description" content="Rifaldi Radya Pratama, software engineer (full-stack .NET). Builds and runs the HR system 13 Panasonic group companies use.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
+<script>
+  /* theme before paint: saved choice, else the device setting */
+  (function () {
+    var t = new URLSearchParams(location.search).get("theme");
+    if (t !== "dark" && t !== "light") { t = null; try { t = localStorage.getItem("rr-theme"); } catch (e) {} }
+    if (!t) t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
+<style>
+:root, :root[data-theme="dark"] {
+  --bg: #0b0b0b;
+  --ink: #f1f1ef;
+  --soft: rgba(241, 241, 239, 0.62);
+  --faint: rgba(241, 241, 239, 0.16);
+  --accent: #7b93ff;
+  --accent-ink: #0b0b0b;
+  --calm: #d2bf9f;
+  --k: 1; /* glow strength */
+  --avatar-ring: rgba(243, 239, 233, 0.2);
+  --dot: rgba(255, 255, 255, 0.085);
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --bg: #f6f6f3;
+  --ink: #111111;
+  --soft: rgba(17, 17, 17, 0.64);
+  --faint: rgba(17, 17, 17, 0.14);
+  --accent: #2f4fe0;
+  --accent-ink: #ffffff;
+  --calm: #8a7152;
+  --k: 0.6;
+  --avatar-ring: rgba(17, 17, 17, 0.14);
+  --dot: rgba(17, 17, 17, 0.1);
+  color-scheme: light;
+}
+:root {
+  --font: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --gutter: clamp(20px, 2.8vw, 40px);
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --win: 100svh; /* one screen */
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-snap-type: y proximity; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; scroll-snap-type: none; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 18px; line-height: 1.6; transition: background-color 300ms var(--ease), color 300ms var(--ease); }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+::selection { background: var(--accent); color: var(--accent-ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+em.ac { font-style: italic; color: var(--accent); font-weight: 600; }
+.label { font-size: 13px; line-height: 1.6; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: -999px; top: 8px; z-index: 99; background: var(--accent); color: var(--accent-ink); padding: 10px 14px; }
+.skip:focus { left: 8px; }
+
+/* ---------- Top bar ---------- */
+.bar { position: fixed; inset: 0 0 auto 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; padding: 8px var(--gutter) 20px; background: linear-gradient(to bottom, var(--bg) 55%, transparent); } /* taste-skill-ignore: neutral scrim, no hard edge over the cursor light */
+.bar .me { font-weight: 600; font-size: 15px; letter-spacing: -0.01em; white-space: nowrap; }
+.bar nav, .bar .navlinks { display: flex; align-items: center; gap: clamp(14px, 2.4vw, 32px); }
+.bar nav a, .bar nav button { font: 500 13px/1 var(--font); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); background: none; border: 0; padding: 16px 0; cursor: pointer; white-space: nowrap; }
+.bar nav a:hover, .bar nav button:hover { color: var(--accent); }
+.bar .lang { display: inline-flex; gap: 2px; }
+.bar .lang button, .bar .lang a { position: relative; padding: 16px 6px; }
+.bar .lang button[aria-pressed="false"], .bar .lang .off { color: var(--soft); opacity: 0.6; }
+.bar .lang button[aria-pressed="false"]:hover, .bar .lang .off:hover { opacity: 1; }
+.bar .lang button[aria-pressed="true"]::after, .bar .lang .on::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: 8px; height: 2px; border-radius: 1px; background: var(--accent); }
+.bar .theme { display: inline-flex; align-items: center; gap: 8px; }
+.bar .theme svg { width: 15px; height: 15px; }
+.bar nav .cta { color: var(--accent); }
+.bar nav .cta:hover { color: var(--ink); }
+.progress { position: fixed; z-index: 30; left: 0; right: 0; top: 0; height: 2px; background: var(--accent); transform-origin: 0 50%; transform: scaleX(0); }
+
+/* ---------- Buttons: the way in ---------- */
+.btn { display: inline-flex; align-items: center; min-height: 52px; padding: 0 22px; border-radius: 3px; background: var(--accent); color: var(--accent-ink); font: 500 16px/1.2 var(--font); transition: background-color 200ms var(--ease), transform 160ms var(--ease); }
+.btn:hover { background: color-mix(in srgb, var(--accent) 84%, var(--ink)); }
+.btn:active { transform: scale(0.97); }
+.btn.alt { background: color-mix(in srgb, var(--ink) 9%, transparent); color: var(--ink); }
+.btn.alt:hover { background: color-mix(in srgb, var(--ink) 16%, transparent); }
+.line-link { display: inline-block; padding: 10px 0; border-bottom: 1px solid var(--faint); /* taste-skill-ignore: link underline is the affordance */ transition: border-color 200ms var(--ease), color 200ms var(--ease); }
+.line-link:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ---------- Views: home and the Work page (#/work) ---------- */
+.v-work { display: none; }
+html[data-view="work"] .v-home { display: none; }
+html[data-view="work"] .v-work { display: block; }
+
+/* ---------- Chapters: one theme per screen ---------- */
+.ch { position: relative; overflow: clip; min-height: var(--win); display: flex; flex-direction: column; justify-content: center; padding: 104px var(--gutter) 72px; scroll-snap-align: start; view-timeline: --ch block; }
+.ch > .inner { position: relative; z-index: 1; width: 100%; }
+
+/* depth layer: dots + one glow, moving slower than the content (brief: Pal asked for dots + glows) taste-skill-ignore */
+.depth { position: absolute; inset: 0; z-index: 0; pointer-events: none; -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent); } /* taste-skill-ignore: edge mask, not a fill */
+.depth .layer { position: absolute; inset: -20% 0; }
+/* taste-skill-ignore */ .depth .dots { position: absolute; inset: 0; background-image: radial-gradient(var(--dot) 1.2px, transparent 1.8px); background-size: 32px 32px; }
+/* taste-skill-ignore */ .depth .glow { position: absolute; left: var(--gx, 70%); top: var(--gy, 40%); width: 70vmax; height: 70vmax; margin: -35vmax 0 0 -35vmax; border-radius: 50%; background: radial-gradient(circle, var(--glow), transparent 62%); }
+/* each chapter has its own light: work bright, about calm, contact strongest */
+#top { --gx: 88%; --gy: 30%; --glow: color-mix(in srgb, var(--accent) calc(14% * var(--k)), transparent); }
+#work, #all { --gx: 12%; --gy: 55%; --glow: color-mix(in srgb, var(--accent) calc(24% * var(--k)), transparent); }
+#about { --gx: 8%; --gy: 70%; --glow: color-mix(in srgb, var(--calm) calc(9% * var(--k)), transparent); }
+#highlight { --gx: 86%; --gy: 64%; --glow: color-mix(in srgb, var(--accent) calc(17% * var(--k)), transparent); }
+#contact, #more { --gx: 30%; --gy: 24%; --glow: color-mix(in srgb, var(--accent) calc(26% * var(--k)), transparent); }
+
+/* ---------- Cursor + a light that follows it (mouse only; touch keeps the chapter lights) ---------- */
+@property --spot-c { syntax: "<color>"; inherits: false; initial-value: transparent; }
+@property --spot-s { syntax: "<number>"; inherits: false; initial-value: 1; }
+.spot, .cur-dot, .cur-ring, .peek { position: fixed; left: 0; top: 0; pointer-events: none; opacity: 0; transition: opacity 300ms var(--ease); }
+.spot { z-index: 0; width: 820px; height: 820px; margin: -410px 0 0 -410px; display: none; }
+.spot i { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, var(--spot-c), transparent 62%); transform: scale(var(--spot-s)); transition: --spot-c 900ms var(--ease), --spot-s 900ms var(--ease); --spot-c: color-mix(in srgb, var(--accent) calc(16% * var(--k)), transparent); } /* taste-skill-ignore: Pal asked for a cursor light */
+html[data-zone="work"] .spot i, html[data-zone="all"] .spot i { --spot-c: color-mix(in srgb, var(--accent) calc(32% * var(--k)), transparent); --spot-s: 1.2; }
+html[data-zone="about"] .spot i { --spot-c: color-mix(in srgb, var(--calm) calc(10% * var(--k)), transparent); --spot-s: 0.8; }
+html[data-zone="highlight"] .spot i { --spot-c: color-mix(in srgb, var(--accent) calc(22% * var(--k)), transparent); --spot-s: 1; }
+html[data-zone="contact"] .spot i, html[data-zone="more"] .spot i { --spot-c: color-mix(in srgb, var(--accent) calc(36% * var(--k)), transparent); --spot-s: 1.4; }
+html.has-spot .spot { display: block; }
+html.has-spot .depth .glow { display: none; }
+.cur-dot { z-index: 60; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--accent); }
+.cur-ring { z-index: 60; width: 34px; height: 34px; margin: -17px 0 0 -17px; }
+.cur-ring i { position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid color-mix(in srgb, var(--accent) 70%, transparent); transition: transform 250ms var(--ease), background-color 250ms var(--ease), border-color 250ms var(--ease); } /* taste-skill-ignore: cursor ring */
+.cur-ring b { position: absolute; inset: -30px; display: grid; place-items: center; font: 600 11px/1 var(--font); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-ink); opacity: 0; transition: opacity 200ms var(--ease); }
+html.cur-on .spot, html.cur-on .cur-dot, html.cur-on .cur-ring { opacity: 1; }
+html.cur-hot .cur-ring i { transform: scale(1.6); background: color-mix(in srgb, var(--accent) 14%, transparent); border-color: var(--accent); }
+html.cur-label .cur-ring i { transform: scale(2.5); background: var(--accent); border-color: var(--accent); }
+html.cur-label .cur-ring b { opacity: 1; }
+html.cur-label .cur-dot { opacity: 0; }
+html.cur-down .cur-ring i { transform: scale(0.8); }
+html.has-cursor, html.has-cursor * { cursor: none !important; }
+/* the Work page shows a preview next to the cursor */
+.peek { z-index: 40; width: 340px; aspect-ratio: 16 / 10; border-radius: 6px; overflow: hidden; display: none; }
+html.has-cursor .peek { display: block; }
+html.peek-on .peek { opacity: 1; }
+.peek > * { position: absolute; inset: 0; opacity: 0; transition: opacity 200ms var(--ease); }
+.peek img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.peek-card { display: flex; flex-direction: column; justify-content: flex-end; padding: 24px; background: color-mix(in srgb, var(--accent) 16%, var(--bg)); }
+.peek-card b { font-size: 56px; line-height: 1; letter-spacing: -0.03em; font-weight: 500; font-variant-numeric: tabular-nums; }
+.peek-card span { margin-top: 8px; font-size: 14px; color: var(--soft); }
+html[data-peek="hrms"] .peek [data-k="hrms"], html[data-peek="sso"] .peek [data-k="sso"], html[data-peek="teams"] .peek [data-k="teams"], html[data-peek="swiftpay"] .peek [data-k="swiftpay"], html[data-peek="bloom"] .peek [data-k="bloom"], html[data-peek="site"] .peek [data-k="site"], html[data-peek="ai"] .peek [data-k="ai"] { opacity: 1; }
+
+/* ---------- Hero ---------- */
+.hero { justify-content: flex-end; padding-bottom: 64px; }
+.who { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+.who img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1px var(--avatar-ring); } /* taste-skill-ignore: 1px ring, not a shadow */
+.who .status { display: inline-flex; align-items: center; gap: 8px; }
+.who .status i { width: 7px; height: 7px; border-radius: 50%; background: #3fbf6f; }
+h1 { font-size: clamp(52px, 8.2vw, 132px); line-height: 0.98; letter-spacing: -0.035em; font-weight: 600; }
+h1 .line { display: block; white-space: nowrap; }
+.hero-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-top: 56px; }
+.hero-foot p { max-width: 34ch; color: var(--soft); font-size: 18px; line-height: 1.55; }
+.hero-foot .stack { max-width: none; margin-top: 20px; font-size: 15px; line-height: 1.7; }
+.hero-foot .stack span { white-space: nowrap; }
+.hero-foot .stack .k { color: var(--ink); font-weight: 500; }
+.hero-foot .stack span + span::before { content: "·"; margin: 0 10px; opacity: 0.6; }
+.hero-act { display: flex; align-items: center; gap: 28px; }
+.scroll { white-space: nowrap; padding: 14px 0; }
+
+/* ---------- Work: one chapter, five steps ---------- */
+.work { position: relative; }
+.work .stage { position: relative; overflow: clip; padding: 0 var(--gutter); }
+.whead { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: baseline; padding-top: 104px; }
+.whead .count { display: none; font-variant-numeric: tabular-nums; }
+.cn { display: inline-grid; }
+.cn b { grid-area: 1 / 1; font-weight: inherit; }
+.cn b + b { visibility: hidden; }
+.projects { position: relative; z-index: 1; }
+.proj { min-height: var(--win); display: flex; align-items: center; padding: 72px 0; scroll-snap-align: start; }
+.proj > .pin { width: 100%; }
+.proj .label { margin-bottom: 20px; }
+.wt { font-size: clamp(56px, 9vw, 150px); line-height: 0.95; letter-spacing: -0.04em; font-weight: 600; }
+.wt-a { position: relative; display: inline-flex; align-items: baseline; gap: 0.14em; padding-bottom: 0.06em; }
+.wt-a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 0.04em; min-height: 2px; border-radius: 1px; background: var(--accent); transform: scaleX(0); transform-origin: 0 50%; transition: transform 550ms var(--ease); }
+.wt-a .go { font-style: normal; font-weight: 500; font-size: 0.42em; color: var(--accent); opacity: 0; transform: translateX(-0.5em); transition: opacity 250ms var(--ease), transform 450ms var(--ease); }
+.wt-a:hover::after, .wt-a:focus-visible::after { transform: scaleX(1); }
+.wt-a:hover .go, .wt-a:focus-visible .go { opacity: 1; transform: none; }
+@media (hover: none) { .wt-a .go { opacity: 0.7; transform: none; } }
+.wd { margin-top: 28px; max-width: 40ch; color: var(--soft); font-size: clamp(18px, 1.5vw, 22px); line-height: 1.5; }
+.links { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 4px 32px; }
+.has-pic { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 56px; align-items: center; }
+.has-pic .wt { font-size: clamp(48px, 5vw, 88px); }
+.shot { display: block; border-radius: 6px; transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 500ms var(--ease); }
+.shot .pic { width: 100%; height: auto; aspect-ratio: 16 / 10; max-height: 52svh; object-fit: cover; object-position: top; border-radius: 6px; }
+.wfoot { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 8px 0 28px; }
+.rail { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 28px; font-size: 15px; }
+.rail a { display: inline-flex; align-items: center; gap: 10px; padding: 10px 0; color: var(--soft); transition: color 200ms var(--ease); }
+.rail a::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); opacity: 0; transform: scale(0.5); }
+.rail a:hover { color: var(--ink); }
+.marks { display: none; }
+
+/* ---------- About ---------- */
+.statement { margin-top: 20px; font-size: clamp(34px, 4.2vw, 64px); line-height: 1.06; letter-spacing: -0.03em; font-weight: 500; max-width: 22ch; }
+.split2 { margin-top: 56px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px var(--gutter); align-items: start; }
+.about-body { max-width: 46ch; color: var(--soft); }
+.about-body p + p { margin-top: 18px; }
+.facts { display: grid; gap: 10px; }
+.facts p { color: var(--soft); font-size: 16px; }
+.facts p b { color: var(--ink); font-weight: 500; }
+.facts .cert { margin-top: 14px; }
+
+/* ---------- Highlight ---------- */
+@property --n { syntax: "<integer>"; inherits: false; initial-value: 0; }
+.x { position: relative; white-space: nowrap; }
+.x::after { content: ""; position: absolute; left: -0.04em; right: -0.04em; top: 56%; height: 0.07em; border-radius: 0.04em; background: var(--accent); transform-origin: 0 50%; }
+.stats { margin-top: 56px; display: flex; flex-wrap: wrap; gap: 32px 88px; }
+.stats b { display: block; font-size: clamp(52px, 6vw, 104px); line-height: 1; letter-spacing: -0.03em; font-weight: 500; font-variant-numeric: tabular-nums; }
+.stats span { display: block; margin-top: 10px; font-size: 14px; color: var(--soft); }
+.stats b span { display: inline; margin: 0; font-size: inherit; color: inherit; }
+.num { --n: var(--to); counter-reset: n var(--n); font-style: normal; }
+.num::after { content: counter(n); }
+.note { margin-top: 40px; font-size: 15px; color: var(--soft); }
+.bridge { margin-top: 48px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 20px; font-size: clamp(18px, 1.5vw, 22px); }
+.bridge .line-link { color: var(--accent); border-color: currentColor; }
+.bridge .line-link:hover { color: var(--ink); }
+
+/* ---------- Contact ---------- */
+.contact { justify-content: space-between; padding-top: 140px; padding-bottom: 32px; }
+.talk { margin-top: 20px; font-size: clamp(56px, 8vw, 128px); line-height: 0.98; letter-spacing: -0.04em; font-weight: 600; max-width: 14ch; }
+.pitch { margin-top: 32px; max-width: 46ch; color: var(--soft); font-size: clamp(18px, 1.5vw, 22px); line-height: 1.5; }
+.acts { margin-top: 40px; display: flex; flex-wrap: wrap; gap: 12px; }
+.reach { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 4px 36px; font-size: 17px; }
+.clock { margin-top: 20px; color: var(--soft); font-size: 15px; font-variant-numeric: tabular-nums; }
+.foot { position: relative; z-index: 1; margin-top: 64px; padding-top: 24px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 14px; color: var(--soft); }
+.foot a { padding: 6px 0; }
+.foot a:hover { color: var(--ink); }
+
+/* ---------- Work page ---------- */
+.workpage { justify-content: flex-start; padding-top: 140px; scroll-snap-align: none; }
+.wp-title { font-size: clamp(96px, 15vw, 232px); line-height: 0.88; letter-spacing: -0.05em; font-weight: 600; white-space: nowrap; }
+.wp-title sup { position: relative; top: -2.6em; margin-left: 0.35em; font-size: 0.14em; letter-spacing: 0; font-weight: 500; color: var(--soft); }
+.wp-sub { margin-top: 32px; max-width: 46ch; color: var(--soft); font-size: clamp(18px, 1.5vw, 22px); line-height: 1.5; }
+.filters { margin-top: 48px; display: flex; flex-wrap: wrap; gap: 8px; }
+.filters button { min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--ink) 8%, transparent); color: var(--soft); font: 500 15px/1 var(--font); cursor: pointer; transition: background-color 200ms var(--ease), color 200ms var(--ease); }
+.filters button:hover { color: var(--ink); }
+.filters button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+html[data-filter="panasonic"] .row:not([data-group="panasonic"]), html[data-filter="web"] .row:not([data-group="web"]), html[data-filter="ai"] .row:not([data-group="ai"]) { display: none; }
+.rows { list-style: none; margin: 40px 0 0; padding: 0; }
+.row { border-top: 1px solid var(--faint); scroll-margin-top: 88px; } /* taste-skill-ignore: rows of a real list */
+.row:last-child { border-bottom: 1px solid var(--faint); } /* taste-skill-ignore */
+.row-head { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto 150px 28px; align-items: center; gap: 24px; padding: clamp(24px, 2.6vw, 40px) 0; background: none; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.row-head .t { font-size: clamp(36px, 5vw, 80px); line-height: 1; letter-spacing: -0.035em; font-weight: 500; transition: transform 400ms var(--ease), color 200ms var(--ease); }
+.row-head .m { color: var(--soft); font-size: 15px; text-align: right; }
+.row-head .y { color: var(--soft); font-size: 14px; text-align: right; font-variant-numeric: tabular-nums; }
+.pm { position: relative; justify-self: end; width: 20px; height: 20px; }
+.pm::before, .pm::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1.5px; margin-top: -0.75px; background: currentColor; transition: transform 300ms var(--ease); }
+.pm::after { transform: rotate(90deg); }
+.row-head[aria-expanded="true"] .pm::after { transform: rotate(0deg); }
+.row-head:hover .t, .row-head:focus-visible .t, .row-head[aria-expanded="true"] .t { transform: translateX(14px); color: var(--accent); }
+.row-body { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows 450ms var(--ease), visibility 450ms; }
+.row-head[aria-expanded="true"] + .row-body { grid-template-rows: 1fr; visibility: visible; }
+.row-body > div { overflow: hidden; }
+.cols { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr) minmax(0, 1fr); gap: 24px; padding: 4px 0 48px; }
+.cols .label { margin-bottom: 10px; }
+.cols p, .cols li { color: var(--soft); font-size: 17px; line-height: 1.55; }
+.cols ul { margin: 0; padding-left: 1.1em; }
+.cols li + li { margin-top: 6px; }
+.cols .val { color: var(--ink); }
+.cols .val + .label { margin-top: 20px; }
+.cols .btn, .cols .line-link { margin-top: 20px; }
+
+/* ---------- Motion (CSS only; without support or with reduced motion the page is a plain stack) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  h1 .line { animation: up 900ms var(--ease) both; }
+  h1 .line:nth-child(2) { animation-delay: 90ms; }
+  @keyframes up { from { opacity: 0; transform: translateY(40%); } }
+
+  @supports (animation-timeline: view()) {
+    /* each chapter comes into focus, then leaves */
+    .ch > .inner { animation: focus linear both; animation-timeline: --ch; animation-range: cover 0% cover 100%; }
+    .hero > .inner { animation-name: focus-out; }
+    .contact > .inner { animation-name: focus-in; }
+    .workpage > .inner { animation: none; }
+    @keyframes focus {
+      0% { opacity: 0; transform: translateY(80px) scale(0.97); filter: blur(8px); }
+      36%, 64% { opacity: 1; transform: none; filter: blur(0); }
+      100% { opacity: 0; transform: translateY(-80px) scale(0.97); filter: blur(8px); }
+    }
+    @keyframes focus-out {
+      0%, 50% { opacity: 1; transform: none; filter: blur(0); }
+      100% { opacity: 0; transform: translateY(-80px) scale(0.97); filter: blur(8px); }
+    }
+    @keyframes focus-in {
+      0% { opacity: 0; transform: translateY(80px) scale(0.97); filter: blur(8px); }
+      45%, 100% { opacity: 1; transform: none; filter: blur(0); }
+    }
+
+    /* parallax: the depth layer lags behind every chapter */
+    .ch .layer { animation: drift linear both; animation-timeline: --ch; animation-range: cover 0% cover 100%; }
+    .ch .glow { animation: glow-drift linear both; animation-timeline: --ch; animation-range: cover 0% cover 100%; }
+    @keyframes drift { from { transform: translateY(-16%); } to { transform: translateY(16%); } }
+    @keyframes glow-drift { from { transform: translate(-6vw, -12%) scale(0.85); } to { transform: translate(6vw, 12%) scale(1.15); } }
+
+    /* work: the stage stays, the five projects take turns */
+    .work { view-timeline: --work block; }
+    .work .stage { position: sticky; top: 0; height: var(--win); display: flex; flex-direction: column; }
+    .whead { padding-top: 96px; }
+    .whead .count { display: block; }
+    .proj .pn { display: none; }
+    .projects { flex: 1; }
+    .proj { position: absolute; inset: 0; min-height: 0; padding: 0; scroll-snap-align: none; }
+    .proj { animation: step linear both; animation-timeline: --work; animation-range: contain var(--r0) contain var(--r1); }
+    .cn b { animation: num linear both; animation-timeline: --work; animation-range: contain var(--r0) contain var(--r1); }
+    @keyframes num { 0% { visibility: hidden; } 1%, 99% { visibility: visible; } 100% { visibility: hidden; } }
+    /* each step is centred on its snap point (0, 25, 50, 75, 100%) */
+    .proj:nth-child(1), .cn b:nth-child(1), .rail li:nth-child(1) { --r0: -12.5%; --r1: 12.5%; }
+    .proj:nth-child(2), .cn b:nth-child(2), .rail li:nth-child(2) { --r0: 12.5%; --r1: 37.5%; }
+    .proj:nth-child(3), .cn b:nth-child(3), .rail li:nth-child(3) { --r0: 37.5%; --r1: 62.5%; }
+    .proj:nth-child(4), .cn b:nth-child(4), .rail li:nth-child(4) { --r0: 62.5%; --r1: 87.5%; }
+    .proj:nth-child(5), .cn b:nth-child(5), .rail li:nth-child(5) { --r0: 87.5%; --r1: 112.5%; }
+    .cn b + b { visibility: visible; }
+    .proj .shot .pic { animation: near linear both; animation-timeline: --work; animation-range: contain var(--r0) contain var(--r1); }
+    .proj .wt { animation: mid linear both; animation-timeline: --work; animation-range: contain var(--r0) contain var(--r1); }
+    .rail a { animation: rail-on linear both; animation-timeline: --work; animation-range: contain var(--r0) contain var(--r1); }
+    .rail a::before { animation: rail-dot linear both; animation-timeline: --work; animation-range: contain var(--r0) contain var(--r1); }
+    .marks { display: block; margin-top: calc(var(--win) * -1); }
+    .marks i { display: block; height: var(--win); scroll-snap-align: start; }
+    @keyframes step {
+      0% { opacity: 0; visibility: hidden; transform: translateY(70px) scale(0.97); filter: blur(8px); }
+      28%, 72% { opacity: 1; visibility: visible; transform: none; filter: blur(0); }
+      100% { opacity: 0; visibility: hidden; transform: translateY(-70px) scale(0.97); filter: blur(8px); }
+    }
+    @keyframes near { from { transform: translateY(90px); } to { transform: translateY(-90px); } }
+    @keyframes mid { from { transform: translateY(26px); } to { transform: translateY(-26px); } }
+    @keyframes rail-on { 0%, 100% { color: var(--soft); } 28%, 72% { color: var(--ink); } }
+    @keyframes rail-dot { 0%, 100% { opacity: 0; transform: scale(0.5); } 28%, 72% { opacity: 1; transform: scale(1); } }
+    .stage .layer { animation: work-drift linear both; animation-timeline: --work; animation-range: contain 0% contain 100%; }
+    .stage .glow { animation: work-glow linear both; animation-timeline: --work; animation-range: contain 0% contain 100%; }
+    @keyframes work-drift { from { transform: translateY(0); } to { transform: translateY(-30%); } }
+    @keyframes work-glow { from { transform: translate(0, 0) scale(0.9); } to { transform: translate(70vw, -14vh) scale(1.15); } }
+
+    /* about: the statement fills in, line by line, as it arrives */
+    .fill { color: transparent; background-image: linear-gradient(var(--ink), var(--ink)), linear-gradient(color-mix(in srgb, var(--ink) 20%, transparent), color-mix(in srgb, var(--ink) 20%, transparent)); background-repeat: no-repeat; background-size: 0% 100%, 100% 100%; -webkit-background-clip: text; background-clip: text; animation: fill linear both; animation-timeline: --ch; animation-range: cover 22% cover 50%; } /* taste-skill-ignore: text fill, flat colours */
+    @keyframes fill { to { background-size: 100% 100%, 100% 100%; } }
+
+    /* highlight: "five passwords" gets struck out, then the numbers count to their value */
+    .x { animation: x-dim linear both; animation-timeline: --ch; animation-range: cover 30% cover 46%; }
+    .x::after { animation: x-line linear both; animation-timeline: --ch; animation-range: cover 30% cover 46%; }
+    @keyframes x-dim { from { color: var(--ink); } to { color: var(--soft); } }
+    @keyframes x-line { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    .num { animation: count linear both; animation-timeline: --ch; animation-range: cover 30% cover 50%; }
+    @keyframes count { from { --n: var(--from); } to { --n: var(--to); } }
+
+    .progress { animation: grow linear both; animation-timeline: scroll(root); }
+    @keyframes grow { to { transform: scaleX(1); } }
+  }
+}
+
+/* ---------- Phone ---------- */
+@media (max-width: 767px) {
+  body { font-size: 17px; }
+  .bar .navlinks { display: none; }
+  .bar nav { gap: 14px; }
+  .bar .theme span { display: none; }
+  .ch { padding: 88px var(--gutter) 56px; }
+  /* hero: centred, the headline carries the screen; the label steps back */
+  .hero { justify-content: center; padding: 96px var(--gutter) 48px; }
+  .who { gap: 12px; margin-bottom: 24px; }
+  .who img { width: 44px; height: 44px; }
+  .who .label { font-size: 13px; letter-spacing: 0.02em; text-transform: none; line-height: 1.45; }
+  .who .loc { display: none; }
+  h1 { font-size: 13.6vw; line-height: 0.96; letter-spacing: -0.04em; }
+  h1 .line { white-space: normal; }
+  .hero-foot { flex-direction: column; align-items: flex-start; gap: 28px; margin-top: 32px; }
+  .hero-foot p { font-size: 17px; }
+  .hero-foot .stack { margin-top: 14px; font-size: 14px; }
+  .scroll { display: none; }
+  .whead { padding-top: 88px; }
+  .wt { font-size: 15vw; }
+  .has-pic { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .has-pic .shot { order: -1; }
+  .shot .pic { max-height: none; }
+  .has-pic .wt { font-size: 12vw; }
+  .rail { display: none; }
+  .wfoot { justify-content: flex-start; padding-bottom: 20px; }
+  .statement { font-size: 9vw; }
+  .split2 { grid-template-columns: 1fr; gap: 32px; margin-top: 36px; }
+  .stats { margin-top: 36px; gap: 24px 40px; }
+  .stats b { font-size: 13vw; }
+  .bridge { margin-top: 36px; }
+  .contact { padding-top: 104px; }
+  .talk { font-size: 13vw; }
+  .acts { flex-direction: column; align-items: stretch; }
+  .acts .btn { justify-content: center; }
+  #about > .inner { animation: none; }
+  .workpage { padding-top: 104px; }
+  .wp-title { font-size: 30vw; }
+  .row-head { grid-template-columns: minmax(0, 1fr) 20px; gap: 4px 12px; padding: 24px 0; }
+  .row-head .t { grid-column: 1; font-size: 9vw; }
+  .row-head .m, .row-head .y { grid-column: 1; grid-row: 2; text-align: left; font-size: 14px; }
+  .row-head .y { display: none; }
+  .row-head .pm { grid-column: 2; grid-row: 1; }
+  .row-head:hover .t, .row-head:focus-visible .t, .row-head[aria-expanded="true"] .t { transform: none; }
+  .cols { grid-template-columns: 1fr; gap: 20px; padding: 0 0 32px; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="skip">Skip to content</a>
+
+<header class="bar">
+  <a class="me" href="#top">Rifaldi Radya Pratama</a>
+  <nav aria-label="Main">
+    <span class="navlinks">
+      <a href="#/work" data-i18n="nav.work">Work</a>
+      <a href="#about" data-i18n="nav.about">About</a>
+    </span>
+    <span class="lang"><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="id" aria-pressed="false">ID</button></span>
+    <button class="theme" type="button" id="theme" aria-label="Switch to light mode">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg>
+      <span id="theme-label">Light</span>
+    </button>
+    <a class="cta" href="mailto:hello@rifaldiradya.com" data-mail="hello" data-i18n="cta">Email me</a>
+  </nav>
+</header>
+
+<div class="progress" aria-hidden="true"></div>
+<div class="spot" aria-hidden="true"><i></i></div>
+<div class="peek" aria-hidden="true">
+  <div class="peek-card" data-k="hrms"><b>13</b><span data-i18n="peek.hrms">group companies on one HR system</span></div>
+  <div class="peek-card" data-k="sso"><b>5 → 1</b><span data-i18n="peek.sso">passwords per person</span></div>
+  <div class="peek-card" data-k="teams"><b>57 → 4</b><span data-i18n="peek.teams">minutes per approval, projected</span></div>
+  <div class="peek-card" data-k="site"><b>Next.js</b><span data-i18n="peek.site">from my own PRD and design doc to a live site</span></div>
+  <div class="peek-card" data-k="ai"><b>4</b><span data-i18n="peek.ai">agent skills for documents, notes and citations</span></div>
+  <img data-k="swiftpay" src="assets/01M3PWWDDZSNSTHSW24Y62BXRC-1600.webp" alt="">
+  <img data-k="bloom" src="assets/01M3RYC83KNE6FCBQEW6QK2DT8-1600.webp" alt="">
+</div>
+<div class="cur-ring" aria-hidden="true"><i></i><b></b></div>
+<div class="cur-dot" aria-hidden="true"></div>
+<main id="main">
+ <div class="v-home">
+  <section class="ch hero" id="top" aria-labelledby="h">
+    <div class="depth" aria-hidden="true"><div class="layer"><i class="dots"></i><i class="glow"></i></div></div>
+    <div class="inner">
+      <div class="who">
+        <img src="assets/01M3Q0CCXMAP13F1SYC2T01D76-320.webp" width="64" height="64" alt="Rifaldi Radya">
+        <div>
+          <p class="label"><span data-i18n="hero.role">Software engineer · Full-stack .NET</span><span class="loc" data-i18n="hero.loc"> · Jakarta, Indonesia</span></p>
+          <p class="label status"><i aria-hidden="true"></i><span data-i18n="hero.open">Open to full-time roles and projects</span></p>
+        </div>
+      </div>
+      <h1 id="h"><span class="line" data-i18n="hero.l1">Building HR software</span><span class="line" data-i18n-html="hero.l2">for <em class="ac">thousands.</em></span></h1>
+      <div class="hero-foot">
+        <div>
+          <p data-i18n="hero.sub">Four years building and running the HR system of 13 Panasonic group companies: hundreds of HR users, thousands of employee records.</p>
+          <p class="stack"><span class="k" data-i18n="hero.stack">Stack</span> <span>C#</span> <span>ASP.NET</span> <span>SQL Server</span> <span>Azure</span> <span>Power Automate</span> <span>Next.js</span> <span>TypeScript</span></p>
+        </div>
+        <div class="hero-act">
+          <a class="btn" href="mailto:hello@rifaldiradya.com" data-mail="hello" data-i18n="cta">Email me</a>
+          <a class="label scroll" href="#work" data-i18n="hero.scroll">Scroll ↓</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="work" id="work" aria-labelledby="work-h">
+    <div class="stage">
+      <div class="depth" aria-hidden="true"><div class="layer"><i class="dots"></i><i class="glow"></i></div></div>
+      <div class="whead">
+        <h2 class="label" id="work-h" data-i18n="work.h">Selected work</h2>
+        <p class="label count" aria-hidden="true"><!-- taste-skill-ignore: position in the pinned sequence --><span class="cn"><b>01</b><b>02</b><b>03</b><b>04</b><b>05</b></span> / 05</p>
+      </div>
+      <div class="projects">
+        <article class="proj">
+          <div class="pin">
+            <p class="label"><span class="pn">01 / 05 · </span><span data-i18n="w1.m">Panasonic · 13 companies · 2022–now</span></p>
+            <h3 class="wt"><a class="wt-a" href="#/work/hrms" data-cursor="Read" data-i18n-cursor="cur.read"><span data-i18n="w1.t">HR System</span><i class="go" aria-hidden="true">→</i></a></h3>
+            <p class="wd" data-i18n="w1.d">The HR system 13 Panasonic group companies run on: onboarding, attendance, overtime, payroll, welfare and resource booking.</p>
+          </div>
+        </article>
+        <article class="proj">
+          <div class="pin">
+            <p class="label"><span class="pn">02 / 05 · </span><span data-i18n="w2.m">Panasonic · Live since early 2023</span></p>
+            <h3 class="wt"><a class="wt-a" href="#/work/sso" data-cursor="Read" data-i18n-cursor="cur.read"><span>Single Sign-On</span><i class="go" aria-hidden="true">→</i></a></h3>
+            <p class="wd" data-i18n="w2.d">One login replaced four or five separate passwords for about 200 staff. Legacy apps joined through query string and POST handoff, without a rewrite.</p>
+          </div>
+        </article>
+        <article class="proj">
+          <div class="pin">
+            <p class="label"><span class="pn">03 / 05 · </span><span data-i18n="w3.m">Panasonic · Proposal, not live</span></p>
+            <h3 class="wt"><a class="wt-a" href="#/work/teams" data-cursor="Read" data-i18n-cursor="cur.read"><span data-i18n="w3.t">Teams Approvals</span><i class="go" aria-hidden="true">→</i></a></h3>
+            <p class="wd" data-i18n="w3.d">A mobile approval flow on Microsoft Teams, projected to cut a three-level approval from about 57 minutes to 4.</p>
+          </div>
+        </article>
+        <article class="proj">
+          <div class="pin has-pic">
+            <div>
+              <p class="label"><span class="pn">04 / 05 · </span><span data-i18n="w4.m">Concept · Fintech · WordPress</span></p>
+              <h3 class="wt"><a class="wt-a" href="#/work/swiftpay" data-cursor="Read" data-i18n-cursor="cur.read"><span>SwiftPay</span><i class="go" aria-hidden="true">→</i></a></h3>
+              <p class="wd" data-i18n="w4.d">Landing page for an international money transfer startup.</p>
+              <div class="links">
+                <a class="line-link" href="https://staging0.rifaldiradya.com/" target="_blank" rel="noopener noreferrer" data-i18n="w.open">Open the live site ↗</a>
+              </div>
+            </div>
+            <a class="shot" href="https://staging0.rifaldiradya.com/" target="_blank" rel="noopener noreferrer" data-cursor="Visit" data-i18n-cursor="cur.visit"><img class="pic" src="assets/01M3PWWDDZSNSTHSW24Y62BXRC-1600.webp" width="1600" height="1000" loading="lazy" alt="SwiftPay landing page" data-i18n-alt="w4.alt"></a>
+          </div>
+        </article>
+        <article class="proj">
+          <div class="pin has-pic">
+            <div>
+              <p class="label"><span class="pn">05 / 05 · </span><span data-i18n="w5.m">Bali · Studio site · WordPress</span></p>
+              <h3 class="wt"><a class="wt-a" href="#/work/bloom" data-cursor="Read" data-i18n-cursor="cur.read"><span>Bloom Studio</span><i class="go" aria-hidden="true">→</i></a></h3>
+              <p class="wd" data-i18n="w5.d">Website for a photography and branding studio, with a filterable portfolio.</p>
+              <div class="links">
+                <a class="line-link" href="https://staging1.rifaldiradya.com/" target="_blank" rel="noopener noreferrer" data-i18n="w.open">Open the live site ↗</a>
+              </div>
+            </div>
+            <a class="shot" href="https://staging1.rifaldiradya.com/" target="_blank" rel="noopener noreferrer" data-cursor="Visit" data-i18n-cursor="cur.visit"><img class="pic" src="assets/01M3RYC83KNE6FCBQEW6QK2DT8-1600.webp" width="1600" height="1000" loading="lazy" alt="Bloom Studio homepage" data-i18n-alt="w5.alt"></a>
+          </div>
+        </article>
+      </div>
+      <div class="wfoot">
+        <ol class="rail" aria-label="Projects" data-i18n-aria="work.rail">
+          <li><a href="#w1" data-i18n="w1.t">HR System</a></li>
+          <li><a href="#w2">Single Sign-On</a></li>
+          <li><a href="#w3" data-i18n="w3.t">Teams Approvals</a></li>
+          <li><a href="#w4">SwiftPay</a></li>
+          <li><a href="#w5">Bloom Studio</a></li>
+        </ol>
+        <a class="line-link" href="#/work" data-i18n="work.all">See all work →</a>
+      </div>
+    </div>
+    <div class="marks" aria-hidden="true"><i id="w1"></i><i id="w2"></i><i id="w3"></i><i id="w4"></i><i id="w5"></i></div>
+  </section>
+
+  <section class="ch" id="about" aria-labelledby="about-h">
+    <div class="depth" aria-hidden="true"><div class="layer"><i class="dots"></i><i class="glow"></i></div></div>
+    <div class="inner">
+      <h2 class="label" id="about-h" data-i18n="about.h">About</h2>
+      <p class="statement"><span class="fill" data-i18n="about.s">I build the systems a company runs on: attendance, overtime, payroll.</span></p>
+      <div class="split2">
+        <div class="about-body">
+          <p data-i18n="about.p1">I'm one of three developers on the HR system that 13 Panasonic group companies use. I own delivery for six of them: requirements, estimates, development and installation on their servers. I also train users at every rollout, prepare SOX audit documents and mentor interns.</p>
+          <p data-i18n="about.p2">Before code I edited video. I studied informatics at IPB and Telkom University, and I'm now doing a Master of Management in HR, with a thesis on presenteeism, work-life balance and burnout.</p>
+        </div>
+        <div class="facts">
+          <p class="label" data-i18n="about.edu">Education</p>
+          <p><b data-i18n="e1">Bachelor of Informatics</b>, Telkom University, 2022</p>
+          <p><b data-i18n="e2">Diploma, Informatics Management</b>, IPB University, 2018</p>
+          <p><b data-i18n="e3">Master of Management, HR</b>, Universitas Pancasila, <span data-i18n="e3d">expected 2027</span></p>
+          <p class="label cert" data-i18n="about.cert">Certifications</p>
+          <p><b>Junior Web Programmer</b>, BNSP, 2019</p>
+          <p><b>UI/UX Design Bootcamp</b>, Digital Skola, 2022</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ch" id="highlight" aria-labelledby="case-h">
+    <div class="depth" aria-hidden="true"><div class="layer"><i class="dots"></i><i class="glow"></i></div></div>
+    <div class="inner">
+      <p class="label" data-i18n="case.meta">Highlight · Panasonic · Live since early 2023</p>
+      <h2 class="statement" id="case-h" data-i18n-html="case.t">One login instead of <span class="x">five passwords.</span></h2>
+      <div class="stats">
+        <p><b><span class="sr">5 → 1</span><span aria-hidden="true">5 → <i class="num" style="--from: 5; --to: 1"></i></span></b><span data-i18n="st1">passwords per person</span></p>
+        <p><b><span class="sr" data-i18n="st2n">~200</span><span aria-hidden="true"><span data-i18n="st2p">~</span><i class="num" style="--from: 0; --to: 200"></i></span></b><span data-i18n="st2">staff on one login</span></p>
+        <p><b><span class="sr">13</span><span aria-hidden="true"><i class="num" style="--from: 0; --to: 13"></i></span></b><span data-i18n="st3">group companies on the HRMS</span></p>
+      </div>
+      <p class="note" data-i18n="case.blur">Screens of the HRMS are internal; I can walk you through them in an interview.</p>
+      <p class="bridge"><span data-i18n="bridge.q">Need a system like this at your company?</span> <a class="line-link" href="#contact" data-i18n="bridge.go">Go to contact ↓</a></p>
+    </div>
+  </section>
+
+  <section class="ch contact" id="contact" aria-labelledby="talk">
+    <div class="depth" aria-hidden="true"><div class="layer"><i class="dots"></i><i class="glow"></i></div></div>
+    <div class="inner">
+      <p class="label" data-i18n="ct.label">Contact</p>
+      <h2 class="talk" id="talk" data-i18n-html="ct.h">Tell me what you're <em class="ac">building.</em></h2>
+      <p class="pitch" data-i18n="ct.pitch">Hiring a full-time developer, or need an HR or internal system built? Send a few lines about it and I'll reply by email.</p>
+      <div class="acts">
+        <a class="btn" href="mailto:hello@rifaldiradya.com" data-mail="role" data-i18n="ct.role">Email about a full-time role</a>
+        <a class="btn alt" href="mailto:hello@rifaldiradya.com" data-mail="project" data-i18n="ct.project">Email about a project</a>
+      </div>
+      <div class="reach">
+        <a class="line-link" href="mailto:hello@rifaldiradya.com" data-mail="hello">hello@rifaldiradya.com</a>
+        <a class="line-link" href="https://www.linkedin.com/in/rifaldiradya" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+        <a class="line-link" href="https://github.com/riyama46" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      </div>
+      <p class="clock" id="clock">GMT+7</p>
+    </div>
+    <div class="foot">
+      <span>© 2026 Rifaldi Radya Pratama</span>
+      <span><a href="#privacy" data-i18n="ft.p">Privacy</a> · <a href="#cookies" data-i18n="ft.c">Cookie settings</a></span>
+      <a href="#top" data-i18n="ft.top">Back to top ↑</a>
+    </div>
+  </section>
+ </div>
+
+ <div class="v-work">
+  <section class="ch workpage" id="all" aria-labelledby="all-h">
+    <div class="depth" aria-hidden="true"><div class="layer"><i class="dots"></i><i class="glow"></i></div></div>
+    <div class="inner">
+      <p class="label" data-i18n="wp.label">All work</p>
+      <h1 class="wp-title" id="all-h"><span data-i18n="nav.work">Work</span><sup><!-- taste-skill-ignore: project count -->7</sup></h1>
+      <p class="wp-sub" data-i18n="wp.sub">Three projects inside the Panasonic HR system, three websites and a set of AI tools I use every day. Open a row for the details.</p>
+      <div class="filters" role="group" aria-label="Filter" data-i18n-aria="wp.filter">
+        <button type="button" data-filter="all" aria-pressed="true" data-i18n="wp.f.all">All</button>
+        <button type="button" data-filter="panasonic" aria-pressed="false">Panasonic</button>
+        <button type="button" data-filter="web" aria-pressed="false" data-i18n="wp.f.web">Websites</button>
+        <button type="button" data-filter="ai" aria-pressed="false" data-i18n="wp.f.ai">AI tools</button>
+      </div>
+      <ol class="rows">
+        <li class="row" data-group="panasonic" id="case-hrms">
+          <button class="row-head" type="button" aria-expanded="false" aria-controls="cb-hrms" data-cursor="Read" data-i18n-cursor="cur.read" data-preview="hrms">
+            <span class="t" data-i18n="w1.t">HR System</span><span class="m" data-i18n="r1.m">Panasonic · 13 companies</span><span class="y" data-i18n="r1.y">2022–now</span><span class="pm" aria-hidden="true"></span>
+          </button>
+          <div class="row-body" id="cb-hrms"><div><div class="cols">
+                        <div><p class="label" data-i18n="c.is">What it is</p><p class="val" data-i18n="c1.is">A legacy HRMS that 13 Panasonic group companies in Indonesia run on. Hundreds of HR and admin staff use it, and it holds the records of thousands of employees, about 2,000 at the main site alone.</p></div>
+            <div><p class="label" data-i18n="c.did">What I did</p><ul>
+              <li data-i18n="c1.d1">One of three developers on the system since November 2022.</li>
+              <li data-i18n="c1.d2">Features from requirements to installation on client servers.</li>
+              <li data-i18n="c1.d3">Excel mass upload for overtime and new-employee data.</li>
+              <li data-i18n="c1.d4">Shift-group assignment for many employees at once.</li>
+              <li data-i18n="c1.d5">End-to-end delivery for 6 of the 13 companies.</li>
+              <li data-i18n="c1.d6">User training at every rollout, SOX audit documents, and mentoring interns.</li>
+            </ul></div>
+            <div><p class="label">Stack</p><p class="val">ASP.NET Web Forms · C# · SQL Server · Azure</p><p class="label">Status</p><p class="val" data-i18n="c1.st">Live, 2022–now</p><a class="btn alt" href="mailto:hello@rifaldiradya.com" data-mail="walk" data-i18n="c.walk">Email to ask for a walkthrough</a></div>
+          </div></div></div>
+        </li>
+        <li class="row" data-group="panasonic" id="case-sso">
+          <button class="row-head" type="button" aria-expanded="false" aria-controls="cb-sso" data-cursor="Read" data-i18n-cursor="cur.read" data-preview="sso">
+            <span class="t">Single Sign-On</span><span class="m" data-i18n="r2.m">Panasonic · about 200 staff</span><span class="y">2023</span><span class="pm" aria-hidden="true"></span>
+          </button>
+          <div class="row-body" id="cb-sso"><div><div class="cols">
+                        <div><p class="label" data-i18n="c.is">What it is</p><p class="val" data-i18n="c2.is">A single sign-on for the HR and internal apps, live since early 2023.</p></div>
+            <div><p class="label" data-i18n="c.did">What I did</p><ul>
+              <li data-i18n="c2.d1">Replaced four or five separate passwords with one login for about 200 staff.</li>
+              <li data-i18n="c2.d2">Connected the legacy apps through query string and POST handoff, so none of them had to be rewritten.</li>
+            </ul></div>
+            <div><p class="label">Stack</p><p class="val">ASP.NET · SQL Server</p><p class="label">Status</p><p class="val" data-i18n="c2.st">Live since early 2023</p><a class="btn alt" href="mailto:hello@rifaldiradya.com" data-mail="walk" data-i18n="c.walk">Email to ask for a walkthrough</a></div>
+          </div></div></div>
+        </li>
+        <li class="row" data-group="panasonic" id="case-teams">
+          <button class="row-head" type="button" aria-expanded="false" aria-controls="cb-teams" data-cursor="Read" data-i18n-cursor="cur.read" data-preview="teams">
+            <span class="t" data-i18n="w3.t">Teams Approvals</span><span class="m" data-i18n="r3.m">Panasonic · proposal</span><span class="y" data-i18n="r3.y">Not live</span><span class="pm" aria-hidden="true"></span>
+          </button>
+          <div class="row-body" id="cb-teams"><div><div class="cols">
+                        <div><p class="label" data-i18n="c.is">What it is</p><p class="val" data-i18n="c3.is">A proposal to move three-level approvals into Microsoft Teams, so managers can approve from their phone.</p></div>
+            <div><p class="label" data-i18n="c.did">What I did</p><ul>
+              <li data-i18n="c3.d1">Designed the architecture: ASP.NET API, Azure Relay and Power Automate on Microsoft Teams.</li>
+              <li data-i18n="c3.d2">Projected the approval time to drop from about 57 minutes to 4.</li>
+            </ul></div>
+            <div><p class="label">Stack</p><p class="val">ASP.NET API · Azure Relay · Power Automate</p><p class="label">Status</p><p class="val" data-i18n="c3.st">Proposal, not live</p><a class="btn alt" href="mailto:hello@rifaldiradya.com" data-mail="walk" data-i18n="c.walk">Email to ask for a walkthrough</a></div>
+          </div></div></div>
+        </li>
+        <li class="row" data-group="web" id="case-swiftpay">
+          <button class="row-head" type="button" aria-expanded="false" aria-controls="cb-swiftpay" data-cursor="Read" data-i18n-cursor="cur.read" data-preview="swiftpay">
+            <span class="t">SwiftPay</span><span class="m" data-i18n="r4.m">Concept · Fintech</span><span class="y">WordPress</span><span class="pm" aria-hidden="true"></span>
+          </button>
+          <div class="row-body" id="cb-swiftpay"><div><div class="cols">
+                        <div><p class="label" data-i18n="c.is">What it is</p><p class="val" data-i18n="c4.is">A concept landing page for an international money transfer startup.</p></div>
+            <div><p class="label" data-i18n="c.did">What I did</p><ul><li data-i18n="c4.d1">Built the page in WordPress.</li></ul></div>
+            <div><p class="label">Stack</p><p class="val">WordPress</p><p class="label">Status</p><p class="val" data-i18n="c4.st">Concept</p><a class="line-link" href="https://staging0.rifaldiradya.com/" target="_blank" rel="noopener noreferrer" data-i18n="w.open">Open the live site ↗</a></div>
+          </div></div></div>
+        </li>
+        <li class="row" data-group="web" id="case-bloom">
+          <button class="row-head" type="button" aria-expanded="false" aria-controls="cb-bloom" data-cursor="Read" data-i18n-cursor="cur.read" data-preview="bloom">
+            <span class="t">Bloom Studio</span><span class="m" data-i18n="r5.m">Bali · Studio site</span><span class="y">WordPress</span><span class="pm" aria-hidden="true"></span>
+          </button>
+          <div class="row-body" id="cb-bloom"><div><div class="cols">
+                        <div><p class="label" data-i18n="c.is">What it is</p><p class="val" data-i18n="c5.is">A website for a photography and branding studio in Bali.</p></div>
+            <div><p class="label" data-i18n="c.did">What I did</p><ul><li data-i18n="c5.d1">Built the site in WordPress, with a portfolio visitors can filter.</li></ul></div>
+            <div><p class="label">Stack</p><p class="val">WordPress</p><p class="label">Status</p><p class="val" data-i18n="c5.st">Live site</p><a class="line-link" href="https://staging1.rifaldiradya.com/" target="_blank" rel="noopener noreferrer" data-i18n="w.open">Open the live site ↗</a></div>
+          </div></div></div>
+        </li>
+        <li class="row" data-group="web" id="case-site">
+          <button class="row-head" type="button" aria-expanded="false" aria-controls="cb-site" data-cursor="Read" data-i18n-cursor="cur.read" data-preview="site">
+            <span class="t">rifaldiradya.com</span><span class="m" data-i18n="r6.m">Personal · Next.js</span><span class="y" data-i18n="r6.y">Live</span><span class="pm" aria-hidden="true"></span>
+          </button>
+          <div class="row-body" id="cb-site"><div><div class="cols">
+            <div><p class="label" data-i18n="c.is">What it is</p><p class="val" data-i18n="c6.is">The site you're on: a portfolio with an admin panel for managing project content.</p></div>
+            <div><p class="label" data-i18n="c.did">What I did</p><ul>
+              <li data-i18n="c6.d1">Wrote the PRD and the system design document myself.</li>
+              <li data-i18n="c6.d2">Built and shipped it with Next.js and AI coding tools (Claude Code).</li>
+            </ul></div>
+            <div><p class="label">Stack</p><p class="val">Next.js · TypeScript · MySQL</p><p class="label">Status</p><p class="val" data-i18n="c6.st">Live</p></div>
+          </div></div></div>
+        </li>
+        <li class="row" data-group="ai" id="case-ai">
+          <button class="row-head" type="button" aria-expanded="false" aria-controls="cb-ai" data-cursor="Read" data-i18n-cursor="cur.read" data-preview="ai">
+            <span class="t" data-i18n="r7.t">AI workflow automation</span><span class="m" data-i18n="r7.m">Personal · LLM agents</span><span class="y">2026</span><span class="pm" aria-hidden="true"></span>
+          </button>
+          <div class="row-body" id="cb-ai"><div><div class="cols">
+            <div><p class="label" data-i18n="c.is">What it is</p><p class="val" data-i18n="c7.is">Custom LLM agent skills with tool integrations (MCP) that I use for my own documents and studies.</p></div>
+            <div><p class="label" data-i18n="c.did">What I did</p><ul>
+              <li data-i18n="c7.d1">Filing and triage of Google Drive documents.</li>
+              <li data-i18n="c7.d2">Course material turned into a searchable knowledge base.</li>
+              <li data-i18n="c7.d3">Thesis citations checked against their real sources.</li>
+              <li data-i18n="c7.d4">Word documents formatted to a required template.</li>
+            </ul></div>
+            <div><p class="label">Stack</p><p class="val">LLM agents · MCP · Claude Code</p><p class="label">Status</p><p class="val" data-i18n="c7.st">Personal tools, 2026</p></div>
+          </div></div></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ch contact" id="more" aria-labelledby="more-h">
+    <div class="depth" aria-hidden="true"><div class="layer"><i class="dots"></i><i class="glow"></i></div></div>
+    <div class="inner">
+      <p class="label" data-i18n="ct.label">Contact</p>
+      <h2 class="talk" id="more-h" data-i18n-html="more.h">Have a project like <em class="ac">these?</em></h2>
+      <p class="pitch" data-i18n="ct.pitch">Hiring a full-time developer, or need an HR or internal system built? Send a few lines about it and I'll reply by email.</p>
+      <div class="acts">
+        <a class="btn" href="mailto:hello@rifaldiradya.com" data-mail="role" data-i18n="ct.role">Email about a full-time role</a>
+        <a class="btn alt" href="mailto:hello@rifaldiradya.com" data-mail="project" data-i18n="ct.project">Email about a project</a>
+      </div>
+    </div>
+    <div class="foot">
+      <span>© 2026 Rifaldi Radya Pratama</span>
+      <span><a href="#privacy" data-i18n="ft.p">Privacy</a> · <a href="#cookies" data-i18n="ft.c">Cookie settings</a></span>
+      <a href="#top" data-i18n="ft.home">Back to home ↑</a>
+    </div>
+  </section>
+ </div>
+</main>
+
+<script>
+const MAIL = "hello@rifaldiradya.com";
+const T = {
+  en: {
+    "skip": "Skip to content", "nav.work": "Work", "nav.about": "About", "cta": "Email me",
+    "hero.role": "Software engineer · Full-stack .NET", "hero.loc": " · Jakarta, Indonesia", "hero.open": "Open to full-time roles and projects",
+    "hero.l1": "Building HR software", "hero.l2": "for <em class=\"ac\">thousands.</em>",
+    "hero.sub": "Four years building and running the HR system of 13 Panasonic group companies: hundreds of HR users, thousands of employee records.", "hero.stack": "Stack", "hero.scroll": "Scroll ↓",
+    "work.h": "Selected work", "work.all": "See all work →", "work.rail": "Projects",
+    "w1.m": "Panasonic · 13 companies · 2022–now", "w1.t": "HR System", "w1.d": "The HR system 13 Panasonic group companies run on: onboarding, attendance, overtime, payroll, welfare and resource booking.",
+    "w2.m": "Panasonic · Live since early 2023", "w2.d": "One login replaced four or five separate passwords for about 200 staff. Legacy apps joined through query string and POST handoff, without a rewrite.",
+    "w3.m": "Panasonic · Proposal, not live", "w3.t": "Teams Approvals", "w3.d": "A mobile approval flow on Microsoft Teams, projected to cut a three-level approval from about 57 minutes to 4.",
+    "w4.m": "Concept · Fintech · WordPress", "w4.d": "Landing page for an international money transfer startup.", "w4.alt": "SwiftPay landing page",
+    "w5.m": "Bali · Studio site · WordPress", "w5.d": "Website for a photography and branding studio, with a filterable portfolio.", "w5.alt": "Bloom Studio homepage",
+    "w.open": "Open the live site ↗", "w.case": "Read the case →",
+    "cur.visit": "Visit", "cur.read": "Read",
+    "about.h": "About", "about.s": "I build the systems a company runs on: attendance, overtime, payroll.",
+    "about.p1": "I'm one of three developers on the HR system that 13 Panasonic group companies use. I own delivery for six of them: requirements, estimates, development and installation on their servers. I also train users at every rollout, prepare SOX audit documents and mentor interns.",
+    "about.p2": "Before code I edited video. I studied informatics at IPB and Telkom University, and I'm now doing a Master of Management in HR, with a thesis on presenteeism, work-life balance and burnout.",
+    "about.edu": "Education", "e1": "Bachelor of Informatics", "e2": "Diploma, Informatics Management", "e3": "Master of Management, HR", "e3d": "expected 2027", "about.cert": "Certifications",
+    "case.meta": "Highlight · Panasonic · Live since early 2023", "case.t": "One login instead of <span class=\"x\">five passwords.</span>",
+    "st1": "passwords per person", "st2p": "~", "st2n": "~200", "st2": "staff on one login", "st3": "group companies on the HRMS",
+    "case.blur": "Screens of the HRMS are internal; I can walk you through them in an interview.",
+    "bridge.q": "Need a system like this at your company?", "bridge.go": "Go to contact ↓",
+    "ct.label": "Contact", "ct.h": "Tell me what you're <em class=\"ac\">building.</em>",
+    "ct.pitch": "Hiring a full-time developer, or need an HR or internal system built? Send a few lines about it and I'll reply by email.",
+    "ct.role": "Email about a full-time role", "ct.project": "Email about a project",
+    "wp.label": "All work", "wp.sub": "Three projects inside the Panasonic HR system, three websites and a set of AI tools I use every day. Open a row for the details.",
+    "wp.filter": "Filter projects", "wp.f.all": "All", "wp.f.web": "Websites", "wp.f.ai": "AI tools",
+    "r1.m": "Panasonic · 13 companies", "r1.y": "2022–now", "r2.m": "Panasonic · about 200 staff", "r3.m": "Panasonic · proposal", "r3.y": "Not live", "r4.m": "Concept · Fintech", "r5.m": "Bali · Studio site", "r6.m": "Personal · Next.js", "r6.y": "Live", "r7.t": "AI workflow automation", "r7.m": "Personal · LLM agents",
+    "c.is": "What it is", "c.did": "What I did", "c.walk": "Email to ask for a walkthrough",
+    "c1.is": "A legacy HRMS that 13 Panasonic group companies in Indonesia run on. Hundreds of HR and admin staff use it, and it holds the records of thousands of employees, about 2,000 at the main site alone.",
+    "c1.d1": "One of three developers on the system since November 2022.", "c1.d2": "Features from requirements to installation on client servers.", "c1.d3": "Excel mass upload for overtime and new-employee data.", "c1.d4": "Shift-group assignment for many employees at once.", "c1.d5": "End-to-end delivery for 6 of the 13 companies.", "c1.d6": "User training at every rollout, SOX audit documents, and mentoring interns.", "c1.st": "Live, 2022–now",
+    "c2.is": "A single sign-on for the HR and internal apps, live since early 2023.",
+    "c2.d1": "Replaced four or five separate passwords with one login for about 200 staff.", "c2.d2": "Connected the legacy apps through query string and POST handoff, so none of them had to be rewritten.", "c2.st": "Live since early 2023",
+    "c3.is": "A proposal to move three-level approvals into Microsoft Teams, so managers can approve from their phone.",
+    "c3.d1": "Designed the architecture: ASP.NET API, Azure Relay and Power Automate on Microsoft Teams.", "c3.d2": "Projected the approval time to drop from about 57 minutes to 4.", "c3.st": "Proposal, not live",
+    "c4.is": "A concept landing page for an international money transfer startup.", "c4.d1": "Built the page in WordPress.", "c4.st": "Concept",
+    "c5.is": "A website for a photography and branding studio in Bali.", "c5.d1": "Built the site in WordPress, with a portfolio visitors can filter.", "c5.st": "Live site",
+    "c6.is": "The site you're on: a portfolio with an admin panel for managing project content.", "c6.d1": "Wrote the PRD and the system design document myself.", "c6.d2": "Built and shipped it with Next.js and AI coding tools (Claude Code).", "c6.st": "Live",
+    "c7.is": "Custom LLM agent skills with tool integrations (MCP) that I use for my own documents and studies.", "c7.d1": "Filing and triage of Google Drive documents.", "c7.d2": "Course material turned into a searchable knowledge base.", "c7.d3": "Thesis citations checked against their real sources.", "c7.d4": "Word documents formatted to a required template.", "c7.st": "Personal tools, 2026",
+    "peek.hrms": "group companies on one HR system", "peek.sso": "passwords per person", "peek.teams": "minutes per approval, projected", "peek.site": "from my own PRD and design doc to a live site", "peek.ai": "agent skills for documents, notes and citations",
+    "more.h": "Have a project like <em class=\"ac\">these?</em>",
+    "mail.hello.s": "Hello Rifaldi", "mail.hello.b": "",
+    "mail.role.s": "Full-time role: ", "mail.role.b": "Company:\nRole and link to the job post:\nA good time to talk:\n",
+    "mail.project.s": "Project: ", "mail.project.b": "What you need built:\nTimeline:\nBudget range:\n",
+    "mail.walk.s": "HRMS walkthrough", "mail.walk.b": "Company:\nRole you're hiring for:\nA good time to talk:\n",
+    "clock.live": "My time {here} (GMT+7), yours {there}.", "clock.same": "My time {here} (GMT+7), same as yours.",
+    "ft.p": "Privacy", "ft.c": "Cookie settings", "ft.top": "Back to top ↑", "ft.home": "Back to home ↑",
+    "theme.toLight": "Light", "theme.toDark": "Dark", "theme.ariaLight": "Switch to light mode", "theme.ariaDark": "Switch to dark mode"
+  },
+  id: {
+    "skip": "Lewati ke konten", "nav.work": "Karya", "nav.about": "Tentang", "cta": "Kirim email",
+    "hero.role": "Software engineer · Full-stack .NET", "hero.loc": " · Jabodetabek", "hero.open": "Terbuka untuk posisi full-time dan proyek",
+    "hero.l1": "Membangun software HR", "hero.l2": "untuk <em class=\"ac\">ribuan karyawan.</em>",
+    "hero.sub": "Empat tahun membangun dan menjaga sistem HR 13 perusahaan grup Panasonic: ratusan pengguna HR, ribuan data karyawan.", "hero.stack": "Stack", "hero.scroll": "Gulir ↓",
+    "work.h": "Karya pilihan", "work.all": "Lihat semua karya →", "work.rail": "Proyek",
+    "w1.m": "Panasonic · 13 perusahaan · 2022–sekarang", "w1.t": "Sistem HR", "w1.d": "Sistem HR yang dipakai 13 perusahaan grup Panasonic: onboarding, absensi, lembur, payroll, kesejahteraan, dan booking ruangan.",
+    "w2.m": "Panasonic · Berjalan sejak awal 2023", "w2.d": "Satu login menggantikan empat sampai lima password untuk sekitar 200 staf. Aplikasi lama tersambung lewat query string dan POST handoff, tanpa ditulis ulang.",
+    "w3.m": "Panasonic · Usulan, belum berjalan", "w3.t": "Approval Teams", "w3.d": "Alur approval lewat Microsoft Teams, diperkirakan memangkas approval tiga tingkat dari sekitar 57 menit menjadi 4.",
+    "w4.m": "Konsep · Fintech · WordPress", "w4.d": "Landing page untuk startup transfer uang antarnegara.", "w4.alt": "Landing page SwiftPay",
+    "w5.m": "Bali · Situs studio · WordPress", "w5.d": "Website studio foto dan branding, dengan portofolio yang bisa difilter.", "w5.alt": "Beranda Bloom Studio",
+    "w.open": "Buka situsnya ↗", "w.case": "Baca detailnya →",
+    "cur.visit": "Buka", "cur.read": "Baca",
+    "about.h": "Tentang", "about.s": "Saya membangun sistem yang menjalankan perusahaan: absensi, lembur, payroll.",
+    "about.p1": "Saya satu dari tiga developer di sistem HR yang dipakai 13 perusahaan grup Panasonic. Enam di antaranya saya pegang sendiri, mulai dari analisis kebutuhan, estimasi, pengembangan, sampai instalasi di server mereka. Saya juga melatih pengguna di setiap rollout, menyiapkan dokumen audit SOX, dan membimbing anak magang.",
+    "about.p2": "Sebelum coding, saya editor video. Saya kuliah informatika di IPB dan Telkom University, dan sekarang menempuh Magister Manajemen SDM dengan tesis tentang presenteeism, work-life balance, dan burnout.",
+    "about.edu": "Pendidikan", "e1": "S1 Informatika", "e2": "D3 Manajemen Informatika", "e3": "Magister Manajemen, SDM", "e3d": "target lulus 2027", "about.cert": "Sertifikasi",
+    "case.meta": "Sorotan · Panasonic · Berjalan sejak awal 2023", "case.t": "<span class=\"x\">Lima password</span> jadi satu login.",
+    "st1": "password per orang", "st2p": "±", "st2n": "±200", "st2": "staf dengan satu login", "st3": "perusahaan grup di HRMS",
+    "case.blur": "Tampilan HRMS bersifat internal; saya bisa menunjukkannya saat wawancara.",
+    "bridge.q": "Perlu sistem seperti ini di perusahaan Anda?", "bridge.go": "Lanjut ke kontak ↓",
+    "ct.label": "Kontak", "ct.h": "Ada posisi atau <em class=\"ac\">proyek?</em>",
+    "ct.pitch": "Sedang mencari developer full-time, atau perlu sistem HR dan aplikasi internal dibangun? Ceritakan singkat kebutuhannya, saya balas lewat email.",
+    "ct.role": "Email soal posisi full-time", "ct.project": "Email soal proyek",
+    "wp.label": "Semua karya", "wp.sub": "Tiga proyek di sistem HR Panasonic, tiga website, dan alat AI yang saya pakai setiap hari. Buka satu baris untuk melihat detailnya.",
+    "wp.filter": "Saring proyek", "wp.f.all": "Semua", "wp.f.web": "Website", "wp.f.ai": "Alat AI",
+    "r1.m": "Panasonic · 13 perusahaan", "r1.y": "2022–sekarang", "r2.m": "Panasonic · sekitar 200 staf", "r3.m": "Panasonic · usulan", "r3.y": "Belum berjalan", "r4.m": "Konsep · Fintech", "r5.m": "Bali · Situs studio", "r6.m": "Pribadi · Next.js", "r6.y": "Live", "r7.t": "Otomasi alur kerja AI", "r7.m": "Pribadi · LLM agent",
+    "c.is": "Apa ini", "c.did": "Yang saya kerjakan", "c.walk": "Email untuk minta walkthrough",
+    "c1.is": "HRMS lama yang dipakai 13 perusahaan grup Panasonic di Indonesia. Penggunanya ratusan staf HR dan admin, dan isinya data ribuan karyawan, sekitar 2.000 di site utama saja.",
+    "c1.d1": "Satu dari tiga developer di sistem ini sejak November 2022.", "c1.d2": "Fitur dari analisis kebutuhan sampai instalasi di server klien.", "c1.d3": "Upload massal Excel untuk data lembur dan karyawan baru.", "c1.d4": "Penempatan grup shift untuk banyak karyawan sekaligus.", "c1.d5": "Memegang penuh enam dari 13 perusahaan itu.", "c1.d6": "Melatih pengguna di setiap rollout, menyiapkan dokumen audit SOX, dan membimbing anak magang.", "c1.st": "Berjalan, 2022–sekarang",
+    "c2.is": "Single sign-on untuk aplikasi HR dan internal, berjalan sejak awal 2023.",
+    "c2.d1": "Mengganti empat sampai lima password dengan satu login untuk sekitar 200 staf.", "c2.d2": "Menyambungkan aplikasi lama lewat query string dan POST handoff, jadi tidak ada yang perlu ditulis ulang.", "c2.st": "Berjalan sejak awal 2023",
+    "c3.is": "Usulan memindahkan approval tiga tingkat ke Microsoft Teams, supaya atasan bisa approve dari ponsel.",
+    "c3.d1": "Merancang arsitekturnya: ASP.NET API, Azure Relay, dan Power Automate di Microsoft Teams.", "c3.d2": "Memperkirakan waktu approval turun dari sekitar 57 menit menjadi 4.", "c3.st": "Usulan, belum berjalan",
+    "c4.is": "Landing page konsep untuk startup transfer uang antarnegara.", "c4.d1": "Membangun halamannya di WordPress.", "c4.st": "Konsep",
+    "c5.is": "Website untuk studio foto dan branding di Bali.", "c5.d1": "Membangun situsnya di WordPress, dengan portofolio yang bisa difilter pengunjung.", "c5.st": "Situs live",
+    "c6.is": "Situs yang sedang Anda buka: portofolio dengan panel admin untuk mengelola konten proyek.", "c6.d1": "Menulis sendiri PRD dan dokumen desain sistemnya.", "c6.d2": "Membangun dan merilisnya dengan Next.js dan alat coding AI (Claude Code).", "c6.st": "Live",
+    "c7.is": "Skill LLM agent buatan sendiri dengan integrasi tool (MCP), untuk dokumen dan kuliah saya sendiri.", "c7.d1": "Memilah dan mengarsipkan dokumen Google Drive.", "c7.d2": "Mengubah materi kursus jadi basis pengetahuan yang bisa dicari.", "c7.d3": "Mengecek sitasi tesis ke sumber aslinya.", "c7.d4": "Merapikan dokumen Word sesuai template.", "c7.st": "Alat pribadi, 2026",
+    "peek.hrms": "perusahaan grup di satu sistem HR", "peek.sso": "password per orang", "peek.teams": "menit per approval, perkiraan", "peek.site": "dari PRD dan dokumen desain sendiri sampai live", "peek.ai": "skill agent untuk dokumen, catatan, dan sitasi",
+    "more.h": "Punya proyek <em class=\"ac\">serupa?</em>",
+    "mail.hello.s": "Halo Rifaldi", "mail.hello.b": "",
+    "mail.role.s": "Posisi full-time: ", "mail.role.b": "Perusahaan:\nPosisi dan tautan lowongan:\nWaktu yang cocok untuk ngobrol:\n",
+    "mail.project.s": "Proyek: ", "mail.project.b": "Yang ingin dibangun:\nTarget waktu:\nKisaran anggaran:\n",
+    "mail.walk.s": "Walkthrough HRMS", "mail.walk.b": "Perusahaan:\nPosisi yang dibuka:\nWaktu yang cocok untuk ngobrol:\n",
+    "clock.live": "Di sini pukul {here} WIB, di tempat Anda {there}.", "clock.same": "Di sini pukul {here} WIB, sama dengan waktu Anda.",
+    "ft.p": "Privasi", "ft.c": "Pengaturan cookie", "ft.top": "Kembali ke atas ↑", "ft.home": "Kembali ke beranda ↑",
+    "theme.toLight": "Terang", "theme.toDark": "Gelap", "theme.ariaLight": "Ganti ke mode terang", "theme.ariaDark": "Ganti ke mode gelap"
+  }
+};
+let lang = "en";
+function themeUi() {
+  const dark = document.documentElement.dataset.theme === "dark";
+  document.getElementById("theme-label").textContent = T[lang][dark ? "theme.toLight" : "theme.toDark"];
+  document.getElementById("theme").setAttribute("aria-label", T[lang][dark ? "theme.ariaLight" : "theme.ariaDark"]);
+}
+function mailHref(kind) {
+  const s = T[lang]["mail." + kind + ".s"], b = T[lang]["mail." + kind + ".b"];
+  return "mailto:" + MAIL + "?subject=" + encodeURIComponent(s) + (b ? "&body=" + encodeURIComponent(b) : "");
+}
+function apply(l) {
+  lang = l; document.documentElement.lang = l;
+  document.querySelectorAll("[data-i18n]").forEach(el => { const v = T[l][el.dataset.i18n]; if (v != null) el.textContent = v; });
+  document.querySelectorAll("[data-i18n-html]").forEach(el => { const v = T[l][el.dataset.i18nHtml]; if (v != null) el.innerHTML = v; });
+  document.querySelectorAll("[data-i18n-alt]").forEach(el => { const v = T[l][el.dataset.i18nAlt]; if (v != null) el.alt = v; });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el => { const v = T[l][el.dataset.i18nAria]; if (v != null) el.setAttribute("aria-label", v); });
+  document.querySelectorAll("[data-i18n-cursor]").forEach(el => { const v = T[l][el.dataset.i18nCursor]; if (v != null) el.dataset.cursor = v; });
+  document.querySelectorAll("[data-mail]").forEach(el => { el.href = mailHref(el.dataset.mail); });
+  document.querySelectorAll("[data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === l)));
+  themeUi(); tick();
+}
+function fmt(tz) { return new Intl.DateTimeFormat(lang === "id" ? "id-ID" : "en-GB", { hour: "2-digit", minute: "2-digit", timeZone: tz }).format(new Date()); }
+function tick() {
+  try {
+    const here = fmt("Asia/Jakarta"), there = fmt(Intl.DateTimeFormat().resolvedOptions().timeZone);
+    document.getElementById("clock").textContent = (here === there ? T[lang]["clock.same"] : T[lang]["clock.live"]).replace("{here}", here).replace("{there}", there);
+  } catch (e) {}
+}
+document.getElementById("theme").addEventListener("click", () => {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem("rr-theme", next); } catch (e) {}
+  themeUi();
+});
+document.querySelectorAll("[data-lang]").forEach(b => b.addEventListener("click", () => apply(b.dataset.lang)));
+/* cursor:start */
+function initUi(box, scroller, view0) {
+  /* box: element holding the page; scroller: the element that scrolls (null = the page); view0: first view */
+  const html = document.documentElement;
+  const sc = () => scroller || document.scrollingElement;
+  const ons = [];
+  const on = (t, ev, fn, opt) => { t.addEventListener(ev, fn, opt); ons.push([t, ev, fn]); };
+
+  /* views: #/work opens the Work page, #/work/<id> also opens that case */
+  const setOpen = (head, open) => head.setAttribute("aria-expanded", String(open));
+  function route(h) {
+    const m = h.match(/^#\/work(?:\/([\w-]+))?$/);
+    const view = m ? "work" : "home";
+    const changed = html.dataset.view !== view;
+    html.dataset.view = view;
+    if (m && m[1]) {
+      const head = box.querySelector("#case-" + m[1] + " .row-head");
+      if (head) { setOpen(head, true); setTimeout(() => head.parentNode.scrollIntoView(), 60); }
+    } else if (m) {
+      if (changed) sc().scrollTo(0, 0);
+    } else {
+      const t = h.length > 1 && box.querySelector(h);
+      if (t) setTimeout(() => t.scrollIntoView(), changed ? 30 : 0); else if (changed) sc().scrollTo(0, 0);
+    }
+  }
+  html.dataset.view = view0 === "work" ? "work" : "home";
+  if (location.hash) route(location.hash);
+  on(window, "hashchange", () => route(location.hash));
+  /* in-page links are handled here, so they also work where the host blocks hash navigation */
+  on(box, "click", e => {
+    const a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    const h = a.getAttribute("href");
+    e.preventDefault();
+    route(h);
+    try { history.replaceState(null, "", h); } catch (x) {}
+  });
+  box.querySelectorAll(".row-head").forEach(b => on(b, "click", () => setOpen(b, b.getAttribute("aria-expanded") !== "true")));
+  box.querySelectorAll("[data-filter]").forEach(b => on(b, "click", () => {
+    html.dataset.filter = b.dataset.filter;
+    box.querySelectorAll("[data-filter]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  }));
+
+  /* which chapter is on screen: sets the light's colour */
+  const zones = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) html.dataset.zone = en.target.id; }), { root: scroller, rootMargin: "-45% 0px -45% 0px" });
+  box.querySelectorAll("main section[id]").forEach(s => zones.observe(s));
+  const stop = () => {
+    zones.disconnect(); ons.forEach(([t, ev, fn]) => t.removeEventListener(ev, fn));
+    html.classList.remove("has-cursor", "has-spot", "cur-on", "cur-hot", "cur-label", "cur-down", "peek-on");
+  };
+  if (!matchMedia("(hover: hover) and (pointer: fine)").matches) return stop;
+
+  /* mouse: dot, lagging ring with labels, a light that follows, previews and tilt */
+  const still = matchMedia("(prefers-reduced-motion: reduce)");
+  const spot = box.querySelector(".spot"), dot = box.querySelector(".cur-dot"), ring = box.querySelector(".cur-ring"), word = ring.querySelector("b"), peek = box.querySelector(".peek");
+  html.classList.add("has-cursor");
+  if (!still.matches) html.classList.add("has-spot");
+  let x = 0, y = 0, sx = 0, sy = 0, rx = 0, ry = 0, raf = 0, seen = false, shot = null;
+  const put = (el, a, b) => { el.style.transform = "translate3d(" + a + "px," + b + "px,0)"; };
+  function frame() {
+    const ks = still.matches ? 1 : 0.1, kr = still.matches ? 1 : 0.28;
+    sx += (x - sx) * ks; sy += (y - sy) * ks; rx += (x - rx) * kr; ry += (y - ry) * kr;
+    put(spot, sx, sy); put(ring, rx, ry);
+    put(peek, rx + (rx > innerWidth - 400 ? -372 : 32), Math.max(16, ry - 120));
+    raf = Math.abs(x - sx) + Math.abs(y - sy) + Math.abs(x - rx) + Math.abs(y - ry) > 0.4 ? requestAnimationFrame(frame) : 0;
+  }
+  on(window, "pointermove", e => {
+    if (e.pointerType && e.pointerType !== "mouse") return;
+    x = e.clientX; y = e.clientY; put(dot, x, y);
+    if (!seen) { seen = true; sx = rx = x; sy = ry = y; html.classList.add("cur-on"); }
+    const t = e.target && e.target.closest ? e.target : null;
+    const lab = t && t.closest("[data-cursor]");
+    if (lab) word.textContent = lab.dataset.cursor;
+    html.classList.toggle("cur-label", !!lab);
+    html.classList.toggle("cur-hot", !lab && !!(t && t.closest("a, button")));
+    const pk = t && t.closest("[data-preview]");
+    if (pk) html.dataset.peek = pk.dataset.preview;
+    html.classList.toggle("peek-on", !!pk);
+    const s = t && t.closest(".shot");
+    if (shot && shot !== s) { shot.style.removeProperty("--rx"); shot.style.removeProperty("--ry"); }
+    shot = s;
+    if (s && !still.matches) {
+      const r = s.getBoundingClientRect();
+      s.style.setProperty("--ry", (((x - r.left) / r.width) - 0.5) * 8 + "deg");
+      s.style.setProperty("--rx", (0.5 - ((y - r.top) / r.height)) * 6 + "deg");
+    }
+    if (!raf) raf = requestAnimationFrame(frame);
+  }, { passive: true });
+  on(document, "mouseout", e => { if (!e.relatedTarget) { html.classList.remove("cur-on", "peek-on"); seen = false; } });
+  on(window, "pointerdown", () => html.classList.add("cur-down"));
+  on(window, "pointerup", () => html.classList.remove("cur-down"));
+  return () => { cancelAnimationFrame(raf); stop(); };
+}
+/* cursor:end */
+initUi(document.body, null, null);
+apply("en"); setInterval(tick, 30000);
+</script>
+</body>
+</html>
