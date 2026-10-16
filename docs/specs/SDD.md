@@ -2,9 +2,9 @@
 doc: SDD
 app: rifaldiradya.com
 tier: full
-version: 1.0.0
+version: 1.0.1
 status: current
-last_updated: 2026-10-13
+last_updated: 2026-10-17
 ---
 
 # SDD — rifaldiradya.com v1
@@ -377,7 +377,7 @@ Semua variabel divalidasi oleh `lib/env.ts` (Zod) dalam 4 kelompok: site, databa
 
 - Di Hostinger: isi lewat pengaturan environment variables app Node.js, lalu **restart app** (env tidak di-reload otomatis). Variabel `NEXT_PUBLIC_*` dibaca saat **build**, jadi setelah mengubahnya perlu redeploy, bukan hanya restart.
 - Lokal: `.env.local` (tidak di-commit). `.env.example` berisi semua nama variabel tanpa nilai.
-- Konfigurasi non-secret di `lib/site-config.ts` (di-commit, bukan env): `availableForWork: boolean` (mengatur item "Available for new projects" di MetaRow; nilai awal `true`, diputuskan 28 Sep 2026), `timezoneLabel: 'GMT+7'` (dikonfirmasi 28 Sep 2026; dipakai blok fakta About lewat interpolasi kamus), dan `social: { linkedin: 'https://www.linkedin.com/in/rifaldi-radya-070a44174/' }` (dipakai link footer dan `sameAs` JSON-LD `Person`). Mengubahnya = commit + deploy (beberapa menit); sengaja tidak dimasukkan ke admin supaya scope v1 tidak bertambah.
+- Konfigurasi non-secret di `lib/site-config.ts` (di-commit, bukan env): `availableForWork: boolean` (mengatur item "Available for new projects" di MetaRow; nilai awal `true`, diputuskan 28 Sep 2026), `timezoneLabel: 'GMT+7'` (dikonfirmasi 28 Sep 2026; dipakai blok fakta About lewat interpolasi kamus), dan `social: { linkedin: 'https://www.linkedin.com/in/rifaldiradya' }` (dipakai link footer dan `sameAs` JSON-LD `Person`). Mengubahnya = commit + deploy (beberapa menit); sengaja tidak dimasukkan ke admin supaya scope v1 tidak bertambah.
 - `next.config.ts`: `images.loader: 'custom'`, `images.loaderFile: './lib/images/loader.ts'`, `deviceSizes` = lebar tersimpan, `headers()` keamanan (bagian 6), `poweredByHeader: false`, `reactStrictMode: true`.
 - `package.json` (`"type": "module"`) scripts: `dev`, `build`, `start` (`next start`; migrasi berjalan otomatis di `instrumentation.ts`; Next.js membaca `PORT` dari env Hostinger), `lint`, `typecheck`, `test`, `test:e2e`, `db:generate`, `db:migrate`, `hash-password`.
 
