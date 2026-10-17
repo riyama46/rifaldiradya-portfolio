@@ -1,25 +1,30 @@
-import { eq, like } from "drizzle-orm";
+import { eq, inArray, like } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
 import { getDb } from "@/lib/db/client";
-import { images, projects } from "@/lib/db/schema";
+import { images, projects, siteSettings } from "@/lib/db/schema";
 import { mediaUrl } from "@/lib/images/rules";
 import {
   deleteOrphanImages,
+  getAvailability,
   getImage,
   getProfilePhoto,
+  getSiteSettings,
   getVariant,
   saveImage,
+  setAvailability,
   setProfilePhoto,
 } from "@/lib/images/store";
 import {
   createProject,
   deleteProject,
   moveProject,
+  ShowOnHomeLimitError,
   toProjectInput,
   updateProject,
   withStoredThumbnail,
 } from "@/lib/projects/mutations";
 import { getAllProjects, getProjectById, getPublishedProjects } from "@/lib/projects/queries";
+import { toPublicProject } from "@/lib/projects/public";
 import { projectInputSchema, type ProjectInputRaw } from "@/lib/projects/validation";
 
 // Every row made here carries this marker, so the run cleans up after itself and ignores rows
@@ -34,6 +39,15 @@ function input(title: string, overrides: Partial<ProjectInputRaw> = {}) {
     summary_en: "Integration test project.",
     summary_id: "Project uji integrasi.",
     live_url: "https://example.com",
+    // v2 fields needed to publish (CHANGE v2.0.0, S-12).
+    meta_en: "Test · Meta",
+    meta_id: "Uji · Meta",
+    case_is_en: "A test project.",
+    case_is_id: "Proyek uji.",
+    case_did_en: ["Tested it."],
+    case_did_id: ["Mengujinya."],
+    status_en: "Live",
+    status_id: "Live",
     ...overrides,
   });
 }
@@ -64,6 +78,7 @@ async function expectCompactPositions() {
 }
 
 let profilePhotoBefore: string | null = null;
+let availabilityBefore: boolean | null = null;
 
 afterAll(async () => {
   // deleteProject closes position gaps, so the local sample data keeps positions 1…n.
@@ -73,6 +88,7 @@ afterAll(async () => {
     .where(like(projects.titleEn, `${run}%`));
   for (const project of left) await deleteProject((await getProjectById(project.id))!);
   await setProfilePhoto(profilePhotoBefore);
+  if (availabilityBefore !== null) await setAvailability(availabilityBefore);
   for (const id of createdImages) await getDb().delete(images).where(eq(images.id, id));
 });
 
@@ -318,5 +334,185 @@ describe("profile photo (S-14)", () => {
     await setProfilePhoto(null);
     expect(await getProfilePhoto()).toBeNull();
     expect(await getImage(second.id)).toBeNull();
+  });
+});
+
+describe("v2 project fields (CHANGE v2.0.0, Delta APP_FLOW section 9)", () => {
+  it("stores and reads back every v2 field, including an internal project without a URL", async () => {
+    const created = await createProject(
+      input("internal", {
+        group: "panasonic",
+        side_en: "2022–now",
+        side_id: "2022–kini",
+        case_did_en: ["Built the API.", "", "Ran the rollout."],
+        tags: ["C#", "ASP.NET", "SQL Server", "Azure", "Power Automate", "Next.js"],
+        case_action: "walkthrough",
+        live_url: null,
+        visual_type: "number",
+        card_number: "5 → 1",
+        card_caption_en: "passwords to one login",
+        card_caption_id: "password jadi satu login",
+        published: true,
+      }),
+    );
+    const stored = (await getProjectById(created.id))!;
+    expect(stored).toMatchObject({
+      group: "panasonic",
+      sideEn: "2022–now",
+      sideId: "2022–kini",
+      caseDidEn: ["Built the API.", "Ran the rollout."],
+      caseDidId: ["Mengujinya."],
+      caseAction: "walkthrough",
+      liveUrl: null,
+      visualType: "number",
+      cardNumber: "5 → 1",
+      cardCaptionId: "password jadi satu login",
+      showOnHome: false,
+      featured: false,
+      published: true,
+    });
+    expect(stored.tags).toHaveLength(6);
+    expect(toProjectInput(stored)).not.toHaveProperty("featured");
+    expect(toPublicProject(stored, "en").visual).toEqual({
+      type: "number",
+      number: "5 → 1",
+      caption: "passwords to one login",
+    });
+  });
+
+  it("never writes the deprecated featured column (D-22)", async () => {
+    const created = await createProject(input("featured probe"));
+    await getDb().update(projects).set({ featured: true }).where(eq(projects.id, created.id));
+    const updated = await updateProject(
+      (await getProjectById(created.id))!,
+      projectInputSchema.parse({
+        ...toProjectInput(created),
+        featured: false,
+        title_en: `${run} f`,
+      }),
+    );
+    expect(updated?.featured).toBe(true);
+  });
+
+  it("E-27: a published v1 row stays public until edited, then needs the v2 fields", async () => {
+    const image = await newImage();
+    const id = `${run.slice(-10)}V1ROW`.padEnd(26, "0").slice(0, 26);
+    await getDb()
+      .insert(projects)
+      .values({
+        id,
+        slug: `${run.toLowerCase()}-v1-row`,
+        titleEn: `${run} v1 row`,
+        titleId: `${run} v1 row ID`,
+        summaryEn: "From v1.",
+        summaryId: "Dari v1.",
+        liveUrl: "https://example.com",
+        thumbnailPublicId: image.id,
+        thumbnailUrl: mediaUrl(image.id, image.format),
+        thumbnailWidth: image.width,
+        thumbnailHeight: image.height,
+        thumbnailAltEn: "a",
+        thumbnailAltId: "a",
+        sortOrder: 9999,
+        published: true,
+      });
+    const row = ours(await getPublishedProjects()).find((p) => p.id === id)!;
+    expect(toPublicProject(row, "en")).toMatchObject({ caseIs: null, caseDid: [], meta: null });
+
+    const edit = projectInputSchema.safeParse({
+      ...toProjectInput(row),
+      title_en: `${run} edited`,
+    });
+    expect(edit.success).toBe(false);
+    await deleteProject(row);
+  });
+});
+
+describe("Selected work limit (E-26, AC-7)", () => {
+  it("allows 5 projects on, drafts included, and refuses a 6th on create and update", async () => {
+    // Other rows in the local database are switched off for the test and restored afterwards.
+    const others = (await getAllProjects()).filter(
+      (p) => p.showOnHome && !p.titleEn.startsWith(run),
+    );
+    const otherIds = others.map((p) => p.id);
+    if (otherIds.length > 0) {
+      await getDb()
+        .update(projects)
+        .set({ showOnHome: false })
+        .where(inArray(projects.id, otherIds));
+    }
+    try {
+      await getDb()
+        .update(projects)
+        .set({ showOnHome: false })
+        .where(like(projects.titleEn, `${run}%`));
+
+      const on = [];
+      for (const n of [1, 2, 3, 4, 5]) {
+        on.push(await createProject(input(`home ${n}`, { show_on_home: true })));
+      }
+      await expect(createProject(input("home 6", { show_on_home: true }))).rejects.toBeInstanceOf(
+        ShowOnHomeLimitError,
+      );
+
+      const off = await createProject(input("home off"));
+      await expect(
+        updateProject(
+          off,
+          projectInputSchema.parse({ ...toProjectInput(off), show_on_home: true }),
+        ),
+      ).rejects.toBeInstanceOf(ShowOnHomeLimitError);
+      expect((await getProjectById(off.id))!.showOnHome).toBe(false);
+
+      // A project that is already on can be saved again.
+      const saved = await updateProject(
+        on[0],
+        projectInputSchema.parse({ ...toProjectInput(on[0]), title_en: `${run} home 1b` }),
+      );
+      expect(saved?.showOnHome).toBe(true);
+
+      // Turning one off frees the place.
+      await updateProject(
+        on[1],
+        projectInputSchema.parse({ ...toProjectInput(on[1]), show_on_home: false }),
+      );
+      const now = await updateProject(
+        off,
+        projectInputSchema.parse({ ...toProjectInput(off), show_on_home: true }),
+      );
+      expect(now?.showOnHome).toBe(true);
+
+      for (const project of ours(await getAllProjects())) {
+        if (project.showOnHome) {
+          await getDb()
+            .update(projects)
+            .set({ showOnHome: false })
+            .where(eq(projects.id, project.id));
+        }
+      }
+    } finally {
+      if (otherIds.length > 0) {
+        await getDb()
+          .update(projects)
+          .set({ showOnHome: true })
+          .where(inArray(projects.id, otherIds));
+      }
+    }
+  });
+});
+
+describe("availability (S-14, D-16, API-09)", () => {
+  it("is on by default, and can be switched off and on", async () => {
+    availabilityBefore = await getAvailability();
+    await getDb().delete(siteSettings).where(eq(siteSettings.key, "availability_on"));
+    expect(await getAvailability()).toBe(true);
+    expect((await getSiteSettings()).availabilityOn).toBe(true);
+
+    await setAvailability(false);
+    expect(await getAvailability()).toBe(false);
+    expect((await getSiteSettings()).availabilityOn).toBe(false);
+
+    await setAvailability(true);
+    expect((await getSiteSettings()).availabilityOn).toBe(true);
   });
 });

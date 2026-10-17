@@ -20,7 +20,7 @@ function StatusBadges({ project }: { project: Project }) {
         />
         {project.published ? strings.published : strings.draft}
       </Badge>
-      {project.featured && <Badge>{strings.featured}</Badge>}
+      {project.showOnHome && <Badge>{strings.onHome}</Badge>}
     </span>
   );
 }

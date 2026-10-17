@@ -5,12 +5,13 @@ import { ProjectThumbnail } from "@/components/site/ProjectThumbnail";
 import { ArrowIcon } from "@/components/ui/ArrowIcon";
 import { StatusDot } from "@/components/ui/StatusDot";
 import { cn } from "@/lib/cn";
-import type { PublicProject } from "@/lib/projects/public";
+import type { PublicProject, ScreenshotVisual } from "@/lib/projects/public";
 
-export type ProofSlide = Pick<
-  PublicProject,
-  "id" | "slug" | "title" | "liveUrl" | "liveHost" | "thumbnail"
-> & {
+export type ProofSlide = Pick<PublicProject, "id" | "slug" | "title"> & {
+  liveUrl: string;
+  /** Host shown in the browser frame, e.g. "staging0.rifaldiradya.com". */
+  liveHost: string;
+  thumbnail: ScreenshotVisual | null;
   /** "Visit {title} (opens in new tab)", resolved on the server so the dictionary stays there. */
   ariaLabel: string;
 };

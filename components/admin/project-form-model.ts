@@ -10,6 +10,8 @@ import {
 } from "@/lib/projects/validation";
 
 // Form state for S-12/S-13 and its mapping to ProjectInput. Pure, so it is unit tested.
+// v1 form until T-26 rebuilds it per section: the v2 case fields are not on it yet. They are not
+// sent either, so API-04 keeps their stored values; the server still reports them when missing.
 
 export type FormValues = {
   title_en: string;
@@ -21,13 +23,13 @@ export type FormValues = {
   thumbnail: UploadedImage | null;
   thumbnail_alt_en: string;
   thumbnail_alt_id: string;
-  featured: boolean;
+  show_on_home: boolean;
   published: boolean;
 };
 
 export type FieldErrors = Partial<Record<ProjectField, string>>;
 
-/** UF-07 step 1: empty, Published off, Featured off (the server places a new project first). */
+/** UF-07 step 1: empty, Published off, not in Selected work (the server places it first). */
 export const emptyValues: FormValues = {
   title_en: "",
   title_id: "",
@@ -38,7 +40,7 @@ export const emptyValues: FormValues = {
   thumbnail: null,
   thumbnail_alt_en: "",
   thumbnail_alt_id: "",
-  featured: false,
+  show_on_home: false,
   published: false,
 };
 
@@ -53,7 +55,7 @@ export function valuesFromInput(input: ProjectInputRaw): FormValues {
     thumbnail: input.thumbnail ?? null,
     thumbnail_alt_en: input.thumbnail_alt_en ?? "",
     thumbnail_alt_id: input.thumbnail_alt_id ?? "",
-    featured: input.featured ?? false,
+    show_on_home: input.show_on_home ?? false,
     published: input.published ?? false,
   };
 }
@@ -83,7 +85,7 @@ export const fieldOrder: ProjectField[] = [
   "thumbnail",
   "thumbnail_alt_en",
   "thumbnail_alt_id",
-  "featured",
+  "show_on_home",
   "published",
 ];
 
@@ -93,7 +95,7 @@ export const firstErrorField = (errors: FieldErrors) =>
 export const isDirty = (initial: FormValues, current: FormValues) =>
   JSON.stringify(initial) !== JSON.stringify(current);
 
-/** Chip input (App Flow S-12 field 6): Enter or comma adds; 0–4 unique tags of 1–24 characters. */
+/** Chip input (S-12 Stack): Enter or comma adds; 0–6 unique items of 1–24 characters. */
 export function addTags(tags: string[], raw: string): { tags: string[]; error: string | null } {
   let next = [...tags];
   for (const part of raw.split(",")) {

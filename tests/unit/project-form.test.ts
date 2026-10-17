@@ -28,23 +28,35 @@ const filled: FormValues = {
 };
 
 describe("project form model", () => {
-  it("starts as App Flow UF-07 step 1: empty, draft, not featured, no position field", () => {
-    expect(emptyValues).toMatchObject({ published: false, featured: false, tags: [] });
+  it("starts as App Flow UF-07 step 1: empty, draft, not on the homepage, no position", () => {
+    expect(emptyValues).toMatchObject({ published: false, show_on_home: false, tags: [] });
     expect(emptyValues).not.toHaveProperty("sort_order");
   });
 
   it("a filled draft is valid; publishing it without an image is not (E-16)", () => {
     expect(validate(filled)).toEqual({});
     expect(validate({ ...filled, published: true })).toHaveProperty("thumbnail");
-    expect(
-      validate({
-        ...filled,
-        published: true,
-        thumbnail,
-        thumbnail_alt_en: "a",
-        thumbnail_alt_id: "b",
-      }),
-    ).toEqual({});
+  });
+
+  it("until T-26, publishing reports the v2 case fields this form doesn't have yet", () => {
+    const errors = validate({
+      ...filled,
+      published: true,
+      thumbnail,
+      thumbnail_alt_en: "a",
+      thumbnail_alt_id: "b",
+    });
+    expect(Object.keys(errors).sort()).toEqual(
+      ["case_did_en", "case_did_id", "case_is_en", "case_is_id"]
+        .concat(["meta_en", "meta_id", "status_en", "status_id"])
+        .sort(),
+    );
+  });
+
+  it("an empty live URL is reported with the case button wording (AC-8)", () => {
+    expect(validate({ ...filled, live_url: "" }).live_url).toBe(
+      "Add a live URL, or choose another button.",
+    );
   });
 
   it("reports the first error in on-screen order", () => {
@@ -67,7 +79,7 @@ describe("project form model", () => {
     const values = valuesFromInput(toPayload(filled));
     expect(values).toEqual(filled);
     expect(isDirty(values, { ...values })).toBe(false);
-    expect(isDirty(values, { ...values, featured: true })).toBe(true);
+    expect(isDirty(values, { ...values, show_on_home: true })).toBe(true);
   });
 });
 
@@ -79,11 +91,11 @@ describe("addTags (chip input)", () => {
     });
   });
 
-  it("refuses duplicates (case-insensitive), a 5th tag, and tags over 24 characters", () => {
+  it("refuses duplicates (case-insensitive), a 7th item, and items over 24 characters", () => {
     expect(addTags(["Next.js"], "next.js").error).toMatch(/already added/);
-    expect(addTags(["a", "b", "c", "d"], "e")).toEqual({
-      tags: ["a", "b", "c", "d"],
-      error: "Use up to 4 tags.",
+    expect(addTags(["a", "b", "c", "d", "e", "f"], "g")).toEqual({
+      tags: ["a", "b", "c", "d", "e", "f"],
+      error: "Use up to 6 items.",
     });
     expect(addTags([], "x".repeat(25)).error).toBe("Keep it under 24 characters (25 now).");
   });

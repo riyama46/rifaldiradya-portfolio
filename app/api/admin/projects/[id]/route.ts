@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { guardAdminWrite } from "@/lib/auth/guard";
 import { apiError, readJsonBody } from "@/lib/http/api";
-import { missingImage } from "@/lib/projects/errors";
+import { missingImage, showOnHomeFull } from "@/lib/projects/errors";
 import {
   deleteProject,
+  ShowOnHomeLimitError,
   toProjectInput,
   toProjectJson,
   updateProject,
@@ -50,6 +51,7 @@ export async function PATCH(request: Request, ctx: RouteContext<"/api/admin/proj
     const revalidated = revalidatePublicPages();
     return NextResponse.json({ project: toProjectJson(project), revalidated });
   } catch (error) {
+    if (error instanceof ShowOnHomeLimitError) return showOnHomeFull();
     console.error("[projects] update failed:", (error as Error).message);
     return apiError(500, "SERVER_ERROR", "Couldn't save. Your changes are still here — try again.");
   }

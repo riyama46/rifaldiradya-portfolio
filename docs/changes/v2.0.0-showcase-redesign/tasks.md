@@ -42,7 +42,7 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
   - tema tanpa flash (E2E frame pertama) di kedua tema;
   - axe bersih di kedua tema;
   - halaman v1 masih tampil.
-- [ ] **T-25 Migrasi `0004` + skema + validasi.**
+- [x] **T-25 Migrasi `0004` + skema + validasi.**
   - `lib/db/schema.ts` (kolom baru, `live_url` nullable, `featured` deprecated), `0004_v2_showcase.sql`, `db:generate` + `db:embed`.
   - `lib/projects/validation.ts` dengan aturan kondisional dan batas 5 `show_on_home`.
   - `mutations`/`queries`/DTO v2.

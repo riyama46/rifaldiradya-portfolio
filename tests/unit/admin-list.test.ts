@@ -1,24 +1,21 @@
 import { describe, expect, it } from "vitest";
 import { adminStrings, parseNotice } from "@/components/admin/strings";
-import { formatRelativeTime, heroFeaturedCount } from "@/lib/projects/admin";
+import { formatRelativeTime, selectedWorkCount } from "@/lib/projects/admin";
 
-describe("heroFeaturedCount (S-11, E-08)", () => {
-  const project = (featured: boolean, published: boolean) => ({ featured, published });
+describe("selectedWorkCount (S-11 v2, E-26)", () => {
+  const list = (flags: boolean[]) => flags.map((showOnHome) => ({ showOnHome }));
 
-  it("counts only featured projects that are published", () => {
-    const result = heroFeaturedCount([
-      project(true, true),
-      project(true, false),
-      project(false, true),
-      project(true, true),
-    ]);
-    expect(result).toEqual({ count: 2, limit: 3, overLimit: false });
+  it("counts every project switched on, drafts included", () => {
+    expect(selectedWorkCount(list([true, false, true]))).toEqual({
+      count: 2,
+      limit: 5,
+      full: false,
+    });
   });
 
-  it("flags more than 3 without blocking anything", () => {
-    const four = Array.from({ length: 4 }, () => project(true, true));
-    expect(heroFeaturedCount(four).overLimit).toBe(true);
-    expect(heroFeaturedCount(four.slice(0, 3)).overLimit).toBe(false);
+  it("is full at 5", () => {
+    expect(selectedWorkCount(list(Array(5).fill(true))).full).toBe(true);
+    expect(selectedWorkCount(list(Array(4).fill(true))).full).toBe(false);
   });
 });
 
@@ -48,8 +45,10 @@ describe("admin copy", () => {
     expect(adminStrings.projects.count(2)).toBe("2 projects");
   });
 
-  it("uses the App Flow wording for the hero info", () => {
-    expect(adminStrings.projects.featuredInHero(2, 3)).toBe("Featured in homepage hero: 2/3");
+  it("uses the S-11 wording for the Selected work info", () => {
+    expect(adminStrings.projects.selectedWork(5, 5)).toBe(
+      "Selected work on the homepage: 5 of 5. Turn one off before adding another.",
+    );
   });
 });
 

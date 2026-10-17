@@ -1,12 +1,12 @@
-import { HERO_PANEL_LIMIT } from "@/lib/projects/public";
+import { SHOW_ON_HOME_MAX } from "@/lib/projects/validation";
 
 /**
- * "Featured in homepage hero: {n}/3" (S-11, E-08). Only published projects can reach the hero,
- * so a featured draft is not counted.
+ * "Selected work on the homepage: {k} of 5" (S-11 v2). Drafts count too: the limit of 5 (E-26)
+ * applies to the switch, published or not.
  */
-export function heroFeaturedCount(projects: readonly { featured: boolean; published: boolean }[]) {
-  const count = projects.filter((project) => project.featured && project.published).length;
-  return { count, limit: HERO_PANEL_LIMIT, overLimit: count > HERO_PANEL_LIMIT };
+export function selectedWorkCount(projects: readonly { showOnHome: boolean }[]) {
+  const count = projects.filter((project) => project.showOnHome).length;
+  return { count, limit: SHOW_ON_HOME_MAX, full: count >= SHOW_ON_HOME_MAX };
 }
 
 const units: [Intl.RelativeTimeFormatUnit, number][] = [

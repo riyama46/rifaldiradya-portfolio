@@ -37,7 +37,7 @@ export function checkSourceFile(file: { type: string; size: number }): SourcePro
 }
 
 /**
- * Checks on the decoded size: wide enough for the kind (1200 px thumbnail, 320 px avatar), and tall
+ * Checks on the decoded size: wide enough for the kind (1200 px thumbnail, 640 px avatar), and tall
  * enough that the crop keeps that width.
  */
 export function checkSourceSize(

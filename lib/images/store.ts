@@ -1,13 +1,14 @@
-import { and, eq, isNull, lt } from "drizzle-orm";
+import { and, eq, inArray, isNull, lt } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { images, imageVariants, projects, siteSettings, type Image } from "@/lib/db/schema";
 import { AVATAR_WIDTHS, mediaUrl, pickVariantWidth, type ImageFormat } from "./rules";
 import type { Variant } from "./upload";
 
-// Image storage in MySQL (DECISIONS 2026-09-29) and the profile photo setting (S-14, T-18b).
-// DB access for images stays in this file.
+// Image storage in MySQL (DECISIONS 2026-09-29) and the S-14 site settings: the profile photo
+// (T-18b) and, since v2.0.0, the availability switch (D-16). DB access for both stays in this file.
 
 const PROFILE_PHOTO_KEY = "profile_photo";
+const AVAILABILITY_KEY = "availability_on";
 
 /** Uploads not attached to any project after this long are removed (closed tab, abandoned form). */
 export const ORPHAN_AFTER_MS = 24 * 60 * 60 * 1000;
@@ -136,29 +137,69 @@ export async function setProfilePhoto(id: string | null): Promise<void> {
   }
 }
 
+/** Shows or hides the availability line in the hero (S-14, D-16). Stored as '1' / '0'. */
+export async function setAvailability(on: boolean): Promise<void> {
+  const value = on ? "1" : "0";
+  await getDb()
+    .insert(siteSettings)
+    .values({ key: AVAILABILITY_KEY, value })
+    .onDuplicateKeyUpdate({ set: { value, updatedAt: new Date() } });
+}
+
+/** The availability switch; on until it has been saved once (Delta APP_FLOW section 9). */
+export async function getAvailability(): Promise<boolean> {
+  const [row] = await getDb()
+    .select({ value: siteSettings.value })
+    .from(siteSettings)
+    .where(eq(siteSettings.key, AVAILABILITY_KEY))
+    .limit(1);
+  return row?.value !== "0";
+}
+
 export type PublicAvatar = { src: string; srcSet: string };
+
+/**
+ * src + srcset of a profile photo. Only widths the photo really has: a 320 px photo from v1 stays
+ * at 320 instead of advertising a 640 variant that doesn't exist (E-32).
+ */
+export function avatarSources(image: Pick<Image, "id" | "format" | "width">): PublicAvatar {
+  const widths = AVATAR_WIDTHS.filter((w) => w <= image.width);
+  const available = widths.length > 0 ? widths : [image.width];
+  return {
+    src: mediaUrl(image.id, image.format, available.at(-1)),
+    srcSet: available.map((w) => `${mediaUrl(image.id, image.format, w)} ${w}w`).join(", "),
+  };
+}
+
+export type SiteSettings = { avatar: PublicAvatar | null; availabilityOn: boolean };
 
 const isBuildPhase = () => process.env.NEXT_PHASE === "phase-production-build";
 
 /**
- * For the public hero byline (static pages): src + srcset of the photo, or null for the initials.
- * Same rule as the project query (E-02): no DB during `next build` → initials; at runtime an error
- * is re-thrown so the last good static page keeps being served.
+ * For the public pages (static, revalidated by API-09): the hero photo (null = initials) and the
+ * availability switch, read in one query. Same rule as the project query (E-02): no DB during
+ * `next build` → initials and the default; at runtime an error is re-thrown so the last good
+ * static page keeps being served.
  */
-export async function getPublicAvatar(): Promise<PublicAvatar | null> {
-  let image: Image | null;
+export async function getSiteSettings(): Promise<SiteSettings> {
+  let rows: { key: string; value: string | null }[];
   try {
-    image = await getProfilePhoto();
+    rows = await getDb()
+      .select({ key: siteSettings.key, value: siteSettings.value })
+      .from(siteSettings)
+      .where(inArray(siteSettings.key, [PROFILE_PHOTO_KEY, AVAILABILITY_KEY]));
   } catch (error) {
     if (!isBuildPhase()) throw error;
     console.warn(
-      `[images] database unavailable during build, showing initials: ${(error as Error).message}`,
+      `[images] database unavailable during build, using default settings: ${(error as Error).message}`,
     );
-    return null;
+    return { avatar: null, availabilityOn: true };
   }
-  if (!image) return null;
+  const value = (key: string) => rows.find((row) => row.key === key)?.value ?? null;
+  const photoId = value(PROFILE_PHOTO_KEY);
+  const image = photoId ? await getImage(photoId) : null;
   return {
-    src: mediaUrl(image.id, image.format, AVATAR_WIDTHS[1]),
-    srcSet: AVATAR_WIDTHS.map((w) => `${mediaUrl(image.id, image.format, w)} ${w}w`).join(", "),
+    avatar: image ? avatarSources(image) : null,
+    availabilityOn: value(AVAILABILITY_KEY) !== "0",
   };
 }
