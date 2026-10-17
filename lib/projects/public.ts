@@ -38,9 +38,6 @@ export type PublicProject = {
 export const SELECTED_WORK_LIMIT = 5;
 export const STACK_LIMIT = 6;
 
-/** v1 homepage (removed in T-29/T-30): hero panel and grid sizes. */
-export const HOMEPAGE_GRID_LIMIT = 6;
-
 function httpsUrl(url: string | null): string | null {
   if (!url) return null;
   try {
@@ -124,11 +121,18 @@ export function selectSelectedWork<T extends { showOnHome: boolean }>(projects: 
 }
 
 /**
- * v1 homepage grid until T-30 replaces it with Selected work: the first 6 published, plus the
- * total for "View all work ({n})". Input must already be published-only and in standard order.
+ * Scroll range of each pinned Selected work step, as % of the chapter's `contain` range
+ * (option-b.html): step i is centred on its snap point i / (n - 1), half a step either side.
+ * n = 5 gives -12.5/12.5, 12.5/37.5 … 87.5/112.5. A single project is not pinned: [].
  */
-export function selectHomepageProjects<T>(projects: readonly T[]) {
-  return { grid: projects.slice(0, HOMEPAGE_GRID_LIMIT), total: projects.length };
+export function selectedWorkRanges(n: number): { r0: string; r1: string }[] {
+  if (n < 2) return [];
+  const step = 100 / (n - 1);
+  const pct = (value: number) => `${Math.round(value * 1000) / 1000}%`;
+  return Array.from({ length: n }, (_, i) => ({
+    r0: pct(i * step - step / 2),
+    r1: pct(i * step + step / 2),
+  }));
 }
 
 /** Grid goes to 3 columns at >=1200px only with 3+ cards (App Flow S-02, E-04). */

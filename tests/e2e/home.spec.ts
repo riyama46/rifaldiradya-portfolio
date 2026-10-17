@@ -19,7 +19,9 @@ test("chapters in order: Hero, Selected work, About, Highlight, Contact", async 
   const ids = await page
     .locator("main > section")
     .evaluateAll((sections) => sections.map((section) => section.id));
-  expect(ids).toEqual(["top", "work", "about", "highlight", "contact"]);
+  // Selected work depends on the data (E-25); selected-work.spec.ts covers it with its own.
+  expect(ids.filter((id) => id !== "work")).toEqual(["top", "about", "highlight", "contact"]);
+  expect(ids.indexOf("work")).toBeLessThan(2);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "Building HR software for thousands.",
   );

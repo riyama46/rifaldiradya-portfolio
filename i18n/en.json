@@ -42,8 +42,9 @@
   },
   "work": {
     "h": "Selected work",
-    "viewAll": "View all work",
-    "viewAllCount": "View all work ({n})",
+    "all": "See all work →",
+    "rail": "Projects",
+    "open": "Open the live site ↗",
     "empty": "New work is on the way. Meanwhile, tell me what you need."
   },
   "workPage": {

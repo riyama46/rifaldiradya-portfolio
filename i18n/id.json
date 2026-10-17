@@ -42,8 +42,9 @@
   },
   "work": {
     "h": "Karya pilihan",
-    "viewAll": "Lihat semua karya",
-    "viewAllCount": "Lihat semua karya ({n})",
+    "all": "Lihat semua karya →",
+    "rail": "Proyek",
+    "open": "Buka situsnya ↗",
     "empty": "Karya baru sedang disiapkan. Sementara itu, ceritakan kebutuhanmu."
   },
   "workPage": {

@@ -87,15 +87,16 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
   - Hapus `HeroProofPanel`, `BylineBadge`, `MetaRow`, `SectionHeader`, `ServiceTile`, `ProcessSteps`, `AboutFacts`.
 
   *Rujukan:* Delta APP_FLOW S-01 bab 1/3/4/5, Delta PRD §4. *Selesai bila:* AC-1, AC-5 (mailto), AC-6, AC-9, AC-11, AC-13.
-- [ ] **T-30 Home: Selected work.**
+- [x] **T-30 Home: Selected work.**
   - Item dipin + snap, penghitung 0n/0N, rail, judul → `/work#case-<slug>`, tautan situs, screenshot lazy, atribut `data-cursor`.
   - E-25.
-  - Hapus `ProjectCard`.
+  - ~~Hapus `ProjectCard`~~ → dipindah ke T-31: halaman Work masih memakai `ProjectGrid`/`ProjectCard` sampai baris case menggantikannya (disetujui Pal 2026-10-17).
 
   *Rujukan:* Delta APP_FLOW S-01 bab 2, D-06, D-18, D-20. *Selesai bila:* AC-2, AC-3 (sisi home); fallback daftar biasa tanpa scroll-driven.
 - [ ] **T-31 Halaman Work.**
   - H1 + jumlah, `WorkFilter`, `CaseRow` (`<details>`), tombol case 3 jenis, hash open/reset filter, Contact penutup `#more`.
   - E-27/E-28/E-29.
+  - Hapus `ProjectGrid`, `ProjectCard`, `gridColumnsClass` dan CSS `.reveal` (dipindah dari T-30).
 
   *Rujukan:* Delta APP_FLOW S-02, D-05, D-24. *Selesai bila:* AC-3, AC-4, AC-5; snap dan baris nyaman di HP.
 
