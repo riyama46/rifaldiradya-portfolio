@@ -68,7 +68,7 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
   - Isi 7 proyek dari teks `T` di mockup.
   - Atur `show_on_home` + urutan (D-18).
   - Unggah screenshot SwiftPay/Bloom dan foto ≥ 640.
-  - Siapkan PDF CV web tanpa nomor HP (dibersihkan metadata generator).
+  - [x] Siapkan PDF CV web tanpa nomor HP (dibersihkan metadata generator): `public/cv/rifaldi-radya-pratama-cv.pdf`, disusun ulang dari "Career - CV Software Engineer - v1.0" (Drive), satu halaman A4.
 
   *Selesai bila:* semua proyek published tanpa error validasi; PDF siap di-commit.
 
@@ -87,8 +87,6 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
   - Hapus `HeroProofPanel`, `BylineBadge`, `MetaRow`, `SectionHeader`, `ServiceTile`, `ProcessSteps`, `AboutFacts`.
 
   *Rujukan:* Delta APP_FLOW S-01 bab 1/3/4/5, Delta PRD §4. *Selesai bila:* AC-1, AC-5 (mailto), AC-6, AC-9, AC-11, AC-13.
-
-  *Catatan:* `CvLink` sudah menaut ke `/cv/rifaldi-radya-pratama-cv.pdf`; file PDF menyusul dari T-27, jadi cek status 200 AC-6 (`tests/e2e/home.spec.ts`, `fixme`) diaktifkan saat file di-commit.
 - [ ] **T-30 Home: Selected work.**
   - Item dipin + snap, penghitung 0n/0N, rail, judul → `/work#case-<slug>`, tautan situs, screenshot lazy, atribut `data-cursor`.
   - E-25.

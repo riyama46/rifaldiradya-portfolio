@@ -90,7 +90,6 @@ test("Download CV in About and Contact (D-14)", async ({ page }) => {
 });
 
 test("the CV file is served (AC-6)", async ({ request }) => {
-  test.fixme(true, "public/cv/rifaldi-radya-pratama-cv.pdf arrives with T-27 content");
   const response = await request.get(siteConfig.cvPath);
   expect(response.status()).toBe(200);
   expect(response.headers()["content-type"]).toContain("application/pdf");
