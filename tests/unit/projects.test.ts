@@ -201,34 +201,15 @@ describe("selectSelectedWork (D-18)", () => {
   });
 });
 
-describe("selectHomepageProjects (v1 homepage until T-29/T-30)", () => {
-  const list = (items: [boolean, string | null][]) =>
-    items.map(([showOnHome, liveUrl], id) => ({ id, showOnHome, liveUrl }));
-
-  it("hero panel: the first 3 of Selected work that have a site", () => {
-    const { heroPanel } = selectHomepageProjects(
-      list([
-        [true, "https://a.example"],
-        [true, null],
-        [false, "https://b.example"],
-        [true, "https://c.example"],
-        [true, "https://d.example"],
-        [true, "https://e.example"],
-      ]),
-    );
-    expect(heroPanel.map((p) => p.id)).toEqual([0, 3, 4]);
-  });
-
+describe("selectHomepageProjects (v1 homepage grid until T-30)", () => {
   it("grid: the first 6 published, plus the total", () => {
-    const { grid, total } = selectHomepageProjects(
-      list(Array.from({ length: 8 }, () => [false, null])),
-    );
+    const { grid, total } = selectHomepageProjects(Array.from({ length: 8 }, (_, id) => ({ id })));
     expect(grid).toHaveLength(6);
     expect(total).toBe(8);
   });
 
   it("handles no projects (E-01)", () => {
-    expect(selectHomepageProjects([])).toEqual({ heroPanel: [], grid: [], total: 0 });
+    expect(selectHomepageProjects([])).toEqual({ grid: [], total: 0 });
   });
 });
 

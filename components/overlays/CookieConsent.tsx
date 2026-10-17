@@ -52,8 +52,9 @@ export function CookieConsent({ lang, dict }: { lang: Locale; dict: Dictionary }
   const visible = analyticsEnabled && consent !== undefined && (consent === null || reopened);
 
   // While the banner covers the bottom of the screen, an element that gets keyboard focus underneath
-  // it (e.g. the hero panel's pause button on a 768 px tall laptop) is scrolled just above the
-  // banner instead of staying hidden (WCAG 2.4.11 Focus Not Obscured).
+  // it (e.g. the hero's "Email me" on a 768 px tall laptop) is scrolled just above the banner
+  // instead of staying hidden (WCAG 2.4.11 Focus Not Obscured). Scroll snap is off meanwhile
+  // (globals.css), or it would pull the page straight back.
   useEffect(() => {
     const element = section.current;
     if (!visible || !element) return;
@@ -97,7 +98,7 @@ export function CookieConsent({ lang, dict }: { lang: Locale; dict: Dictionary }
     <section
       ref={section}
       aria-labelledby={titleId}
-      className="fixed inset-x-0 bottom-0 z-50 bg-surface px-[var(--gutter)] pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgb(0_0_0/0.16)] md:inset-x-auto md:right-[var(--gutter)] md:bottom-4 md:w-[420px] md:rounded-card md:p-4 md:shadow-[0_12px_32px_rgb(0_0_0/0.24)]"
+      className="consent-banner fixed inset-x-0 bottom-0 z-50 bg-surface px-[var(--gutter)] pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgb(0_0_0/0.16)] md:inset-x-auto md:right-[var(--gutter)] md:bottom-4 md:w-[420px] md:rounded-card md:p-4 md:shadow-[0_12px_32px_rgb(0_0_0/0.24)]"
     >
       <h2 id={titleId} className="sr-only">
         {dict.consent.label}

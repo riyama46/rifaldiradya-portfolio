@@ -2,7 +2,6 @@
   "nav": {
     "work": "Work",
     "about": "About",
-    "email": "Email me",
     "skip": "Skip to content",
     "label": "Main"
   },
@@ -13,18 +12,17 @@
     "toDark": "Switch to dark mode",
     "toLight": "Switch to light mode"
   },
+  "cta": "Email me",
   "hero": {
-    "title": "Landing Pages That Launch in <em>Days</em>, Not Weeks",
-    "subtitle": "I'm Rifaldi, a web developer who turns a brief into a live site, fast. Need something bigger, like a dashboard or web app? I build those too. Based in Indonesia, working with clients worldwide.",
-    "ctaPrimary": "See the Work",
-    "ctaSecondary": "Email Me About Your Project",
-    "proofLabel": "Latest work",
-    "proofAria": "Visit {title} (opens in new tab)"
-  },
-  "meta": {
-    "available": "Available for new projects",
-    "location": "Based in Indonesia",
-    "remote": "Works remotely"
+    "role": "Software engineer · Full-stack .NET",
+    "loc": "Jakarta, Indonesia",
+    "open": "Open to full-time roles and projects",
+    "l1": "Building HR software",
+    "l2": "for <em>thousands.</em>",
+    "sub": "Four years building and running the HR system of 13 Panasonic group companies: hundreds of HR users, thousands of employee records.",
+    "stack": "Stack",
+    "scroll": "Scroll ↓",
+    "avatarAlt": "Rifaldi Radya Pratama"
   },
   "seo": {
     "siteName": "Rifaldi Radya Pratama",
@@ -42,39 +40,8 @@
       "description": "How rifaldiradya.com handles analytics cookies, your language choice, and email. No accounts, no forms, no tracking without consent."
     }
   },
-  "slider": {
-    "pause": "Pause slideshow",
-    "play": "Play slideshow"
-  },
-  "label": {
-    "services": "Services",
-    "work": "Work",
-    "about": "About",
-    "contact": "Contact"
-  },
-  "services": {
-    "title": "What I build",
-    "primary": {
-      "badge": "Main focus",
-      "title": "Landing Page Development",
-      "desc": "Fast, conversion-focused pages, ready to go live in days."
-    },
-    "secondary": {
-      "badge": "For bigger projects",
-      "title": "Web Apps & Dashboards",
-      "desc": "For needs that go beyond a single page."
-    }
-  },
-  "steps": {
-    "1": "Brief",
-    "2": "Build",
-    "3": "Live",
-    "1d": "You send the goal",
-    "2d": "I design and code",
-    "3d": "Online, ready to share"
-  },
   "work": {
-    "featuredTitle": "Selected work",
+    "h": "Selected work",
     "viewAll": "View all work",
     "viewAllCount": "View all work ({n})",
     "empty": "New work is on the way. Meanwhile, tell me what you need."
@@ -91,29 +58,66 @@
     "visitAria": "Visit {title} (opens in new tab)"
   },
   "about": {
-    "title": "Who you'll work with",
-    "lead": "I'm Rifaldi, a web developer who <strong>builds websites professionally as a full-time job</strong>, and takes on freelance landing pages for founders and small businesses.",
-    "body": "My approach is simple: take your brief, turn it into <strong>a fast, clean page</strong>, and <strong>get it live in days, not weeks</strong>. You get one person from first message to launch, so nothing gets lost between a designer, a developer, and a project manager."
+    "h": "About",
+    "s": "I build the systems a company runs on: attendance, overtime, payroll.",
+    "p1": "I'm one of three developers on the HR system that 13 Panasonic group companies use. I own delivery for six of them: requirements, estimates, development and installation on their servers. I also train users at every rollout, prepare SOX audit documents and mentor interns.",
+    "p2": "Before code I edited video. I studied informatics at IPB and Telkom University, and I'm now doing a Master of Management in HR, with a thesis on presenteeism, work-life balance and burnout.",
+    "edu": "Education",
+    "education": [
+      "<strong>Bachelor of Informatics</strong>, Telkom University, 2022",
+      "<strong>Diploma, Informatics Management</strong>, IPB University, 2018",
+      "<strong>Master of Management, HR</strong>, Universitas Pancasila, expected 2027"
+    ],
+    "cert": "Certifications",
+    "certs": [
+      "<strong>Junior Web Programmer</strong>, BNSP, 2019",
+      "<strong>UI/UX Design Bootcamp</strong>, Digital Skola, 2022"
+    ]
   },
-  "facts": {
-    "basedLabel": "Based in",
-    "based": "Indonesia ({timezone})",
-    "workLabel": "Works with",
-    "work": "Clients worldwide, remotely",
-    "focusLabel": "Focus",
-    "focus": "Landing pages, web apps & dashboards",
-    "langLabel": "Languages",
-    "lang": "English, Indonesian",
-    "stackLabel": "Stack"
+  "case": {
+    "meta": "Highlight · Panasonic · Live since early 2023",
+    "t": "One login instead of <s>five passwords.</s>",
+    "st1": "passwords per person",
+    "st2p": "~",
+    "st2n": "~200",
+    "st2": "staff on one login",
+    "st3": "group companies on the HRMS",
+    "blur": "Screens of the HRMS are internal; I can walk you through them in an interview."
   },
-  "cta": {
-    "title": "Have a page to <em>launch</em>?",
-    "sub": "Send a short brief: what the page is for and when you need it. I'll reply with the next steps.",
-    "button": "Email me about your project",
-    "or": "or copy"
+  "bridge": {
+    "q": "Need a system like this at your company?",
+    "go": "Go to contact ↓"
+  },
+  "ct": {
+    "label": "Contact",
+    "h": "Tell me what you're <em>building.</em>",
+    "pitch": "Hiring a full-time developer, or need an HR or internal system built? Send a few lines about it and I'll reply by email.",
+    "role": "Email about a full-time role",
+    "project": "Email about a project",
+    "linkedin": "LinkedIn ↗",
+    "github": "GitHub ↗"
+  },
+  "cv": {
+    "download": "Download CV (PDF)"
+  },
+  "mail": {
+    "general": {
+      "s": "Hello Rifaldi"
+    },
+    "role": {
+      "s": "Full-time role: ",
+      "b": "Company:\nRole and link to the job post:\nA good time to talk:\n"
+    },
+    "project": {
+      "s": "Project: ",
+      "b": "What you need built:\nTimeline:\nBudget range:\n"
+    },
+    "walk": {
+      "s": "Walkthrough: {title}",
+      "b": "Company:\nRole you're hiring for:\nA good time to talk:\n"
+    }
   },
   "email": {
-    "subject": "Project inquiry from rifaldiradya.com",
     "copy": "Copy email",
     "copied": "Copied",
     "copyFallback": "Press Ctrl/Cmd+C to copy"

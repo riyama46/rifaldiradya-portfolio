@@ -80,13 +80,15 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
   - Hapus `Navbar`, `FooterCta`.
 
   *Rujukan:* Delta APP_FLOW G2/G3/§5, Delta SDD §4. *Selesai bila:* E2E bar + toggle bahasa + tema di 375/1280; tanpa scroll horizontal 320–1440.
-- [ ] **T-29 Home: Hero, About, Highlight, Contact.**
+- [x] **T-29 Home: Hero, About, Highlight, Contact.**
   - Copy dari kamus baru (kunci `T`).
   - `MailtoLink` 4 jenis, `CopyEmailButton` di Contact, `CvLink` + file `public/cv/rifaldi-radya-pratama-cv.pdf`, `LocalClock`, availability dari `site_settings`.
   - Motion CSS D-08 + H1 tanpa fade (D-10) + fallback E-30.
   - Hapus `HeroProofPanel`, `BylineBadge`, `MetaRow`, `SectionHeader`, `ServiceTile`, `ProcessSteps`, `AboutFacts`.
 
   *Rujukan:* Delta APP_FLOW S-01 bab 1/3/4/5, Delta PRD §4. *Selesai bila:* AC-1, AC-5 (mailto), AC-6, AC-9, AC-11, AC-13.
+
+  *Catatan:* `CvLink` sudah menaut ke `/cv/rifaldi-radya-pratama-cv.pdf`; file PDF menyusul dari T-27, jadi cek status 200 AC-6 (`tests/e2e/home.spec.ts`, `fixme`) diaktifkan saat file di-commit.
 - [ ] **T-30 Home: Selected work.**
   - Item dipin + snap, penghitung 0n/0N, rail, judul → `/work#case-<slug>`, tautan situs, screenshot lazy, atribut `data-cursor`.
   - E-25.

@@ -90,10 +90,10 @@ export default async function PrivacyPage({ params }: PageProps<"/[lang]/privacy
               <p>
                 {contactBefore}
                 <a
-                  href={`mailto:${siteConfig.email}`}
+                  href={`mailto:${siteConfig.contactEmail}`}
                   className="font-medium text-text underline decoration-border decoration-2 underline-offset-4 hover:decoration-accent"
                 >
-                  {siteConfig.email}
+                  {siteConfig.contactEmail}
                 </a>
                 {contactAfter}
               </p>

@@ -66,6 +66,15 @@ test("availability switch: saved with API-09 and still set after a reload (AC-9 
   await page.reload();
   await expect(toggle).toHaveAttribute("aria-checked", String(!before));
 
+  // Public side (AC-9): the hero line follows the switch on both locales, the meta does not.
+  for (const path of ["/", "/id"]) {
+    await page.goto(path);
+    const description = await page.locator("meta[name=description]").getAttribute("content");
+    expect(description).not.toMatch(/open to|terbuka untuk/i);
+    await expect(page.locator("#top .who-status")).toHaveCount(before ? 0 : 1);
+  }
+  await page.goto("/admin/profile");
+
   // Put it back for the next run.
   await toggle.click();
   await save.click();

@@ -1,24 +1,23 @@
 import type { Metadata } from "next";
-import { About } from "@/components/site/About";
+import { AboutChapter } from "@/components/site/AboutChapter";
+import { ContactChapter } from "@/components/site/ContactChapter";
+import { Footer } from "@/components/site/Footer";
 import { Hero } from "@/components/site/Hero";
-import { HeroProofPanel, type ProofSlide } from "@/components/site/HeroProofPanel";
+import { HighlightChapter } from "@/components/site/HighlightChapter";
 import { JsonLd } from "@/components/site/JsonLd";
 import { ProjectGrid } from "@/components/site/ProjectGrid";
 import { SelectedWork } from "@/components/site/SelectedWork";
-import { Services } from "@/components/site/Services";
-import { Footer } from "@/components/site/Footer";
 import { SiteBar } from "@/components/site/SiteBar";
 import { ArrowIcon } from "@/components/ui/ArrowIcon";
 import { Button } from "@/components/ui/Button";
 import { getDictionary, interpolate, localePath } from "@/i18n";
 import { resolveLocale } from "@/i18n/server";
+import { getSiteSettings } from "@/lib/images/store";
 import {
   HOMEPAGE_GRID_LIMIT,
-  screenshotOf,
   selectHomepageProjects,
   toPublicProject,
 } from "@/lib/projects/public";
-import { getSiteSettings } from "@/lib/images/store";
 import { getPublishedProjects } from "@/lib/projects/queries";
 import { homeJsonLd } from "@/lib/seo/jsonld";
 import { buildMetadata, siteOrigin } from "@/lib/seo/metadata";
@@ -32,25 +31,19 @@ export async function generateMetadata({ params }: PageProps<"/[lang]">): Promis
   return buildMetadata({ lang, path: "/", page: dict.seo.home, dict });
 }
 
-// S-01 (App Flow): Hero → 01 Services → 02 Selected work → 03 About; the 04 CTA is in the footer.
+// Delta APP_FLOW S-01: Hero → Selected work → About → Highlight → Contact → footer.
+// Selected work is still the v1 grid until T-30.
 export default async function HomePage({ params }: PageProps<"/[lang]">) {
   const lang = await resolveLocale(params);
   const dict = getDictionary(lang);
 
-  const [projects, { avatar }] = await Promise.all([getPublishedProjects(), getSiteSettings()]);
-  const published = projects.map((project) => toPublicProject(project, lang));
-  const { heroPanel, grid, total } = selectHomepageProjects(published);
-
-  // heroPanel only holds projects with a live URL (selectHomepageProjects).
-  const slides: ProofSlide[] = heroPanel.map((project) => ({
-    id: project.id,
-    slug: project.slug,
-    title: project.title,
-    liveUrl: project.liveUrl!,
-    liveHost: new URL(project.liveUrl!).host,
-    thumbnail: screenshotOf(project),
-    ariaLabel: interpolate(dict.hero.proofAria, { title: project.title }),
-  }));
+  const [projects, { avatar, availabilityOn }] = await Promise.all([
+    getPublishedProjects(),
+    getSiteSettings(),
+  ]);
+  const { grid, total } = selectHomepageProjects(
+    projects.map((project) => toPublicProject(project, lang)),
+  );
 
   const viewAllLabel =
     total > HOMEPAGE_GRID_LIMIT
@@ -61,26 +54,8 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
     <>
       <JsonLd data={homeJsonLd(lang, siteOrigin())} />
       <SiteBar lang={lang} dict={dict} path="/" />
-      <main id="content" tabIndex={-1} className="pt-16">
-        <Hero
-          dict={dict}
-          avatar={avatar}
-          proofPanel={
-            slides.length > 0 ? (
-              <HeroProofPanel
-                slides={slides}
-                labels={{
-                  proofLabel: dict.hero.proofLabel,
-                  visitShort: dict.card.visitShort,
-                  live: dict.card.live,
-                  pause: dict.slider.pause,
-                  play: dict.slider.play,
-                }}
-              />
-            ) : undefined
-          }
-        />
-        <Services dict={dict} />
+      <main id="content" tabIndex={-1}>
+        <Hero dict={dict} avatar={avatar} availabilityOn={availabilityOn} />
         <SelectedWork dict={dict}>
           {grid.length > 0 ? (
             <>
@@ -92,7 +67,9 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
             </>
           ) : undefined}
         </SelectedWork>
-        <About dict={dict} />
+        <AboutChapter dict={dict} />
+        <HighlightChapter dict={dict} />
+        <ContactChapter dict={dict} />
       </main>
       <Footer lang={lang} dict={dict} back="top" />
     </>

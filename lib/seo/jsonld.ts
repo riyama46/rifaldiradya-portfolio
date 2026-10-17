@@ -21,7 +21,7 @@ export function homeJsonLd(lang: Locale, origin: string): Json {
         name: siteConfig.name,
         url: `${origin}${localePath("/", lang)}`,
         jobTitle: siteConfig.role,
-        email: `mailto:${siteConfig.email}`,
+        email: `mailto:${siteConfig.contactEmail}`,
         knowsAbout: ["Landing page development", "Web development", "Next.js"],
         sameAs: [siteConfig.social.linkedin],
       },
