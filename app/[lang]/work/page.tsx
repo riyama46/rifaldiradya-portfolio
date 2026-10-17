@@ -9,7 +9,7 @@ import { SiteBar } from "@/components/site/SiteBar";
 import { WorkFilter } from "@/components/site/WorkFilter";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/i18n/server";
-import { groupCounts, toPublicProject } from "@/lib/projects/public";
+import { groupCounts, toPublicProject, workSub } from "@/lib/projects/public";
 import { getPublishedProjects } from "@/lib/projects/queries";
 import { workJsonLd } from "@/lib/seo/jsonld";
 import { buildMetadata, siteOrigin } from "@/lib/seo/metadata";
@@ -31,6 +31,8 @@ export default async function WorkPage({ params }: PageProps<"/[lang]/work">) {
   const dict = getDictionary(lang);
   const projects = (await getPublishedProjects()).map((project) => toPublicProject(project, lang));
   const { wp, group } = dict;
+  const groups = groupCounts(projects);
+  const sub = workSub(groups, wp.sub, lang);
 
   return (
     <>
@@ -45,7 +47,7 @@ export default async function WorkPage({ params }: PageProps<"/[lang]/work">) {
               {dict.nav.work}
               {projects.length > 0 && <sup>{projects.length}</sup>}
             </h1>
-            <p className="wp-sub">{wp.sub}</p>
+            {sub && <p className="wp-sub">{sub}</p>}
 
             {projects.length > 0 ? (
               <>
@@ -53,7 +55,7 @@ export default async function WorkPage({ params }: PageProps<"/[lang]/work">) {
                   listId={LIST_ID}
                   lang={lang}
                   total={projects.length}
-                  groups={groupCounts(projects)}
+                  groups={groups}
                   labels={{ group: wp.filter, all: wp.all, ...group }}
                 />
                 <ol id={LIST_ID} className="rows">

@@ -49,7 +49,36 @@
   },
   "wp": {
     "label": "Semua karya",
-    "sub": "Tiga proyek di sistem HR Panasonic, tiga website, dan alat AI yang saya pakai setiap hari. Buka satu baris untuk melihat detailnya.",
+    "sub": {
+      "panasonic": {
+        "one": "{n} proyek di sistem HR Panasonic",
+        "other": "{n} proyek di sistem HR Panasonic"
+      },
+      "web": {
+        "one": "{n} website",
+        "other": "{n} website"
+      },
+      "ai": {
+        "one": "alat AI yang saya pakai setiap hari",
+        "other": "alat AI yang saya pakai setiap hari"
+      },
+      "and2": " dan ",
+      "andN": ", dan ",
+      "end": "Buka satu baris untuk melihat detailnya.",
+      "n": [
+        "nol",
+        "satu",
+        "dua",
+        "tiga",
+        "empat",
+        "lima",
+        "enam",
+        "tujuh",
+        "delapan",
+        "sembilan",
+        "sepuluh"
+      ]
+    },
     "filter": "Saring proyek",
     "all": "Semua"
   },

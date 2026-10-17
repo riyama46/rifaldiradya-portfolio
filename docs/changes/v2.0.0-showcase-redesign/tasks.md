@@ -116,7 +116,7 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
   - Backup database produksi.
   - `version` 2.0.0, CHANGELOG `[2.0.0]`.
   - PR `staging` → `main`, tag `v2.0.0` + GitHub Release, `check-deploy --production`.
-  - Merge CHANGE.md ke `docs/specs/` (header `version: 2.0.0`, `last_change`), salin D-01..D-29 ke DECISIONS, arsipkan change ke `docs/changes/archive/`, kosongkan "Active change".
+  - Merge CHANGE.md ke `docs/specs/` (header `version: 2.0.0`, `last_change`), salin D-01..D-30 ke DECISIONS, arsipkan change ke `docs/changes/archive/`, kosongkan "Active change".
 
   - Setelah deploy (D-29): Pal mengisi 7 proyek di admin produksi (teks `T` di mockup), atur `show_on_home` + urutan (D-18), unggah screenshot SwiftPay/Bloom dan foto ≥ 640; lalu verifikasi AC-2 dan Lighthouse di produksi.
 
