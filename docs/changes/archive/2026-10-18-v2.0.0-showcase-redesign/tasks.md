@@ -1,7 +1,7 @@
 ---
 change: v2.0.0-showcase-redesign
 doc: tasks
-status: approved
+status: done
 date: 2026-10-17
 ---
 
@@ -110,7 +110,7 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
 
 ## Fase F — QA & rilis
 
-- [ ] **T-33 QA v2.0.0 + rilis.**
+- [x] **T-33 QA v2.0.0 + rilis.** (QA 17–18 Okt 2026, hasil di SDD §11; tag dan check-deploy produksi setelah PR rilis di-merge)
   - Sebelum QA: Pal mengisi 2–3 proyek uji di admin devstaging (tiap jenis tombol case dan visual); periksa juga tampilan proyek v1 hasil migrasi `0004` di devstaging, karena itulah yang tampil di produksi sampai konten diisi (D-29).
   - Jalankan semua Acceptance checks (AC-1..AC-15) dan QA manual (Delta SDD §11): Safari iOS nyata, Firefox, reduced motion, mode terang di semua bab, snap Work di HP, kontras soft, focus ring baris case, Lighthouse mobile ≥ 90 di 4 halaman dalam kedua tema.
   - Backup database produksi.

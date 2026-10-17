@@ -4,6 +4,38 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versi
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-10-18
+
+Arah situs berubah: showcase software engineer full-stack .NET untuk recruiter dan klien proyek, dengan situs sebagai funnel ke email. Detail: `docs/changes/archive/2026-10-18-v2.0.0-showcase-redesign/CHANGE.md`, keputusan D-01..D-30 di `docs/decisions/DECISIONS.md`.
+
+### Added
+
+- Home 5 bab dengan scroll snap: Hero, Selected work (dipin, maks. 5, penghitung + rail), About (Pendidikan, Sertifikasi, Download CV), Highlight SSO, Contact.
+- Halaman Work baru: filter grup (Panasonic, Websites, AI tools), baris case yang bisa dibuka (`/work#case-<slug>`), sub dihitung dari data.
+- Tema gelap/terang dengan toggle, tanpa flash saat load (`rr-theme`).
+- Funnel email: mailto dengan subject dan isi terisi untuk 4 jenis (umum, posisi, proyek, walkthrough), Copy email di Contact, Download CV (PDF web tanpa nomor HP).
+- Model data project v2 (grup, meta + side, isi case EN/ID, tombol case, visual screenshot/kartu angka, Show in Selected work maks. 5); migrasi `0004`.
+- Admin: form per bagian (What I did per baris dengan paste multi-baris, Stack maks. 6, tombol case, visual), daftar dengan filter grup, saklar availability di Profile.
+- Event GA4 `case_open`, `cv_download`, `theme_switch`; `contact_email_click` dengan `kind`.
+
+### Changed
+
+- Positioning, persona, copy EN/ID, meta SEO, JSON-LD `Person` (Software Engineer, `worksFor`, `knowsAbout`), gambar OG.
+- Visual "Opsi B": font Archivo, aksen cobalt, token dua lapis; motion CSS scroll-driven dengan fallback statis.
+- `live_url` opsional (proyek internal tanpa URL); rollback ke v1 butuh restore backup database (D-21).
+- Foto profil minimal 640 px (varian 320/640).
+- Spesifikasi (`docs/specs/`) dinaikkan ke 2.0.0.
+
+### Removed
+
+- HeroProofPanel (rotasi), service block, alur Brief → Build → Live, label section bernomor, highlighter, status dot berdenyut, CTA akhir, ProjectCard.
+- Flag `availableForWork` (diganti saklar availability di admin).
+
+### Fixed
+
+- Paste beberapa baris ke What I did tidak lagi tergabung jadi satu baris.
+- Foto profil dan availability disimpan dalam satu transaksi.
+
 ## [1.0.1] - 2026-10-17
 
 ### Fixed
