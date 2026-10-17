@@ -489,7 +489,7 @@ v1: 22 task dalam 4 fase (T-01..T-22). v2.0.0: 11 task (T-23..T-33), di bawah. S
 
 - [x] **T-32** Meta v2, JSON-LD (Person, ItemList dengan URL case), OG ulang, `events.ts` v2 + `data-track`, Privacy EN/ID (`rr-theme`, CV, `rr-case-from-home`), `site-config` LinkedIn baru + GitHub kosong, `check-deploy.mts` diperbarui.
 - [x] **T-33** QA v2.0.0 (di atas) + rilis: perbaikan QA (#59, #60), backup DB produksi, `version` 2.0.0, CHANGELOG `[2.0.0]`, CHANGE digabung ke `docs/specs/` dan diarsipkan, D-01..D-30 ke DECISIONS, PR `staging` → `main`, tag `v2.0.0` + GitHub Release, `check-deploy --production`.
-- [ ] **Pasca-rilis (D-29):** Pal mengisi 7 proyek di admin produksi, `show_on_home` + urutan, foto ≥ 640; lalu verifikasi AC-2 dan PageSpeed di produksi.
+- [x] **Pasca-rilis (D-29):** Pal mengisi 7 proyek di admin produksi, `show_on_home` + urutan, foto ≥ 640; lalu verifikasi AC-2 dan PageSpeed di produksi. Produksi 18 Okt 2026: AC-2 lolos di `/` dan `/id` (HR System, Single Sign-On, rifaldiradya.com, SwiftPay, Bloom Studio; penghitung 01–05 / 05; AI tidak di home sesuai D-18); `/work` dan `/id/work` 7 baris, filter 7/3/3/1. PageSpeed mobile kedua tema: `/` 98–99, `/work` 97–99, `/id` 97–98, `/id/work` 96–99; Accessibility, Best Practices, SEO 100; CLS ≤ 0,001; LCP lab 1,7–3,1 s (bervariasi antar-run, belum ada data CrUX). Foto profil 640 × 640.
 
 ## 13. Aturan kerja dengan coding AI
 

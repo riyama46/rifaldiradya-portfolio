@@ -4,19 +4,21 @@ app: rifaldiradya.com
 tier: full
 bump: minor
 base_version: 2.0.0
-status: proposed
+status: approved
 date: 2026-10-17
+approved: 2026-10-18
 ---
 
-# Change v2.1.0 — Lapisan pointer dan preview admin
+# Change v2.1.0 — Lapisan pointer, preview admin, dan tema gelap default
 
-> **Status: direncanakan, belum disetujui untuk build.** Bagian ini sengaja ditunda dari v2.0.0 (D-27 di `docs/decisions/DECISIONS.md`; change v2.0.0 diarsipkan di `docs/changes/archive/2026-10-18-v2.0.0-showcase-redesign/`). Mulai build setelah v2.0.0 live. Pal cukup bilang "approve dan build v2.1.0".
+> **Status: disetujui Pal 18 Okt 2026.** Bagian pointer sengaja ditunda dari v2.0.0 (D-27 di `docs/decisions/DECISIONS.md`; change v2.0.0 diarsipkan di `docs/changes/archive/2026-10-18-v2.0.0-showcase-redesign/`). Tema gelap default ditambahkan atas permintaan Pal saat persetujuan.
 >
-> Sebelum build, builder wajib:
-> 1. memastikan v2.0.0 sudah dirilis dan sudah di-merge ke `docs/specs/`;
-> 2. menyesuaikan `base_version` dengan tag terakhir (mis. 2.0.3);
-> 3. mengecek ulang bahwa atribut `data-cursor` dan token cahaya dari v2.0.0 masih ada;
-> 4. mengubah status jadi `approved`.
+> Prasyarat dicek 18 Okt 2026:
+> 1. v2.0.0 sudah dirilis (tag `v2.0.0`, tag terakhir) dan sudah di-merge ke `docs/specs/`; verifikasi pasca-rilis D-29 selesai.
+> 2. `base_version` = 2.0.0.
+> 3. `data-cursor` masih ada di `components/site/SelectedWork.tsx` dan `components/site/CaseRow.tsx`; token cahaya `--gx`, `--gy`, `--glow`, `--k` masih ada di `styles/globals.css`.
+> 4. Nomor keputusan digeser ke D-31..D-36 karena D-29 dan D-30 sudah dipakai di v2.0.0.
+> 5. Key `cur.read`/`cur.visit` ternyata tidak ada di `i18n/*.json` (terhapus saat v2.0.0), jadi dicatat sebagai ADDED di bawah.
 >
 > Rujukan visual dan perilaku: JS dan CSS kursor di `docs/design/v2/option-b.html` (`.spot`, `.cur-dot`, `.cur-ring`, `.peek`, `.shot`) dan panel preview di `docs/design/v2/admin.html`. Kalau mockup berbeda dengan dokumen ini, dokumen ini yang menang.
 
@@ -24,7 +26,9 @@ date: 2026-10-17
 
 Lapisan pointer adalah bagian desain yang diminta eksplisit (D-09) dan menunjukkan craft kepada pengunjung desktop. Lapisan ini ditunda karena mayoritas pengunjung memakai HP, merupakan satu-satunya JS tambahan, dan menjadi risiko terbesar untuk INP dan Lighthouse. Dengan v2.0.0 sudah live, lapisan ini bisa ditambahkan tanpa membongkar apa pun.
 
-Lane MINOR: hanya menambah, tanpa perubahan struktur, URL, atau data.
+Tema: arah "Opsi B" dirancang gelap lebih dulu (PRD §8, "Mode gelap (default)"), tetapi D-23 mengikuti setelan perangkat, sehingga pengunjung yang perangkatnya disetel terang (sebagian besar HP dan laptop kantor) tidak pernah melihat tampilan utama kecuali menekan toggle. Kesan pertama recruiter dan klien sebaiknya sama di semua perangkat.
+
+Lane MINOR: hanya menambah dan mengubah satu perilaku default, tanpa perubahan struktur, URL, atau data.
 
 ## Scope
 
@@ -35,30 +39,33 @@ Lane MINOR: hanya menambah, tanpa perubahan struktur, URL, atau data.
 - Preview di samping kursor (340 px, 16:10) saat hover judul Selected work dan baris Work: screenshot untuk `visual_type = screenshot`, kartu angka (`card_number` + caption) untuk `visual_type = number` (D-11 v2.0.0).
 - Tilt screenshot di Selected work (`perspective` + `rotateX/Y` maks. sekitar 6°, transisi 500 ms).
 - Admin S-12/S-13: panel preview di ≥ 1024 px, "Preview on the homepage" (meta, judul, deskripsi) dan "Preview next to the cursor" (screenshot atau kartu angka), diperbarui saat mengetik, EN dengan tombol ganti ke ID.
+- Tema gelap jadi default untuk semua pengunjung yang belum memilih, di publik dan admin, dengan dan tanpa JS. Terang tetap tersedia lewat toggle (tersimpan di `rr-theme`) dan `?theme=light`.
 
 **Out**
 
-- Perubahan copy, data, API, URL, atau tampilan di HP dan tablet.
+- Perubahan copy, data, API, atau URL; perubahan tampilan di HP dan tablet selain tema default.
 - Library animasi atau dependency baru.
 
 ## Decisions
 
-- **D-29 — Lapisan pointer hanya untuk mouse.** Aktif hanya bila `(hover: hover) and (pointer: fine)` cocok dan event berasal dari `pointerType === "mouse"`. Bila media query berubah (mis. tablet dengan keyboard dicabut), lapisan dimatikan dan semua class dibersihkan. · Alasan: D-09. · Ditolak: aktif di layar sentuh.
-- **D-30 — Satu client component, rAF yang berhenti saat diam.** Satu komponen `PointerLayer` (dimuat dengan dynamic import setelah idle, hanya bila media query cocok, sehingga JS-nya tidak ada di bundle HP). Satu loop `requestAnimationFrame` yang berhenti ketika titik, cincin, dan cahaya sudah mencapai posisi kursor (selisih < 0,4 px), lalu menyala lagi pada `pointermove`. Hanya `transform` dan `opacity`. · Alasan: INP dan baterai.
-- **D-31 — Zona cahaya lewat IntersectionObserver** (`rootMargin: -45% 0 -45% 0`) yang menulis `data-zone`; tanpa listener `scroll`. · Alasan: aturan v2 "tanpa listener scroll".
-- **D-32 — Reduced motion.** Dengan `prefers-reduced-motion: reduce`: titik dan cincin tetap (sebagai penanda), tetapi tanpa lag (langsung di posisi), tanpa tilt, cahaya tanpa transisi; preview tetap tampil tanpa animasi masuk. · Alasan: tetap informatif tanpa gerak.
-- **D-33 — Aksesibilitas tidak bergantung pada lapisan ini.** Label "Read"/"Visit" dan preview bersifat `aria-hidden`; arti tautan tetap dari teksnya. Kursor bawaan kembali muncul saat fokus keyboard dipakai (`:focus-visible` di mana pun → lapisan disembunyikan sampai mouse bergerak lagi).
+- **D-31 — Lapisan pointer hanya untuk mouse.** Aktif hanya bila `(hover: hover) and (pointer: fine)` cocok dan event berasal dari `pointerType === "mouse"`. Bila media query berubah (mis. tablet dengan keyboard dicabut), lapisan dimatikan dan semua class dibersihkan. · Alasan: D-09. · Ditolak: aktif di layar sentuh.
+- **D-32 — Satu client component, rAF yang berhenti saat diam.** Satu komponen `PointerLayer` (dimuat dengan dynamic import setelah idle, hanya bila media query cocok, sehingga JS-nya tidak ada di bundle HP). Satu loop `requestAnimationFrame` yang berhenti ketika titik, cincin, dan cahaya sudah mencapai posisi kursor (selisih < 0,4 px), lalu menyala lagi pada `pointermove`. Hanya `transform` dan `opacity`. · Alasan: INP dan baterai.
+- **D-33 — Zona cahaya lewat IntersectionObserver** (`rootMargin: -45% 0 -45% 0`) yang menulis `data-zone`; tanpa listener `scroll`. · Alasan: aturan v2 "tanpa listener scroll".
+- **D-34 — Reduced motion.** Dengan `prefers-reduced-motion: reduce`: titik dan cincin tetap (sebagai penanda), tetapi tanpa lag (langsung di posisi), tanpa tilt, cahaya tanpa transisi; preview tetap tampil tanpa animasi masuk. · Alasan: tetap informatif tanpa gerak.
+- **D-35 — Aksesibilitas tidak bergantung pada lapisan ini.** Label "Read"/"Visit" dan preview bersifat `aria-hidden`; arti tautan tetap dari teksnya. Kursor bawaan kembali muncul saat fokus keyboard dipakai (`:focus-visible` di mana pun → lapisan disembunyikan sampai mouse bergerak lagi).
+- **D-36 — Tema gelap default, tidak mengikuti setelan perangkat.** Urutan sebelum paint: `?theme=` → `rr-theme` → `dark`. Tanpa JS (E-07) dan saat `localStorage` diblokir (E-31) tema juga gelap. Berlaku untuk publik dan admin (satu `ThemeScript`). Menggantikan bagian `prefers-color-scheme` dari D-23; key, toggle, dan `?theme=` tetap. · Alasan: Opsi B dirancang gelap lebih dulu; kesan pertama sama di semua perangkat; pilihan terang tetap ada dan diingat. Kontras kedua tema sudah lolos WCAG AA dan PageSpeed (SDD §12). · Ditolak: mengikuti setelan perangkat (D-23 lama), karena mayoritas pengunjung tidak pernah melihat tampilan utama.
 
 ## Delta: PRD
 
 ### ADDED
 
-- **§8 Motion.** Baris tabel: kursor (titik + cincin berlabel), cahaya mengikuti kursor per bab, preview samping kursor, tilt screenshot, semuanya khusus mouse (D-29..D-33).
+- **§8 Motion.** Baris tabel: kursor (titik + cincin berlabel), cahaya mengikuti kursor per bab, preview samping kursor, tilt screenshot, semuanya khusus mouse (D-31..D-35).
 - **§10 NFR Performance.** JS lapisan pointer ≤ 3 KB gzip, dimuat terpisah dan hanya di perangkat mouse; tidak ada long task > 50 ms dari lapisan ini saat menggerakkan mouse di halaman Work (Performance panel); INP tetap < 200 ms.
 
 ### MODIFIED
 
 - **§7 Out of scope.** Hapus baris "lapisan pointer + preview admin → v2.1.0". Previously: ditunda di v2.0.0. Why: dikerjakan di change ini.
+- **§8 Visual.** "Mode gelap (default) dan terang dengan toggle, tanpa flash saat load (D-23)" menjadi "Mode gelap selalu default (tidak mengikuti setelan perangkat) dan terang lewat toggle yang diingat, tanpa flash saat load (D-23, D-36)". Previously: default gelap hanya bila perangkat tidak disetel terang. Why: D-36.
 
 ## Delta: APP_FLOW
 
@@ -75,7 +82,14 @@ Lane MINOR: hanya menambah, tanpa perubahan struktur, URL, atau data.
 
 - **S-01 bab 2 dan S-02.** Judul Selected work dan `<summary>` baris Work mendapat `data-preview="<slug>"` (judul sudah punya `data-cursor` dari v2.0.0). Previously: hanya `data-cursor`. Why: preview.
 - **S-12/S-13.** Tambah panel preview di ≥ 1024 px (Scope). Teks bantuan bagian Visual menjadi "Used for the homepage picture and the preview next to the cursor on the Work page." Previously: "…appear in the desktop preview from v2.1."
-- **§11 i18n.** Key `cur.read`, `cur.visit` sekarang dirender. Data kartu angka diambil dari database (bukan key `peek.*`).
+- **O-04 Toggle tema.** Urutan skrip inline menjadi `?theme=` → `rr-theme` → `dark`. Previously: `?theme=` → `rr-theme` → `prefers-color-scheme` → `dark`. Why: D-36.
+- **E-07.** Tanpa JS tema selalu gelap (tidak ada lagi `@media (prefers-color-scheme: light)` untuk `:root:not([data-theme])`); toggle tema tetap tidak tampil. Previously: mengikuti setelan perangkat. Why: D-36.
+- **E-31.** `localStorage` tidak tersedia → tema gelap; toggle tetap mengganti tema untuk sesi itu tanpa error. Previously: tema mengikuti perangkat. Why: D-36.
+- **§11 i18n.** Data kartu angka diambil dari database (bukan key `peek.*`).
+
+### ADDED (i18n)
+
+- Key publik `cur.read` ("Read" / "Baca") dan `cur.visit` ("Visit" / "Kunjungi") di `i18n/en.json` dan `i18n/id.json`. Label admin panel preview ("Preview on the homepage", "Preview next to the cursor", tombol EN/ID) mengikuti cara admin v2.0.0 menyimpan teks UI (EN saja, G3).
 
 ## Delta: DESIGN_SPEC
 
@@ -86,20 +100,22 @@ Tidak ada file DESIGN_SPEC (konvensi v1/v2). Perubahan visual tercatat di Delta 
 ### ADDED
 
 - **§4** `components/site/PointerLayer.tsx` (client, dynamic import) dan `components/admin/ProjectPreview.tsx` (client). Data preview dirender server sebagai markup tersembunyi di dalam `.peek`, bukan diambil lewat fetch.
-- **§8 Motion** Aturan D-30..D-33; satu-satunya `requestAnimationFrame` di situs.
+- **§8 Motion** Aturan D-32..D-35; satu-satunya `requestAnimationFrame` di situs.
 
 ### MODIFIED
 
+- **§8 Token tema.** Hapus `@media (prefers-color-scheme: light) :root:not([data-theme])`; `:root` tanpa `data-theme` memakai token gelap. `lib/theme.ts` `resolveTheme(query, stored)` tanpa argumen setelan perangkat. Previously: fallback tanpa JS mengikuti perangkat (E-07). Why: D-36.
+- **§11 Testing.** E2E "tema tanpa flash" ditambah kasus perangkat `colorScheme: light` tanpa pilihan → gelap; unit `resolveTheme` disesuaikan.
 - **§13 AGENTS.md.** Aturan JS klien: tambah "`PointerLayer` (khusus mouse, dimuat terpisah)". Previously: lapisan pointer dilarang sampai v2.1.0.
 
 ## Impact checklist
 
-- [ ] Screens: S-01, S-02 (atribut + lapisan), S-12/S-13 (panel preview). Route tidak berubah.
-- [ ] Komponen: 2 komponen baru; tidak ada yang dihapus.
+- [ ] Screens: S-01, S-02 (atribut + lapisan), S-12/S-13 (panel preview); semua layar publik dan admin (tema default). Route tidak berubah.
+- [ ] Komponen: 2 komponen baru; `lib/theme.ts`, `styles/globals.css` (fallback tema) diubah; tidak ada yang dihapus.
 - [ ] URL/SEO: tidak berubah.
-- [ ] Copy: hanya label kursor (sudah ada di kamus).
+- [ ] Copy: label kursor `cur.read`/`cur.visit` (key baru) dan label panel preview admin.
 - [ ] Data/API: tidak ada.
-- [ ] Breaking? Tidak.
+- [ ] Breaking? Tidak. Pengunjung yang sudah menyimpan pilihan tema tidak terpengaruh.
 
 ## Acceptance checks
 
@@ -110,7 +126,9 @@ Tidak ada file DESIGN_SPEC (konvensi v1/v2). Perubahan visual tercatat di Delta 
 - **AC-5.** Given navigasi keyboard, When Tab dipakai, Then kursor kustom tersembunyi dan focus ring terlihat.
 - **AC-6.** Lighthouse mobile tetap ≥ 90 dan INP desktop < 200 ms di `/` dan `/work` kedua tema.
 - **AC-7.** Given form admin di ≥ 1024 px, When judul atau angka diketik, Then panel preview berubah langsung tanpa menyimpan.
+- **AC-8.** Given perangkat disetel terang dan belum ada `rr-theme`, When membuka `/`, `/work`, atau `/admin/login`, Then frame pertama sudah gelap (tanpa flash); setelah toggle ke terang dan reload, tetap terang; `?theme=light` tetap terang.
+- **AC-9.** Given JavaScript mati dan perangkat disetel terang, When membuka `/`, Then tema gelap dan semua konten tetap terbaca.
 
 ## Already implemented
 
-Dari v2.0.0: atribut `data-cursor` pada judul dan tautan Selected work, token cahaya per bab (`--gx`, `--gy`, `--glow`, `--k`), data kartu angka di database dan admin.
+Dari v2.0.0: atribut `data-cursor` pada judul dan tautan Selected work, token cahaya per bab (`--gx`, `--gy`, `--glow`, `--k`), data kartu angka di database dan admin, toggle tema + `rr-theme` + `?theme=`.
