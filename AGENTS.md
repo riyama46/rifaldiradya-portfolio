@@ -2,8 +2,8 @@
 
 ## Specs (source of truth)
 
-- Current: docs/specs/ (cek `version` dan `status: current` di header tiap file). Live: v1.0.0 (tag git di `main`).
-- Active change: none
+- Current: docs/specs/ (cek `version` dan `status: current` di header tiap file). Live: v1.0.1 (tag git di `main`).
+- Active change: docs/changes/v2.0.0-showcase-redesign/CHANGE.md (urutan build: tasks.md di folder yang sama)
   → Implement ONLY what the active change describes. Where it conflicts with docs/specs, the change wins.
 - docs/changes/archive/ is history only — never use it as requirements.
 - Versions: PATCH = fix/tidy (builder directly) · MINOR = something new · MAJOR = direction/structure change. MINOR/MAJOR are planned as a CHANGE.md first (docs/changes/vX.Y.Z-name/CHANGE.md).
@@ -15,7 +15,7 @@
 1. docs/specs/APP_FLOW.md — layar, flow, state, edge case, kontrak API. Paling mengikat.
 2. docs/specs/SDD.md — arsitektur, stack, struktur repo, keamanan.
 3. docs/specs/PRD.md — alasan produk, copy, visual, tabel Motion.
-4. docs/design/homepage-mockup.html — referensi visual saja (tampilan & motion). Kalau berbeda dengan docs, docs yang menang. Abaikan docs/design/archive/ (versi lama).
+4. docs/design/v2/option-b.html (publik) dan docs/design/v2/admin.html (admin) — referensi visual & interaksi. Kalau mockup berbeda dengan docs, docs yang menang; kalau docs diam, ikuti mockup. Abaikan docs/design/archive/ (versi lama).
    Kalau semuanya tidak menjawab: BERHENTI dan tanya. Jangan mengarang.
 
 ## Aturan keras
