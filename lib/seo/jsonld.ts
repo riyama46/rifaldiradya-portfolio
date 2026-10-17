@@ -22,8 +22,10 @@ export function homeJsonLd(lang: Locale, origin: string): Json {
         url: `${origin}${localePath("/", lang)}`,
         jobTitle: siteConfig.role,
         email: `mailto:${siteConfig.contactEmail}`,
-        knowsAbout: ["Landing page development", "Web development", "Next.js"],
-        sameAs: [siteConfig.social.linkedin],
+        worksFor: { "@type": "Organization", name: siteConfig.employer },
+        knowsAbout: [...siteConfig.knowsAbout],
+        // GitHub joins only once it is filled in (D-19).
+        sameAs: [siteConfig.social.linkedin, siteConfig.social.github].filter(Boolean),
       },
       {
         "@type": "WebSite",

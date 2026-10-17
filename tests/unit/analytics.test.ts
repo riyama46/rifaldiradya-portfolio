@@ -70,17 +70,65 @@ describe("track() and data-track attributes (App Flow section 11)", () => {
   it("maps data attributes to the typed events", async () => {
     const { gtag, trackFromElement } = await setup("consent=granted");
     trackFromElement(
-      element({ track: "contact_email_click", location: "hero", method: "mailto" }),
+      element({
+        track: "contact_email_click",
+        kind: "general",
+        location: "hero",
+        method: "mailto",
+      }),
       "/",
       "en",
     );
+    trackFromElement(
+      element({
+        track: "contact_email_click",
+        kind: "general",
+        location: "contact",
+        method: "copy",
+      }),
+      "/",
+      "en",
+    );
+    trackFromElement(
+      element({
+        track: "contact_email_click",
+        kind: "walkthrough",
+        location: "case",
+        method: "mailto",
+        slug: "sso",
+      }),
+      "/id/work",
+      "id",
+    );
+    trackFromElement(element({ track: "cv_download", location: "about" }), "/id", "id");
     trackFromElement(
       element({ track: "project_link_click", slug: "coffee", placement: "case" }),
       "/id/work",
       "id",
     );
     expect(gtag.mock.calls).toEqual([
-      ["event", "contact_email_click", { location: "hero", method: "mailto", language: "en" }],
+      [
+        "event",
+        "contact_email_click",
+        { kind: "general", location: "hero", method: "mailto", language: "en" },
+      ],
+      [
+        "event",
+        "contact_email_click",
+        { kind: "general", location: "contact", method: "copy", language: "en" },
+      ],
+      [
+        "event",
+        "contact_email_click",
+        {
+          kind: "walkthrough",
+          location: "case",
+          method: "mailto",
+          language: "id",
+          project_slug: "sso",
+        },
+      ],
+      ["event", "cv_download", { location: "about", language: "id" }],
       [
         "event",
         "project_link_click",
@@ -89,11 +137,38 @@ describe("track() and data-track attributes (App Flow section 11)", () => {
     ]);
   });
 
+  it("only a walkthrough email carries a project slug", async () => {
+    const { gtag, trackFromElement } = await setup("consent=granted");
+    trackFromElement(
+      element({ track: "contact_email_click", kind: "role", location: "contact", slug: "sso" }),
+      "/",
+      "en",
+    );
+    expect(gtag.mock.calls[0][2]).not.toHaveProperty("project_slug");
+    expect(
+      trackFromElement(
+        element({ track: "contact_email_click", kind: "walkthrough", location: "case" }),
+        "/work",
+        "en",
+      ),
+    ).toBe(false);
+  });
+
   it("ignores incomplete or unknown attributes instead of sending half an event", async () => {
     const { gtag, trackFromElement } = await setup("consent=granted");
     expect(
-      trackFromElement(element({ track: "contact_email_click", location: "sidebar" }), "/", "en"),
+      trackFromElement(
+        element({ track: "contact_email_click", kind: "general", location: "footer" }),
+        "/",
+        "en",
+      ),
     ).toBe(false);
+    expect(
+      trackFromElement(element({ track: "contact_email_click", location: "hero" }), "/", "en"),
+    ).toBe(false);
+    expect(trackFromElement(element({ track: "cv_download", location: "hero" }), "/", "en")).toBe(
+      false,
+    );
     expect(
       trackFromElement(element({ track: "project_link_click", placement: "case" }), "/", "en"),
     ).toBe(false);
