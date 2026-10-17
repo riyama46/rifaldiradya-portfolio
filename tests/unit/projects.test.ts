@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { Project } from "@/lib/db/schema";
+import { getDictionary } from "@/i18n";
 import { mediaLoader } from "@/lib/images/loader";
 import {
   compareProjects,
@@ -8,6 +9,7 @@ import {
   selectSelectedWork,
   selectedWorkRanges,
   toPublicProject,
+  workSub,
 } from "@/lib/projects/public";
 
 function project(overrides: Partial<Project> = {}): Project {
@@ -241,6 +243,65 @@ describe("groupCounts", () => {
 
   it("returns nothing for no projects", () => {
     expect(groupCounts([])).toEqual([]);
+  });
+});
+
+describe("workSub", () => {
+  const en = getDictionary("en").wp.sub;
+  const id = getDictionary("id").wp.sub;
+  const all = [
+    { group: "panasonic", count: 3 },
+    { group: "web", count: 3 },
+    { group: "ai", count: 1 },
+  ] as const;
+
+  it("matches the mockup copy for the full set (the AI row is one set of tools)", () => {
+    expect(workSub(all, en, "en")).toBe(
+      "Three projects inside the Panasonic HR system, three websites and a set of AI tools I use every day. Open a row for the details.",
+    );
+    expect(workSub(all, id, "id")).toBe(
+      "Tiga proyek di sistem HR Panasonic, tiga website, dan alat AI yang saya pakai setiap hari. Buka satu baris untuk melihat detailnya.",
+    );
+  });
+
+  it("names only the groups that have projects, singular when one", () => {
+    expect(workSub([{ group: "web", count: 1 }], en, "en")).toBe(
+      "One website. Open a row for the details.",
+    );
+    expect(
+      workSub(
+        [
+          { group: "panasonic", count: 1 },
+          { group: "web", count: 2 },
+        ],
+        en,
+        "en",
+      ),
+    ).toBe(
+      "One project inside the Panasonic HR system and two websites. Open a row for the details.",
+    );
+    expect(
+      workSub(
+        [
+          { group: "panasonic", count: 1 },
+          { group: "web", count: 2 },
+        ],
+        id,
+        "id",
+      ),
+    ).toBe(
+      "Satu proyek di sistem HR Panasonic dan dua website. Buka satu baris untuk melihat detailnya.",
+    );
+  });
+
+  it("writes numbers above ten as digits", () => {
+    expect(workSub([{ group: "web", count: 12 }], en, "en")).toBe(
+      "12 websites. Open a row for the details.",
+    );
+  });
+
+  it("returns null when there are no projects", () => {
+    expect(workSub([], en, "en")).toBeNull();
   });
 });
 

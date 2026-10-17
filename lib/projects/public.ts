@@ -1,4 +1,4 @@
-import type { Locale } from "@/i18n";
+import { interpolate, type Dictionary, type Locale } from "@/i18n";
 import type { Project } from "@/lib/db/schema";
 import { PROJECT_GROUPS, type CaseAction, type ProjectGroup } from "./validation";
 
@@ -146,4 +146,31 @@ export function groupCounts(
     group,
     count: projects.filter((project) => project.group === group).length,
   })).filter(({ count }) => count > 0);
+}
+
+/**
+ * Work page sub (D-30): one phrase per group that has projects, in the filter order, so the
+ * sentence always matches the counts on the filter buttons. Numbers up to ten are written as
+ * words. No projects → null (E-01 empty state says the rest).
+ */
+export function workSub(
+  groups: readonly { group: ProjectGroup; count: number }[],
+  sub: Dictionary["wp"]["sub"],
+  lang: Locale,
+): string | null {
+  if (groups.length === 0) return null;
+
+  const plural = new Intl.PluralRules(lang);
+  const parts = groups.map(({ group, count }) =>
+    interpolate(sub[group][plural.select(count) === "one" ? "one" : "other"], {
+      n: sub.n[count] ?? count,
+    }),
+  );
+  const last = parts.pop() as string;
+  const list =
+    parts.length === 0
+      ? last
+      : `${parts.join(", ")}${parts.length === 1 ? sub.and2 : sub.andN}${last}`;
+
+  return `${list.charAt(0).toLocaleUpperCase(lang)}${list.slice(1)}. ${sub.end}`;
 }

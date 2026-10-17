@@ -49,7 +49,24 @@
   },
   "wp": {
     "label": "All work",
-    "sub": "Three projects inside the Panasonic HR system, three websites and a set of AI tools I use every day. Open a row for the details.",
+    "sub": {
+      "panasonic": {
+        "one": "{n} project inside the Panasonic HR system",
+        "other": "{n} projects inside the Panasonic HR system"
+      },
+      "web": {
+        "one": "{n} website",
+        "other": "{n} websites"
+      },
+      "ai": {
+        "one": "a set of AI tools I use every day",
+        "other": "a set of AI tools I use every day"
+      },
+      "and2": " and ",
+      "andN": " and ",
+      "end": "Open a row for the details.",
+      "n": ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
+    },
     "filter": "Filter projects",
     "all": "All"
   },
