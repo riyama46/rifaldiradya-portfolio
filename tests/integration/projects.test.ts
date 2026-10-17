@@ -11,6 +11,7 @@ import {
   getSiteSettings,
   getVariant,
   saveImage,
+  saveProfileSettings,
   setAvailability,
   setProfilePhoto,
 } from "@/lib/images/store";
@@ -514,5 +515,14 @@ describe("availability (S-14, D-16, API-09)", () => {
 
     await setAvailability(true);
     expect((await getSiteSettings()).availabilityOn).toBe(true);
+  });
+
+  it("saves photo and availability together: a failed save changes neither", async () => {
+    await setAvailability(true);
+    // The photo id is written after the switch and is too long for the column, so the save fails.
+    await expect(
+      saveProfileSettings({ availability: false, photoId: "X".repeat(300) }),
+    ).rejects.toThrow();
+    expect(await getAvailability()).toBe(true);
   });
 });
