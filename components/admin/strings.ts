@@ -73,8 +73,8 @@ export const adminStrings = {
     count: (n: number) => `${n} ${n === 1 ? "project" : "projects"}`,
     newProject: "New project",
     empty: "No projects yet. Add your first one to show it on the site.",
-    featuredInHero: (n: number, limit: number) => `Featured in homepage hero: ${n}/${limit}`,
-    featuredOverLimit: "Only the first 3 featured projects appear in the homepage hero.",
+    selectedWork: (n: number, limit: number) =>
+      `Selected work on the homepage: ${n} of ${limit}. Turn one off before adding another.`,
     gridInfo: "Shown on homepage grid: first 6 published projects in this order.",
     orderHelp: "Use ↑ and ↓ to change the order. New projects are added at the top.",
     moveUp: (title: string) => `Move ${title} up`,
@@ -83,7 +83,7 @@ export const adminStrings = {
     moveFailed: "Couldn't change the order. Try again.",
     published: "Published",
     draft: "Draft",
-    featured: "Featured",
+    onHome: "Homepage",
     edit: "Edit",
     editProject: (title: string) => `Edit ${title}`,
     columns: {
@@ -108,9 +108,9 @@ export const adminStrings = {
     help: {
       summary_en: "Shown on the card",
       live_url: "Opens in a new tab on the site",
-      tags: "Press Enter or comma to add. Up to 4, e.g. Next.js, Tailwind",
+      tags: "Press Enter or comma to add. Up to 6, e.g. C#, ASP.NET",
       thumbnail_alt_en: "Describe what the image shows",
-      featured: "Show in homepage hero (max 3)",
+      show_on_home: "Up to 5 projects appear in Selected work on the homepage.",
       published: "Off = draft, not shown on the site",
     },
     counter: (current: number, max: number) => `${current}/${max}`,

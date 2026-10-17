@@ -42,7 +42,7 @@ export function workJsonLd(
   lang: Locale,
   origin: string,
   title: string,
-  projects: Pick<PublicProject, "title" | "liveUrl">[],
+  projects: Pick<PublicProject, "title" | "slug" | "liveUrl">[],
 ): Json {
   const { person, website } = ids(origin);
   return {
@@ -59,7 +59,8 @@ export function workJsonLd(
         "@type": "ListItem",
         position: index + 1,
         name: project.title,
-        url: project.liveUrl,
+        // Projects without a site point at their case row (Delta PRD section 9).
+        url: project.liveUrl ?? `${origin}${localePath("/work", lang)}#case-${project.slug}`,
       })),
     },
   };

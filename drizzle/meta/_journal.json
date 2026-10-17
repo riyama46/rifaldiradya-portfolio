@@ -29,6 +29,13 @@
       "when": 1790697382852,
       "tag": "0003_positions_and_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1792212460780,
+      "tag": "0004_v2_showcase",
+      "breakpoints": true
     }
   ]
 }

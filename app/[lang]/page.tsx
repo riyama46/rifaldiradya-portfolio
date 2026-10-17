@@ -13,10 +13,11 @@ import { getDictionary, interpolate, localePath } from "@/i18n";
 import { resolveLocale } from "@/i18n/server";
 import {
   HOMEPAGE_GRID_LIMIT,
+  screenshotOf,
   selectHomepageProjects,
   toPublicProject,
 } from "@/lib/projects/public";
-import { getPublicAvatar } from "@/lib/images/store";
+import { getSiteSettings } from "@/lib/images/store";
 import { getPublishedProjects } from "@/lib/projects/queries";
 import { homeJsonLd } from "@/lib/seo/jsonld";
 import { buildMetadata, siteOrigin } from "@/lib/seo/metadata";
@@ -35,17 +36,18 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
   const lang = await resolveLocale(params);
   const dict = getDictionary(lang);
 
-  const [projects, avatar] = await Promise.all([getPublishedProjects(), getPublicAvatar()]);
+  const [projects, { avatar }] = await Promise.all([getPublishedProjects(), getSiteSettings()]);
   const published = projects.map((project) => toPublicProject(project, lang));
   const { heroPanel, grid, total } = selectHomepageProjects(published);
 
+  // heroPanel only holds projects with a live URL (selectHomepageProjects).
   const slides: ProofSlide[] = heroPanel.map((project) => ({
     id: project.id,
     slug: project.slug,
     title: project.title,
-    liveUrl: project.liveUrl,
-    liveHost: project.liveHost,
-    thumbnail: project.thumbnail,
+    liveUrl: project.liveUrl!,
+    liveHost: new URL(project.liveUrl!).host,
+    thumbnail: screenshotOf(project),
     ariaLabel: interpolate(dict.hero.proofAria, { title: project.title }),
   }));
 

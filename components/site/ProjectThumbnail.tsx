@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import type { PublicProject } from "@/lib/projects/public";
+type Thumbnail = { url: string; width: number; height: number; alt: string };
 
 type ProjectThumbnailProps = {
   title: string;
-  thumbnail: PublicProject["thumbnail"];
+  thumbnail: Thumbnail | null;
   sizes: string;
   priority?: boolean;
   className?: string;

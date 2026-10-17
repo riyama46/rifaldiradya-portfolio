@@ -60,7 +60,7 @@ export function checkVariants(
   variants.sort((a, b) => a.width - b.width);
   const largest = variants.at(-1)!;
   const { minSourceWidth } = KINDS[kind];
-  // The largest stored width equals the crop (thumbnail, max 1600) or 320 (avatar).
+  // The largest stored width equals the crop (thumbnail, max 1600) or 640 (avatar).
   if (largest.width < minSourceWidth) {
     return {
       ok: false,

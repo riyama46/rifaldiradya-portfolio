@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { guardAdminWrite } from "@/lib/auth/guard";
 import { apiError, readJsonBody } from "@/lib/http/api";
-import { missingImage } from "@/lib/projects/errors";
-import { createProject, toProjectJson, withStoredThumbnail } from "@/lib/projects/mutations";
+import { missingImage, showOnHomeFull } from "@/lib/projects/errors";
+import {
+  createProject,
+  ShowOnHomeLimitError,
+  toProjectJson,
+  withStoredThumbnail,
+} from "@/lib/projects/mutations";
 import { fieldErrors, pickProjectFields, projectInputSchema } from "@/lib/projects/validation";
 import { revalidatePublicPages } from "@/lib/revalidate";
 
@@ -26,6 +31,7 @@ export async function POST(request: Request) {
     const revalidated = revalidatePublicPages();
     return NextResponse.json({ project: toProjectJson(project), revalidated }, { status: 201 });
   } catch (error) {
+    if (error instanceof ShowOnHomeLimitError) return showOnHomeFull();
     console.error("[projects] create failed:", (error as Error).message);
     return apiError(500, "SERVER_ERROR", "Couldn't save. Your changes are still here — try again.");
   }

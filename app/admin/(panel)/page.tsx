@@ -4,7 +4,7 @@ import { ProjectList } from "@/components/admin/ProjectList";
 import { adminStrings, parseNotice } from "@/components/admin/strings";
 import { Button } from "@/components/ui/Button";
 import { requireAdmin } from "@/lib/auth/guard";
-import { heroFeaturedCount } from "@/lib/projects/admin";
+import { selectedWorkCount } from "@/lib/projects/admin";
 import { getAllProjects } from "@/lib/projects/queries";
 
 export const metadata: Metadata = { title: adminStrings.projects.title };
@@ -17,7 +17,7 @@ export default async function AdminProjectsPage({ searchParams }: PageProps<"/ad
   await requireAdmin();
   const [projects, { notice }] = await Promise.all([getAllProjects(), searchParams]);
   const noticeKey = parseNotice(notice);
-  const featured = heroFeaturedCount(projects);
+  const selected = selectedWorkCount(projects);
 
   return (
     <>
@@ -39,11 +39,12 @@ export default async function AdminProjectsPage({ searchParams }: PageProps<"/ad
       ) : (
         <>
           <div className="mt-6 grid gap-2 text-small text-text-muted">
-            <p>{strings.featuredInHero(featured.count, featured.limit)}</p>
-            {featured.overLimit && (
+            {selected.full ? (
               <p className="rounded-button border-l-4 border-l-accent bg-accent/12 px-3 py-2 font-medium text-text">
-                {strings.featuredOverLimit}
+                {strings.selectedWork(selected.count, selected.limit)}
               </p>
+            ) : (
+              <p>{strings.selectedWork(selected.count, selected.limit)}</p>
             )}
             <p>{strings.gridInfo}</p>
             <p>{strings.orderHelp}</p>

@@ -38,7 +38,8 @@ export const projects = mysqlTable(
     titleId: varchar("title_id", { length: 80 }).notNull(),
     summaryEn: varchar("summary_en", { length: 160 }).notNull(),
     summaryId: varchar("summary_id", { length: 160 }).notNull(),
-    liveUrl: varchar("live_url", { length: 300 }).notNull(),
+    // Nullable since v2.0.0 (D-21): internal projects have no URL; required only for case_action site.
+    liveUrl: varchar("live_url", { length: 300 }),
     tags: json("tags")
       .$type<string[]>()
       .notNull()
@@ -51,13 +52,41 @@ export const projects = mysqlTable(
     thumbnailAltId: varchar("thumbnail_alt_id", { length: 140 }),
     // Position 1…n, unique, maintained by lib/projects/mutations.ts (↑/↓ on S-11, new = 1).
     sortOrder: smallint("sort_order").notNull().default(1),
+    // Deprecated v2.0.0, not read (D-22). Kept because columns are never dropped; use showOnHome.
     featured: boolean("featured").notNull().default(false),
+    // v2.0.0 (CHANGE v2.0.0, Delta SDD section 3). Text fields are null until filled in the admin;
+    // the publish rules live in lib/projects/validation.ts.
+    group: varchar("group", { length: 12, enum: ["panasonic", "web", "ai"] })
+      .notNull()
+      .default("web"),
+    metaEn: varchar("meta_en", { length: 40 }),
+    metaId: varchar("meta_id", { length: 40 }),
+    sideEn: varchar("side_en", { length: 20 }),
+    sideId: varchar("side_id", { length: 20 }),
+    caseIsEn: varchar("case_is_en", { length: 220 }),
+    caseIsId: varchar("case_is_id", { length: 220 }),
+    caseDidEn: json("case_did_en").$type<string[]>(),
+    caseDidId: json("case_did_id").$type<string[]>(),
+    statusEn: varchar("status_en", { length: 40 }),
+    statusId: varchar("status_id", { length: 40 }),
+    caseAction: varchar("case_action", { length: 12, enum: ["site", "walkthrough", "none"] })
+      .notNull()
+      .default("site"),
+    visualType: varchar("visual_type", { length: 10, enum: ["screenshot", "number"] })
+      .notNull()
+      .default("screenshot"),
+    cardNumber: varchar("card_number", { length: 12 }),
+    cardCaptionEn: varchar("card_caption_en", { length: 60 }),
+    cardCaptionId: varchar("card_caption_id", { length: 60 }),
+    // Selected work on the homepage (D-18): at most 5 rows true, drafts included.
+    showOnHome: boolean("show_on_home").notNull().default(false),
     published: boolean("published").notNull().default(false),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (table) => [
     index("projects_public_order_idx").on(table.published, table.sortOrder, table.createdAt),
+    index("projects_home_order_idx").on(table.published, table.showOnHome, table.sortOrder),
   ],
 );
 
@@ -121,7 +150,8 @@ export const imageVariants = mysqlTable(
   (table) => [primaryKey({ columns: [table.imageId, table.width] })],
 );
 
-// Small key/value settings edited in the admin (S-14): currently only the profile photo image id.
+// Small key/value settings edited in the admin (S-14): the profile photo image id and, since
+// v2.0.0, availability_on ('1' | '0').
 export const siteSettings = mysqlTable("site_settings", {
   key: varchar("key", { length: 50 }).primaryKey(),
   value: varchar("value", { length: 255 }),

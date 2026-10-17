@@ -103,10 +103,10 @@ describe("JSON-LD", () => {
     expect(website).toMatchObject({ "@type": "WebSite", inLanguage: "id-ID" });
   });
 
-  it("work page: an ItemList of the live projects in page order", () => {
+  it("work page: an ItemList of the projects in page order", () => {
     const data = workJsonLd("en", origin, "Work", [
-      { title: "Clinic", liveUrl: "https://a.example" },
-      { title: "Coffee", liveUrl: "https://b.example" },
+      { title: "Clinic", slug: "clinic", liveUrl: "https://a.example" },
+      { title: "Coffee", slug: "coffee", liveUrl: "https://b.example" },
     ]);
     expect(data).toMatchObject({
       "@type": "CollectionPage",
@@ -120,9 +120,20 @@ describe("JSON-LD", () => {
     });
   });
 
+  it("work page: a project without a site points at its case row (Delta PRD section 9)", () => {
+    const data = workJsonLd("id", origin, "Karya", [
+      { title: "HR System", slug: "hr-system", liveUrl: null },
+    ]);
+    expect(data).toMatchObject({
+      mainEntity: {
+        itemListElement: [{ url: "https://rifaldiradya.com/id/work#case-hr-system" }],
+      },
+    });
+  });
+
   it("escapes < so a project title can never close the script tag", () => {
     const data = workJsonLd("en", origin, "Work", [
-      { title: "</script><script>alert(1)</script>", liveUrl: "https://a.example" },
+      { title: "</script><script>alert(1)</script>", slug: "x", liveUrl: "https://a.example" },
     ]);
     const json = serializeJsonLd(data);
     expect(json).not.toContain("</script>");

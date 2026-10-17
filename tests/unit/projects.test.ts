@@ -1,19 +1,21 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { Project } from "@/lib/db/schema";
 import { mediaLoader } from "@/lib/images/loader";
 import {
   compareProjects,
   gridColumnsClass,
+  screenshotOf,
   selectHomepageProjects,
+  selectSelectedWork,
   toPublicProject,
 } from "@/lib/projects/public";
 
 function project(overrides: Partial<Project> = {}): Project {
   return {
     id: "01JABCDEF0000000000000000",
-    slug: "coffee-shop-landing",
-    titleEn: "Coffee Shop Landing Page",
-    titleId: "Landing Page Coffee Shop",
+    slug: "bloom-studio",
+    titleEn: "Bloom Studio",
+    titleId: "Bloom Studio ID",
     summaryEn: "One-page site with menu and WhatsApp order button.",
     summaryId: "Situs satu halaman dengan menu dan tombol pesan WhatsApp.",
     liveUrl: "https://staging0.rifaldiradya.com",
@@ -22,10 +24,27 @@ function project(overrides: Partial<Project> = {}): Project {
     thumbnailUrl: "/media/01JIMAGE000000000000000000.webp",
     thumbnailWidth: 1600,
     thumbnailHeight: 1000,
-    thumbnailAltEn: "Homepage of a coffee shop site",
-    thumbnailAltId: "Beranda situs coffee shop",
-    sortOrder: 100,
+    thumbnailAltEn: "Homepage of a florist site",
+    thumbnailAltId: "Beranda situs toko bunga",
+    sortOrder: 1,
     featured: false,
+    group: "web",
+    metaEn: "Website · Florist",
+    metaId: "Website · Toko bunga",
+    sideEn: "2025",
+    sideId: "2025",
+    caseIsEn: "A website for a florist.",
+    caseIsId: "Website untuk toko bunga.",
+    caseDidEn: ["Built the site."],
+    caseDidId: ["Membangun situs."],
+    statusEn: "Live, 2025",
+    statusId: "Live, 2025",
+    caseAction: "site",
+    visualType: "screenshot",
+    cardNumber: null,
+    cardCaptionEn: null,
+    cardCaptionId: null,
+    showOnHome: true,
     published: true,
     createdAt: new Date("2026-09-01T00:00:00Z"),
     updatedAt: new Date("2026-09-01T00:00:00Z"),
@@ -33,33 +52,127 @@ function project(overrides: Partial<Project> = {}): Project {
   };
 }
 
-describe("toPublicProject", () => {
+// A published v1 row after migration 0004: defaults only, no v2 text yet (E-27).
+const v1Row = () =>
+  project({
+    metaEn: null,
+    metaId: null,
+    sideEn: null,
+    sideId: null,
+    caseIsEn: null,
+    caseIsId: null,
+    caseDidEn: null,
+    caseDidId: null,
+    statusEn: null,
+    statusId: null,
+    showOnHome: false,
+  });
+
+describe("toPublicProject (v2 DTO)", () => {
   it("picks the English fields for en", () => {
-    const dto = toPublicProject(project(), "en");
-    expect(dto.title).toBe("Coffee Shop Landing Page");
-    expect(dto.summary).toMatch(/^One-page/);
-    expect(dto.thumbnail?.alt).toBe("Homepage of a coffee shop site");
-    expect(dto.liveHost).toBe("staging0.rifaldiradya.com");
+    expect(toPublicProject(project(), "en")).toEqual({
+      id: "01JABCDEF0000000000000000",
+      slug: "bloom-studio",
+      group: "web",
+      title: "Bloom Studio",
+      meta: "Website · Florist",
+      side: "2025",
+      summary: "One-page site with menu and WhatsApp order button.",
+      caseIs: "A website for a florist.",
+      caseDid: ["Built the site."],
+      stack: ["Next.js", "Tailwind CSS"],
+      status: "Live, 2025",
+      caseAction: "site",
+      liveUrl: "https://staging0.rifaldiradya.com",
+      visual: {
+        type: "screenshot",
+        url: "/media/01JIMAGE000000000000000000.webp",
+        width: 1600,
+        height: 1000,
+        alt: "Homepage of a florist site",
+      },
+      showOnHome: true,
+    });
   });
 
   it("picks the Indonesian fields for id", () => {
     const dto = toPublicProject(project(), "id");
-    expect(dto.title).toBe("Landing Page Coffee Shop");
-    expect(dto.thumbnail?.alt).toBe("Beranda situs coffee shop");
+    expect(dto).toMatchObject({
+      title: "Bloom Studio ID",
+      meta: "Website · Toko bunga",
+      caseIs: "Website untuk toko bunga.",
+      caseDid: ["Membangun situs."],
+    });
+    expect(screenshotOf(dto)?.alt).toBe("Beranda situs toko bunga");
   });
 
-  it("returns a null thumbnail when the image is missing", () => {
-    expect(toPublicProject(project({ thumbnailUrl: null }), "en").thumbnail).toBeNull();
+  it("E-27: a v1 row shows title and summary, with the empty case parts hidden", () => {
+    const dto = toPublicProject(v1Row(), "en");
+    expect(dto).toMatchObject({
+      title: "Bloom Studio",
+      summary: expect.stringMatching(/^One-page/),
+      meta: null,
+      side: null,
+      caseIs: null,
+      caseDid: [],
+      status: null,
+      caseAction: "site",
+      showOnHome: false,
+    });
+    expect(dto.visual?.type).toBe("screenshot");
   });
 
-  it("keeps at most 4 tags", () => {
-    const tags = ["a", "b", "c", "d", "e"];
-    expect(toPublicProject(project({ tags }), "en").tags).toEqual(["a", "b", "c", "d"]);
+  it("number card: number + caption per locale, null while incomplete", () => {
+    const card = project({
+      visualType: "number",
+      cardNumber: "13",
+      cardCaptionEn: "group companies",
+      cardCaptionId: "perusahaan grup",
+    });
+    expect(toPublicProject(card, "id").visual).toEqual({
+      type: "number",
+      number: "13",
+      caption: "perusahaan grup",
+    });
+    expect(screenshotOf(toPublicProject(card, "en"))).toBeNull();
+    expect(toPublicProject(project({ visualType: "number" }), "en").visual).toBeNull();
   });
 
-  it("does not expose admin-only fields", () => {
-    const dto = toPublicProject(project(), "en") as Record<string, unknown>;
-    for (const key of ["published", "sortOrder", "thumbnailPublicId", "createdAt"]) {
+  it("returns a null visual when the screenshot is missing", () => {
+    expect(toPublicProject(project({ thumbnailUrl: null }), "en").visual).toBeNull();
+  });
+
+  it("walkthrough projects keep their action without a URL", () => {
+    const dto = toPublicProject(project({ caseAction: "walkthrough", liveUrl: null }), "en");
+    expect(dto).toMatchObject({ caseAction: "walkthrough", liveUrl: null });
+  });
+
+  it("E-28: site without a usable URL becomes no button, with a server warning", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    for (const liveUrl of [null, "", "http://insecure.example.com", "not a url"]) {
+      const dto = toPublicProject(project({ liveUrl }), "en");
+      expect(dto).toMatchObject({ caseAction: "none", liveUrl: null });
+    }
+    expect(warn).toHaveBeenCalledTimes(4);
+    warn.mockRestore();
+  });
+
+  it("never renders a non-https URL, whatever the action (SDD section 6)", () => {
+    const dto = toPublicProject(
+      project({ caseAction: "none", liveUrl: "javascript:alert(1)" }),
+      "en",
+    );
+    expect(dto.liveUrl).toBeNull();
+  });
+
+  it("keeps at most 6 Stack items", () => {
+    const tags = ["a", "b", "c", "d", "e", "f", "g"];
+    expect(toPublicProject(project({ tags }), "en").stack).toEqual(["a", "b", "c", "d", "e", "f"]);
+  });
+
+  it("does not expose admin-only or deprecated fields", () => {
+    const dto = toPublicProject(project({ featured: true }), "en") as Record<string, unknown>;
+    for (const key of ["published", "sortOrder", "thumbnailPublicId", "createdAt", "featured"]) {
       expect(dto).not.toHaveProperty(key);
     }
   });
@@ -74,24 +187,48 @@ describe("compareProjects", () => {
   });
 });
 
-describe("selectHomepageProjects", () => {
-  const list = (featuredFlags: boolean[]) =>
-    featuredFlags.map((featured, index) => ({ id: index, featured }));
+describe("selectSelectedWork (D-18)", () => {
+  const list = (flags: boolean[]) => flags.map((showOnHome, id) => ({ id, showOnHome }));
 
-  it("takes the first 3 featured for the hero panel (E-03)", () => {
-    const { heroPanel } = selectHomepageProjects(list([true, false, true, true, true]));
-    expect(heroPanel.map((p) => p.id)).toEqual([0, 2, 3]);
+  it("takes the show_on_home projects in the given order, at most 5", () => {
+    const picked = selectSelectedWork(list([true, false, true, true, true, true, true]));
+    expect(picked.map((p) => p.id)).toEqual([0, 2, 3, 4, 5]);
   });
 
-  it("takes the first 6 published for the grid, regardless of featured", () => {
-    const { grid, total } = selectHomepageProjects(list(Array(8).fill(false)));
+  it("E-25: none switched on gives an empty list", () => {
+    expect(selectSelectedWork(list([false, false]))).toEqual([]);
+    expect(selectSelectedWork([])).toEqual([]);
+  });
+});
+
+describe("selectHomepageProjects (v1 homepage until T-29/T-30)", () => {
+  const list = (items: [boolean, string | null][]) =>
+    items.map(([showOnHome, liveUrl], id) => ({ id, showOnHome, liveUrl }));
+
+  it("hero panel: the first 3 of Selected work that have a site", () => {
+    const { heroPanel } = selectHomepageProjects(
+      list([
+        [true, "https://a.example"],
+        [true, null],
+        [false, "https://b.example"],
+        [true, "https://c.example"],
+        [true, "https://d.example"],
+        [true, "https://e.example"],
+      ]),
+    );
+    expect(heroPanel.map((p) => p.id)).toEqual([0, 3, 4]);
+  });
+
+  it("grid: the first 6 published, plus the total", () => {
+    const { grid, total } = selectHomepageProjects(
+      list(Array.from({ length: 8 }, () => [false, null])),
+    );
     expect(grid).toHaveLength(6);
     expect(total).toBe(8);
   });
 
-  it("handles no projects and no featured projects (E-01, E-21)", () => {
+  it("handles no projects (E-01)", () => {
     expect(selectHomepageProjects([])).toEqual({ heroPanel: [], grid: [], total: 0 });
-    expect(selectHomepageProjects(list([false, false])).heroPanel).toEqual([]);
   });
 });
 

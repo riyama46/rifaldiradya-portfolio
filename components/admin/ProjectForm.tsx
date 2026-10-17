@@ -503,11 +503,11 @@ export function ProjectForm(props: ProjectFormProps) {
 
         <div className="grid gap-5">
           <Toggle
-            id="featured"
-            label={fieldLabels.featured}
-            description={t.help.featured}
-            checked={values.featured}
-            onChange={(checked) => set("featured", checked)}
+            id="show_on_home"
+            label={fieldLabels.show_on_home}
+            description={t.help.show_on_home}
+            checked={values.show_on_home}
+            onChange={(checked) => set("show_on_home", checked)}
           />
           <Toggle
             id="published"
