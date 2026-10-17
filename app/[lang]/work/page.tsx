@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { EmptyState } from "@/components/site/EmptyState";
 import { JsonLd } from "@/components/site/JsonLd";
+import { MailtoLink } from "@/components/site/MailtoLink";
 import { ProjectGrid } from "@/components/site/ProjectGrid";
 import { Footer } from "@/components/site/Footer";
 import { SiteBar } from "@/components/site/SiteBar";
-import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/i18n/server";
-import { mailtoHref } from "@/lib/site-config";
 import { toPublicProject } from "@/lib/projects/public";
 import { getPublishedProjects } from "@/lib/projects/queries";
 import { workJsonLd } from "@/lib/seo/jsonld";
@@ -43,17 +42,13 @@ export default async function WorkPage({ params }: PageProps<"/[lang]/work">) {
                 <ProjectGrid projects={projects} dict={dict} priorityFirst />
                 <div className="mt-12 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-border pt-8">
                   <p className="text-card font-semibold">{dict.workPage.cta}</p>
-                  <Button
-                    href={mailtoHref(dict.email.subject)}
-                    data-track="contact_email_click"
-                    data-location="work_page"
-                  >
-                    {dict.cta.button}
-                  </Button>
+                  <MailtoLink dict={dict} kind="project" location="work_contact" variant="primary">
+                    {dict.ct.project}
+                  </MailtoLink>
                 </div>
               </>
             ) : (
-              <EmptyState dict={dict} trackLocation="work_page" />
+              <EmptyState dict={dict} location="work_contact" />
             )}
           </div>
         </Container>

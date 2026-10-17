@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { EmptyState } from "@/components/site/EmptyState";
-import { SectionHeader } from "@/components/site/SectionHeader";
 import { Container } from "@/components/ui/Container";
 import type { Dictionary } from "@/i18n";
 
@@ -10,19 +9,16 @@ type SelectedWorkProps = {
   children?: ReactNode;
 };
 
-// App Flow S-01 section 3. `#work` is the target of the hero "See the Work" button.
+// v1 project grid with the v2 chapter label, until T-30 pins Selected work. `#work` is the
+// target of the hero "Scroll ↓" link.
 export function SelectedWork({ dict, children }: SelectedWorkProps) {
   return (
     <section id="work" aria-labelledby="work-title" className="scroll-mt-14 py-16 lg:py-24">
       <Container>
-        <SectionHeader
-          number="02"
-          label={dict.label.work}
-          title={dict.work.featuredTitle}
-          titleId="work-title"
-          className="mb-8"
-        />
-        {children ?? <EmptyState dict={dict} />}
+        <h2 id="work-title" className="ch-label mb-8">
+          {dict.work.h}
+        </h2>
+        {children ?? <EmptyState dict={dict} location="contact" />}
       </Container>
     </section>
   );

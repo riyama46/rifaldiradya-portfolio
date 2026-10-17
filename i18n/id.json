@@ -2,7 +2,6 @@
   "nav": {
     "work": "Karya",
     "about": "Tentang",
-    "email": "Kirim email",
     "skip": "Lewati ke konten",
     "label": "Utama"
   },
@@ -13,18 +12,17 @@
     "toDark": "Ganti ke mode gelap",
     "toLight": "Ganti ke mode terang"
   },
+  "cta": "Kirim email",
   "hero": {
-    "title": "Landing Page Siap Pakai dalam Hitungan <em>Hari</em>, Bukan Minggu",
-    "subtitle": "Saya bikin landing page dari brief sampai live, cepat dan rapi. Butuh dashboard atau web app yang lebih kompleks? Saya juga bisa bantu.",
-    "ctaPrimary": "Lihat Hasil Kerja",
-    "ctaSecondary": "Kirim Brief via Email",
-    "proofLabel": "Karya terbaru",
-    "proofAria": "Lihat {title} (buka di tab baru)"
-  },
-  "meta": {
-    "available": "Menerima project baru",
-    "location": "Berbasis di Indonesia",
-    "remote": "Kerja remote"
+    "role": "Software engineer · Full-stack .NET",
+    "loc": "Jabodetabek",
+    "open": "Terbuka untuk posisi full-time dan proyek",
+    "l1": "Membangun software HR",
+    "l2": "untuk <em>ribuan karyawan.</em>",
+    "sub": "Empat tahun membangun dan menjaga sistem HR 13 perusahaan grup Panasonic: ratusan pengguna HR, ribuan data karyawan.",
+    "stack": "Stack",
+    "scroll": "Gulir ↓",
+    "avatarAlt": "Rifaldi Radya Pratama"
   },
   "seo": {
     "siteName": "Rifaldi Radya Pratama",
@@ -42,39 +40,8 @@
       "description": "Cara rifaldiradya.com menangani cookie analitik, pilihan bahasa, dan email. Tanpa akun, tanpa formulir, tanpa pelacakan tanpa izin."
     }
   },
-  "slider": {
-    "pause": "Jeda slideshow",
-    "play": "Putar slideshow"
-  },
-  "label": {
-    "services": "Layanan",
-    "work": "Hasil Kerja",
-    "about": "Tentang",
-    "contact": "Kontak"
-  },
-  "services": {
-    "title": "Yang saya kerjakan",
-    "primary": {
-      "badge": "Fokus utama",
-      "title": "Landing Page Development",
-      "desc": "Cepat, fokus konversi, siap tayang dalam hitungan hari."
-    },
-    "secondary": {
-      "badge": "Untuk proyek lebih besar",
-      "title": "Web App & Dashboard",
-      "desc": "Untuk kebutuhan yang lebih kompleks dari sekadar landing page."
-    }
-  },
-  "steps": {
-    "1": "Brief",
-    "2": "Pengerjaan",
-    "3": "Live",
-    "1d": "Kamu kirim tujuannya",
-    "2d": "Saya desain dan coding",
-    "3d": "Online, siap dibagikan"
-  },
   "work": {
-    "featuredTitle": "Karya pilihan",
+    "h": "Karya pilihan",
     "viewAll": "Lihat semua karya",
     "viewAllCount": "Lihat semua karya ({n})",
     "empty": "Karya baru sedang disiapkan. Sementara itu, ceritakan kebutuhanmu."
@@ -91,29 +58,66 @@
     "visitAria": "Lihat {title} (buka di tab baru)"
   },
   "about": {
-    "title": "Siapa yang akan bekerja denganmu",
-    "lead": "Saya Rifaldi, web developer yang <strong>sehari-hari bekerja full-time membangun website</strong>, dan menerima project landing page freelance untuk founder dan bisnis kecil.",
-    "body": "Cara kerja saya sederhana: terima brief, ubah jadi <strong>halaman yang cepat dan rapi</strong>, lalu <strong>tayang dalam hitungan hari, bukan minggu</strong>. Kamu berurusan dengan satu orang dari pesan pertama sampai launch, jadi tidak ada yang hilang di antara desainer, developer, dan project manager."
+    "h": "Tentang",
+    "s": "Saya membangun sistem yang menjalankan perusahaan: absensi, lembur, payroll.",
+    "p1": "Saya satu dari tiga developer di sistem HR yang dipakai 13 perusahaan grup Panasonic. Enam di antaranya saya pegang sendiri, mulai dari analisis kebutuhan, estimasi, pengembangan, sampai instalasi di server mereka. Saya juga melatih pengguna di setiap rollout, menyiapkan dokumen audit SOX, dan membimbing anak magang.",
+    "p2": "Sebelum coding, saya editor video. Saya kuliah informatika di IPB dan Telkom University, dan sekarang menempuh Magister Manajemen SDM dengan tesis tentang presenteeism, work-life balance, dan burnout.",
+    "edu": "Pendidikan",
+    "education": [
+      "<strong>S1 Informatika</strong>, Telkom University, 2022",
+      "<strong>D3 Manajemen Informatika</strong>, IPB University, 2018",
+      "<strong>Magister Manajemen, SDM</strong>, Universitas Pancasila, target lulus 2027"
+    ],
+    "cert": "Sertifikasi",
+    "certs": [
+      "<strong>Junior Web Programmer</strong>, BNSP, 2019",
+      "<strong>UI/UX Design Bootcamp</strong>, Digital Skola, 2022"
+    ]
   },
-  "facts": {
-    "basedLabel": "Berbasis di",
-    "based": "Indonesia ({timezone})",
-    "workLabel": "Bekerja dengan",
-    "work": "Klien dari mana saja, secara remote",
-    "focusLabel": "Fokus",
-    "focus": "Landing page, web app & dashboard",
-    "langLabel": "Bahasa",
-    "lang": "Indonesia, Inggris",
-    "stackLabel": "Stack"
+  "case": {
+    "meta": "Sorotan · Panasonic · Berjalan sejak awal 2023",
+    "t": "<s>Lima password</s> jadi satu login.",
+    "st1": "password per orang",
+    "st2p": "±",
+    "st2n": "±200",
+    "st2": "staf dengan satu login",
+    "st3": "perusahaan grup di HRMS",
+    "blur": "Tampilan HRMS bersifat internal; saya bisa menunjukkannya saat wawancara."
   },
-  "cta": {
-    "title": "Punya halaman yang mau <em>diluncurkan</em>?",
-    "sub": "Kirim brief singkat: halamannya untuk apa dan kapan dibutuhkan. Saya akan balas dengan langkah selanjutnya.",
-    "button": "Kirim brief via email",
-    "or": "atau salin"
+  "bridge": {
+    "q": "Perlu sistem seperti ini di perusahaan Anda?",
+    "go": "Lanjut ke kontak ↓"
+  },
+  "ct": {
+    "label": "Kontak",
+    "h": "Ada posisi atau <em>proyek?</em>",
+    "pitch": "Sedang mencari developer full-time, atau perlu sistem HR dan aplikasi internal dibangun? Ceritakan singkat kebutuhannya, saya balas lewat email.",
+    "role": "Email soal posisi full-time",
+    "project": "Email soal proyek",
+    "linkedin": "LinkedIn ↗",
+    "github": "GitHub ↗"
+  },
+  "cv": {
+    "download": "Unduh CV (PDF)"
+  },
+  "mail": {
+    "general": {
+      "s": "Halo Rifaldi"
+    },
+    "role": {
+      "s": "Posisi full-time: ",
+      "b": "Perusahaan:\nPosisi dan tautan lowongan:\nWaktu yang cocok untuk ngobrol:\n"
+    },
+    "project": {
+      "s": "Proyek: ",
+      "b": "Yang ingin dibangun:\nTarget waktu:\nKisaran anggaran:\n"
+    },
+    "walk": {
+      "s": "Walkthrough: {title}",
+      "b": "Perusahaan:\nPosisi yang dibuka:\nWaktu yang cocok untuk ngobrol:\n"
+    }
   },
   "email": {
-    "subject": "Tanya project dari rifaldiradya.com",
     "copy": "Salin email",
     "copied": "Tersalin",
     "copyFallback": "Tekan Ctrl/Cmd+C untuk menyalin"

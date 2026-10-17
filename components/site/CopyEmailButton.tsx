@@ -12,7 +12,7 @@ type CopyEmailButtonProps = {
 
 const subscribe = () => () => {};
 
-// UF-03: only rendered once JavaScript runs (E-07), so there is never a dead button.
+// UF-03, D-17: small, Contact only. Rendered once JavaScript runs (E-07), so never a dead button.
 export function CopyEmailButton({ email, targetId, labels }: CopyEmailButtonProps) {
   const isClient = useSyncExternalStore(
     subscribe,
@@ -44,17 +44,17 @@ export function CopyEmailButton({ email, targetId, labels }: CopyEmailButtonProp
       }
       setStatus("fallback");
     }
-    // T-19: track("contact_email_click", { location: "footer", method: "copy" })
   }
 
   return (
     <span className="inline-flex items-center gap-3">
       <Button
-        variant="secondary"
+        variant="soft"
         size="sm"
         onClick={copy}
         data-track="contact_email_click"
-        data-location="footer"
+        data-kind="general"
+        data-location="contact"
         data-method="copy"
       >
         {status === "copied" ? labels.copied : labels.copy}

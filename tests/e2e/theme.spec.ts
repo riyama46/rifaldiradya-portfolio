@@ -118,8 +118,8 @@ test.describe("axe in both themes", () => {
         await page.waitForLoadState("networkidle");
         const { violations } = await new AxeBuilder({ page })
           .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-          // WCAG 2.5.3 is only broken by v1 links (HeroProofPanel, ProjectCard "Visit live site"
-          // with a longer aria-label). Both are deleted in T-29/T-30; turn the rule back on there.
+          // WCAG 2.5.3 is only broken by the v1 ProjectCard "Visit live site" link (longer
+          // aria-label). It is deleted in T-30; turn the rule back on there.
           .disableRules(["label-content-name-mismatch"])
           .analyze();
         expect(

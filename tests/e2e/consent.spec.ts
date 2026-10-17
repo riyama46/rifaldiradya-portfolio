@@ -116,7 +116,7 @@ test("events: email and project clicks are tracked after consent", async ({ page
       if ((event.target as Element).closest("a[href^='mailto:']")) event.preventDefault();
     }),
   );
-  await page.getByRole("link", { name: "Email Me About Your Project", exact: true }).click();
+  await page.locator("#top").getByRole("link", { name: "Email me" }).click();
   expect(await events(page)).toContainEqual([
     "contact_email_click",
     { location: "hero", method: "mailto", language: "en" },
@@ -147,7 +147,7 @@ test.describe("phones", () => {
     await expect(banner(page)).toBeVisible();
 
     const box = (await banner(page).boundingBox())!;
-    const cta = (await page.getByRole("link", { name: "See the Work" }).boundingBox())!;
+    const cta = (await page.locator("#top").getByRole("link", { name: "Email me" }).boundingBox())!;
     expect(box.height).toBeLessThanOrEqual(130);
     expect(cta.y + cta.height).toBeLessThanOrEqual(box.y);
 
@@ -169,10 +169,10 @@ test.describe("laptops", () => {
     await page.goto("/");
     await expect(banner(page)).toBeVisible();
 
-    const pause = page.getByRole("button", { name: "Pause slideshow" });
-    await pause.focus();
+    const cta = page.locator("#top").getByRole("link", { name: "Email me" });
+    await cta.focus();
     const cover = (await banner(page).boundingBox())!;
-    const control = (await pause.boundingBox())!;
+    const control = (await cta.boundingBox())!;
     const overlaps =
       control.y + control.height > cover.y &&
       control.x + control.width > cover.x &&

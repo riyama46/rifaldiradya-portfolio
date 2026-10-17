@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-type Variant = "primary" | "secondary" | "ghost" | "danger";
+type Variant = "primary" | "secondary" | "soft" | "ghost" | "danger";
 type Size = "icon" | "sm" | "md" | "lg";
 
 type CommonProps = {
@@ -36,6 +36,8 @@ const variants: Record<Variant, string> = {
   // Admin only (Delta SDD section 8: --color-danger is for admin errors and destructive actions).
   danger: "border-danger/45 bg-transparent text-danger hover:bg-danger/10",
   secondary: "border-text-muted bg-transparent text-text hover:bg-text/8",
+  // Second action next to a primary on public pages (option-b.html .btn.alt): an ink tint, no line.
+  soft: "border-transparent bg-text/9 text-text hover:bg-text/16",
   ghost:
     "border-transparent bg-transparent text-text underline decoration-text-muted decoration-1 underline-offset-[5px] hover:text-accent hover:decoration-accent",
 };

@@ -39,7 +39,6 @@ export const SELECTED_WORK_LIMIT = 5;
 export const STACK_LIMIT = 6;
 
 /** v1 homepage (removed in T-29/T-30): hero panel and grid sizes. */
-export const HERO_PANEL_LIMIT = 3;
 export const HOMEPAGE_GRID_LIMIT = 6;
 
 function httpsUrl(url: string | null): string | null {
@@ -125,20 +124,11 @@ export function selectSelectedWork<T extends { showOnHome: boolean }>(projects: 
 }
 
 /**
- * v1 homepage split until T-29/T-30 replace it: hero panel = first 3 of Selected work that can
- * link out; grid = first 6 published, plus the total for "View all work ({n})".
- * Input must already be published-only and in standard order.
+ * v1 homepage grid until T-30 replaces it with Selected work: the first 6 published, plus the
+ * total for "View all work ({n})". Input must already be published-only and in standard order.
  */
-export function selectHomepageProjects<T extends { showOnHome: boolean; liveUrl: string | null }>(
-  projects: readonly T[],
-) {
-  return {
-    heroPanel: selectSelectedWork(projects)
-      .filter((project) => project.liveUrl !== null)
-      .slice(0, HERO_PANEL_LIMIT),
-    grid: projects.slice(0, HOMEPAGE_GRID_LIMIT),
-    total: projects.length,
-  };
+export function selectHomepageProjects<T>(projects: readonly T[]) {
+  return { grid: projects.slice(0, HOMEPAGE_GRID_LIMIT), total: projects.length };
 }
 
 /** Grid goes to 3 columns at >=1200px only with 3+ cards (App Flow S-02, E-04). */

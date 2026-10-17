@@ -1,50 +1,87 @@
-import type { ReactNode } from "react";
-import { BylineBadge } from "@/components/site/BylineBadge";
-import { MetaRow } from "@/components/site/MetaRow";
-import { Button } from "@/components/ui/Button";
-import { Container } from "@/components/ui/Container";
+import { Fragment } from "react";
+import { ChapterDepth } from "@/components/site/ChapterDepth";
+import { MailtoLink } from "@/components/site/MailtoLink";
 import type { Dictionary } from "@/i18n";
-import type { PublicAvatar } from "@/lib/images/store";
 import { richText } from "@/i18n/rich";
-import { mailtoHref } from "@/lib/site-config";
+import type { PublicAvatar } from "@/lib/images/store";
+import { siteConfig } from "@/lib/site-config";
 
 type HeroProps = {
   dict: Dictionary;
-  /** HeroProofPanel (T-09). When absent (0 featured projects, E-21) the hero is one column. */
-  proofPanel?: ReactNode;
   /** Profile photo from the admin (S-14); null shows the initials. */
   avatar: PublicAvatar | null;
+  /** Availability switch of S-14 (D-16). */
+  availabilityOn: boolean;
 };
 
-// App Flow S-01 section 1. H1, subheadline, and panel are never faded in (would delay LCP);
-// only the highlighter animates.
-export function Hero({ dict, proofPanel, avatar }: HeroProps) {
+// Delta APP_FLOW S-01 bab 1. The H1 rises in without any opacity change (D-10): it is the LCP
+// element. No priority image here; the avatar is small with explicit dimensions.
+export function Hero({ dict, avatar, availabilityOn }: HeroProps) {
   return (
-    <section id="top" className="hero-texture pt-6 pb-16 lg:pt-18 lg:pb-28">
-      <Container
-        className={proofPanel ? "grid items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-14" : ""}
-      >
-        <div>
-          <BylineBadge avatar={avatar} />
-          <h1 className="max-w-[14ch] text-display">{richText(dict.hero.title)}</h1>
-          <p className="mt-4 max-w-[58ch] text-text-muted lg:mt-6 lg:text-body-lg">
-            {dict.hero.subtitle}
-          </p>
-          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 lg:mt-9">
-            <Button href="#work">{dict.hero.ctaPrimary}</Button>
-            <Button
-              href={mailtoHref(dict.email.subject)}
-              variant="ghost"
-              data-track="contact_email_click"
-              data-location="hero"
-            >
-              {dict.hero.ctaSecondary}
-            </Button>
+    <section id="top" data-zone="top" aria-labelledby="hero-h" className="chapter ch hero">
+      <ChapterDepth />
+      <div className="ch-inner">
+        <div className="who">
+          {avatar ? (
+            // A plain <img>: the 320/640 variants cover 1–3× screens at 44/64 px, no loader needed.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={avatar.src}
+              srcSet={avatar.srcSet}
+              sizes="(min-width: 768px) 64px, 44px"
+              width={64}
+              height={64}
+              alt={dict.hero.avatarAlt}
+              decoding="async"
+              className="who-pic"
+            />
+          ) : (
+            <div aria-hidden="true" className="who-pic who-initials">
+              {siteConfig.initials}
+            </div>
+          )}
+          <div>
+            <p className="ch-label">
+              {dict.hero.role}
+              <span className="who-loc"> · {dict.hero.loc}</span>
+            </p>
+            {availabilityOn && (
+              <p className="ch-label who-status">
+                <i aria-hidden="true" />
+                {dict.hero.open}
+              </p>
+            )}
           </div>
-          <MetaRow dict={dict} />
         </div>
-        {proofPanel}
-      </Container>
+
+        <h1 id="hero-h" className="hero-h">
+          <span className="line">{dict.hero.l1}</span>{" "}
+          <span className="line">{richText(dict.hero.l2)}</span>
+        </h1>
+
+        <div className="hero-foot">
+          <div>
+            <p className="hero-sub">{dict.hero.sub}</p>
+            <p className="hero-stack">
+              <span className="k">{dict.hero.stack}</span>
+              {siteConfig.stack.map((item) => (
+                <Fragment key={item}>
+                  {" "}
+                  <span>{item}</span>
+                </Fragment>
+              ))}
+            </p>
+          </div>
+          <div className="hero-act">
+            <MailtoLink dict={dict} kind="general" location="hero" variant="primary">
+              {dict.cta}
+            </MailtoLink>
+            <a href="#work" className="ch-label hero-scroll">
+              {dict.hero.scroll}
+            </a>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

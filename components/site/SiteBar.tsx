@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { LanguageSuggestBanner } from "@/components/overlays/LanguageSuggestBanner";
 import { LanguageToggle } from "@/components/overlays/LanguageToggle";
+import { MailtoLink } from "@/components/site/MailtoLink";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { localePath, type Dictionary, type Locale } from "@/i18n";
-import { mailtoHref, siteConfig } from "@/lib/site-config";
+import { siteConfig } from "@/lib/site-config";
 
 type SiteBarProps = {
   lang: Locale;
@@ -38,15 +39,14 @@ export function SiteBar({ lang, dict, path }: SiteBarProps) {
         </span>
         <LanguageToggle lang={lang} path={path} label={dict.language.label} />
         <ThemeToggle labels={dict.theme} className="w-9" />
-        <a
-          href={mailtoHref(dict.email.subject)}
+        <MailtoLink
+          dict={dict}
+          kind="general"
+          location="bar"
           className="bar-link text-accent hover:text-text"
-          data-track="contact_email_click"
-          data-kind="general"
-          data-location="bar"
         >
-          {dict.nav.email}
-        </a>
+          {dict.cta}
+        </MailtoLink>
       </nav>
 
       {lang === "en" && <LanguageSuggestBanner lang={lang} path={path} labels={dict.langBanner} />}
