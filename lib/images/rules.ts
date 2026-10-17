@@ -13,17 +13,17 @@ export const MAX_VARIANT_BYTES = 1024 * 1024;
 
 /**
  * thumbnail: project image, 16:10 like the cards and the hero panel.
- * avatar: the hero byline photo (S-14), a square shown at 64/72 px, stored at 160 and 320 px
- * (enough for 3× screens).
+ * avatar: the hero photo (S-14), a small square, stored at 320 and 640 px since v2.0.0 (Delta SDD
+ * section 3). Photos stored at 160/320 by v1 keep being served until replaced (E-32).
  */
 export type ImageKind = "thumbnail" | "avatar";
 
 export const KINDS = {
   thumbnail: { aspect: { width: 16, height: 10 }, minSourceWidth: 1200 },
-  avatar: { aspect: { width: 1, height: 1 }, minSourceWidth: 320 },
+  avatar: { aspect: { width: 1, height: 1 }, minSourceWidth: 640 },
 } as const satisfies Record<ImageKind, unknown>;
 
-export const AVATAR_WIDTHS = [160, 320] as const;
+export const AVATAR_WIDTHS = [320, 640] as const;
 
 export const isImageKind = (value: unknown): value is ImageKind =>
   value === "thumbnail" || value === "avatar";

@@ -55,9 +55,9 @@ export function ConfirmDialog({
         event.preventDefault(); // keep React state the source of truth
         if (!busy) onCancel();
       }}
-      className="m-auto w-[min(28rem,calc(100%-2rem))] rounded-card border border-border bg-surface-raised p-6 text-text shadow-card-hover backdrop:bg-text/40"
+      className="m-auto w-[min(28rem,calc(100%-2rem))] rounded-card border border-border bg-surface p-6 text-text shadow-lg backdrop:bg-text/40"
     >
-      <h2 id={titleId} className="font-display text-card font-semibold">
+      <h2 id={titleId} className="text-card font-semibold">
         {title}
       </h2>
       {body && (
@@ -71,7 +71,7 @@ export function ConfirmDialog({
           type="button"
           onClick={onCancel}
           disabled={busy}
-          className="inline-flex min-h-11 cursor-pointer items-center rounded-button border border-border bg-surface-raised px-3.5 font-medium hover:border-text-muted disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex min-h-11 cursor-pointer items-center rounded-button border border-border bg-surface px-3.5 font-medium hover:border-text-muted disabled:cursor-not-allowed disabled:opacity-50"
         >
           {cancelLabel}
         </button>

@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import type { PublicProject } from "@/lib/projects/public";
+type Thumbnail = { url: string; width: number; height: number; alt: string };
 
 type ProjectThumbnailProps = {
   title: string;
-  thumbnail: PublicProject["thumbnail"];
+  thumbnail: Thumbnail | null;
   sizes: string;
   priority?: boolean;
   className?: string;
@@ -15,7 +15,7 @@ type ProjectThumbnailProps = {
 /** E-05 / E-17: a surface block with the title when there is no image or it fails to load. */
 function ThumbnailPlaceholder({ title }: { title: string }) {
   return (
-    <div className="grid size-full place-items-center bg-surface p-4 text-center font-display text-card text-balance text-text-muted">
+    <div className="grid size-full place-items-center bg-surface p-4 text-center text-card text-balance text-text-muted">
       {title}
     </div>
   );

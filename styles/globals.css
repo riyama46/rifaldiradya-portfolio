@@ -1,34 +1,89 @@
 @import "tailwindcss";
 
-/* Design tokens: single source for PRD section 8. Components use these, never raw values. */
+/*
+ * Design tokens v2 (Delta PRD section 8, Delta SDD section 8). Two layers:
+ * 1. theme tokens per theme on :root; values copied from docs/design/v2/option-b.html (public) and
+ *    admin.html (--panel, --field, --ok, --warn, --danger);
+ * 2. the Tailwind mapping in @theme below. Components use the mapped utilities, never raw values.
+ * Rules: --calm is glow colour only, --faint is decorative lines only; neither is ever text.
+ */
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b0b0b;
+  --ink: #f1f1ef;
+  --soft: rgba(241, 241, 239, 0.62);
+  --faint: rgba(241, 241, 239, 0.16);
+  --accent: #7b93ff;
+  --accent-ink: #0b0b0b;
+  --calm: #d2bf9f;
+  --k: 1;
+  --avatar-ring: rgba(243, 239, 233, 0.2);
+  --dot: rgba(255, 255, 255, 0.085);
+  --panel: #121212;
+  --field: #0e0e0e;
+  --ok: #3fbf6f;
+  --warn: #e2b24a;
+  --danger: #ff6b6b;
+}
+
+/* Without JS there is no data-theme (E-07): follow the device setting, dark when it has none. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+    --bg: #f6f6f3;
+    --ink: #111111;
+    --soft: rgba(17, 17, 17, 0.64);
+    --faint: rgba(17, 17, 17, 0.14);
+    --accent: #2f4fe0;
+    --accent-ink: #ffffff;
+    --calm: #8a7152;
+    --k: 0.6;
+    --avatar-ring: rgba(17, 17, 17, 0.14);
+    --dot: rgba(17, 17, 17, 0.1);
+    --panel: #ffffff;
+    --field: #ffffff;
+    --ok: #1a7f45;
+    --warn: #a06b00;
+    --danger: #c62828;
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f6f6f3;
+  --ink: #111111;
+  --soft: rgba(17, 17, 17, 0.64);
+  --faint: rgba(17, 17, 17, 0.14);
+  --accent: #2f4fe0;
+  --accent-ink: #ffffff;
+  --calm: #8a7152;
+  --k: 0.6;
+  --avatar-ring: rgba(17, 17, 17, 0.14);
+  --dot: rgba(17, 17, 17, 0.1);
+  --panel: #ffffff;
+  --field: #ffffff;
+  --ok: #1a7f45;
+  --warn: #a06b00;
+  --danger: #c62828;
+}
+
+:root {
+  --gutter: clamp(20px, 2.8vw, 40px);
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --win: 100svh;
+}
+
 @theme {
   --color-*: initial;
-  --color-bg: oklch(98.5% 0.008 85);
-  --color-surface: oklch(96% 0.012 85);
-  --color-surface-raised: oklch(100% 0 0);
-  --color-border: oklch(88% 0.015 80);
-  --color-text: oklch(22% 0.02 60);
-  --color-text-muted: oklch(45% 0.02 60);
-  --color-accent: oklch(52% 0.15 50);
-  --color-accent-hover: oklch(47% 0.14 48);
-  --color-accent-soft: oklch(93% 0.05 75);
-  --color-on-accent: oklch(100% 0 0);
-  /* L51 instead of PRD's L55: 14px "Live" text needs 4.5:1 on bg and surface (see docs/decisions/DECISIONS.md). */
-  --color-success: oklch(51% 0.13 150);
-  --color-danger: oklch(55% 0.18 28);
 
   --breakpoint-xl: 75rem;
 
   --text-display: clamp(2.5rem, 5.4vw, 4.25rem);
   --text-display--line-height: 1.05;
   --text-display--letter-spacing: -0.03em;
-  --text-display-cta: clamp(2.25rem, 5.5vw, 3.75rem);
-  --text-display-cta--line-height: 1.08;
-  --text-display-cta--letter-spacing: -0.025em;
   --text-heading: clamp(1.75rem, 3.5vw, 2.25rem);
   --text-heading--line-height: 1.2;
-  --text-tile: clamp(1.5rem, 2.6vw, 1.875rem);
-  --text-tile--line-height: 1.2;
   --text-card: clamp(1.25rem, 1.8vw, 1.375rem);
   --text-card--line-height: 1.3;
   --text-lead: clamp(1.25rem, 2.2vw, 1.625rem);
@@ -43,27 +98,29 @@
   --text-eyebrow--line-height: 1.4;
   --text-eyebrow--letter-spacing: 0.08em;
 
-  --radius-card: 12px;
-  --radius-button: 10px;
-
-  --shadow-card:
-    0 1px 2px oklch(40% 0.04 60 / 0.06), 0 4px 12px oklch(40% 0.04 60 / 0.06),
-    0 12px 32px oklch(40% 0.04 60 / 0.05);
-  --shadow-card-hover:
-    0 2px 4px oklch(40% 0.04 60 / 0.06), 0 8px 20px oklch(40% 0.04 60 / 0.08),
-    0 20px 48px oklch(40% 0.04 60 / 0.07);
+  --radius-card: 6px;
+  /* Public buttons are 3px (option-b.html); .admin-shell overrides it to 6px (admin.html). */
+  --radius-button: 3px;
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-pulse: cubic-bezier(0.2, 0.6, 0.35, 1);
 }
 
 @theme inline {
-  --font-sans: var(--font-plex-sans), system-ui, sans-serif;
-  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
-}
+  --color-bg: var(--bg);
+  --color-surface: var(--panel);
+  --color-field: var(--field);
+  --color-text: var(--ink);
+  --color-text-muted: var(--soft);
+  --color-border: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-hover: color-mix(in srgb, var(--accent) 86%, var(--ink));
+  --color-on-accent: var(--accent-ink);
+  /* Admin only (status text and destructive actions). */
+  --color-success: var(--ok);
+  --color-warning: var(--warn);
+  --color-danger: var(--danger);
 
-:root {
-  --slide-ms: 6000ms;
+  --font-sans: var(--font-archivo), "Helvetica Neue", Arial, sans-serif;
 }
 
 @layer base {
@@ -83,8 +140,14 @@
     font-family: var(--font-sans);
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
+    caret-color: var(--color-accent);
+    accent-color: var(--color-accent);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* O-04: theme change fades over 300ms; reduced motion switches instantly (rule below). */
+    transition:
+      background-color 300ms var(--ease),
+      color 300ms var(--ease);
   }
 
   @media (min-width: 64rem) {
@@ -96,9 +159,16 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-display);
     font-weight: 600;
     text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    text-underline-offset: 0.2em;
   }
 
   :focus-visible {
@@ -107,18 +177,8 @@
   }
 
   ::selection {
-    background-color: var(--color-accent-soft);
-    color: var(--color-text);
-  }
-
-  mark {
-    color: inherit;
-    padding-inline: 0.1em;
-    margin-inline: -0.1em;
-    background: linear-gradient(to top, var(--color-accent-soft) 0 42%, transparent 42%) no-repeat
-      left bottom / 100% 100%;
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -133,284 +193,1636 @@
 }
 
 @layer components {
-  /* Highlighter behind a keyword; rendered by richText() for <hl>. */
-  .hl {
-    position: relative;
-    z-index: 0;
-    white-space: nowrap;
+  /* Accent word in a heading: rendered by richText() for <em> (one per heading). */
+  em.ac {
+    font-style: italic;
+    font-weight: 600;
+    color: var(--color-accent);
   }
 
-  .hl::before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    inset: 0.42em -0.1em 0.04em -0.08em;
-    border-radius: 3px;
-    background: var(--color-accent-soft);
-    transform: skew(-10deg) rotate(-1.2deg);
-    transform-origin: left center;
+  /* Admin is dense work UI (admin.html): 16px body at every width, not the public 18px. */
+  .admin-shell {
+    --radius-button: 6px;
+    font-size: 1rem;
+    line-height: 1.5;
   }
 
-  .hl-on-load .hl::before {
-    animation: hl-draw 700ms var(--ease-out) 250ms both;
-  }
+  /* ---------- Public shell (Delta App Flow G2, option-b.html .bar/.progress/.depth/.foot) ---------- */
 
-  .dim {
-    color: var(--color-text-muted);
-  }
-
-  /* Sticky navbar. Its box never changes height (no layout shift); on scroll the background
-     scales down and the row nudges up, which reads as "shrinking" (PRD section 8). */
-  .site-header {
-    isolation: isolate;
+  /* Fixed bar over the chapters. The scrim fades into the page instead of drawing an edge; it
+     takes no clicks, only the links and buttons do. */
+  .site-bar {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px var(--gutter) 20px;
+    /* Lint "gradient" defended: neutral scrim into the page, no hard edge (option-b.html). */
+    background: linear-gradient(to bottom, var(--bg) 55%, transparent);
     pointer-events: none;
   }
 
-  .site-header::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: color-mix(in oklab, var(--color-bg) 92%, transparent);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid transparent;
-    transform-origin: top;
-  }
-
-  .site-header a,
-  .site-header button {
+  .site-bar a,
+  .site-bar button {
     pointer-events: auto;
   }
 
-  /* Faint 32px grid behind the hero, fading out towards the edges (PRD signature motif). */
-  .hero-texture {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
+  .site-bar-name {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    border-radius: 2px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
   }
 
-  .hero-texture::before {
+  .site-bar-nav {
+    display: flex;
+    align-items: center;
+    gap: clamp(10px, 2.4vw, 32px);
+  }
+
+  /* Bar labels: 13px uppercase, 44px tall touch target through the vertical padding. */
+  .bar-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    border-radius: 2px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: color 200ms var(--ease);
+  }
+
+  .bar-link:hover,
+  .bar-link[aria-current="page"] {
+    color: var(--color-accent);
+  }
+
+  /* EN|ID: the current language is ink with an accent line under it. */
+  .lang-link[aria-current="true"] {
+    color: var(--color-text);
+  }
+
+  .lang-link[aria-current="true"]::after {
     content: "";
     position: absolute;
-    inset: 0 0 -120px;
-    z-index: -1;
-    pointer-events: none;
-    background-image:
-      linear-gradient(
-        to right,
-        color-mix(in oklab, var(--color-border) 55%, transparent) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        to bottom,
-        color-mix(in oklab, var(--color-border) 55%, transparent) 1px,
-        transparent 1px
-      );
-    background-size: 32px 32px;
-    background-position: -1px -1px;
-    mask-image: radial-gradient(ellipse 90% 75% at 70% 35%, #000 20%, transparent 75%);
+    left: 6px;
+    right: 6px;
+    bottom: 8px;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--color-accent);
   }
 
-  /* HeroProofPanel (App Flow S-01): stacked back card, crossfading slides, CSS-timed progress. */
-  .proof-stack::before {
-    content: "";
+  .scroll-progress {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 60;
+    height: 2px;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    pointer-events: none;
+  }
+
+  /* A chapter holds a depth layer under its content and is its own view timeline. */
+  .chapter {
+    position: relative;
+    overflow: clip;
+    isolation: isolate;
+    view-timeline: --ch block;
+  }
+
+  .chapter > :not(.depth) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .depth {
     position: absolute;
     inset: 0;
-    transform: translate(10px, -10px);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-card);
-    background: var(--color-surface);
+    z-index: 0;
+    pointer-events: none;
+    /* Lint "gradient" defended: edge mask, not a fill. */
+    mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
   }
 
-  .proof-slide {
-    opacity: 0;
+  .depth-layer {
+    position: absolute;
+    inset: -20% 0;
+  }
+
+  .depth-dots {
+    position: absolute;
+    inset: 0;
+    /* Lint "gradient" defended: dot pattern Pal asked for (D-08). */
+    background-image: radial-gradient(var(--dot) 1.2px, transparent 1.8px);
+    background-size: 32px 32px;
+  }
+
+  .depth-glow {
+    position: absolute;
+    left: var(--gx, 70%);
+    top: var(--gy, 40%);
+    width: 70vmax;
+    height: 70vmax;
+    margin: -35vmax 0 0 -35vmax;
+    border-radius: 50%;
+    /* Lint "gradient" defended: chapter light Pal asked for (D-08). */
+    background: radial-gradient(circle, var(--glow, transparent), transparent 62%);
+  }
+
+  /* Light per chapter (data-zone); --k softens it in the light theme. */
+  [data-zone="top"] {
+    --gx: 88%;
+    --gy: 30%;
+    --glow: color-mix(in srgb, var(--accent) calc(14% * var(--k)), transparent);
+  }
+
+  [data-zone="work"],
+  [data-zone="all"] {
+    --gx: 12%;
+    --gy: 55%;
+    --glow: color-mix(in srgb, var(--accent) calc(24% * var(--k)), transparent);
+  }
+
+  [data-zone="about"] {
+    --gx: 8%;
+    --gy: 70%;
+    --glow: color-mix(in srgb, var(--calm) calc(9% * var(--k)), transparent);
+  }
+
+  [data-zone="highlight"] {
+    --gx: 86%;
+    --gy: 64%;
+    --glow: color-mix(in srgb, var(--accent) calc(17% * var(--k)), transparent);
+  }
+
+  [data-zone="contact"],
+  [data-zone="more"] {
+    --gx: 30%;
+    --gy: 24%;
+    --glow: color-mix(in srgb, var(--accent) calc(26% * var(--k)), transparent);
+  }
+
+  .site-foot {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 24px;
+    padding: 24px var(--gutter) 32px;
+    font-size: 14px;
+    color: var(--color-text-muted);
+  }
+
+  .foot-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: color 200ms var(--ease);
+  }
+
+  .foot-link:hover {
+    color: var(--color-text);
+  }
+
+  /* ---------- Chapters (Delta APP_FLOW S-01, option-b.html .ch/.hero/.statement/.contact) ---------- */
+
+  /* Chapter labels: 13px uppercase, the look chosen in option-b.html (.label). */
+  .ch-label {
+    font-size: 13px;
+    line-height: 1.6;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  /* One screen per chapter, snapped at its top. Long text may make a chapter taller (E-20). */
+  .ch {
+    min-height: var(--win);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 104px var(--gutter) 72px;
+    scroll-snap-align: start;
+  }
+
+  .ch-inner {
+    width: 100%;
+  }
+
+  .line-link {
+    display: inline-block;
+    padding: 10px 0;
+    /* Lint "hairline" defended: the underline is the link affordance (option-b.html). */
+    border-bottom: 1px solid var(--color-text-muted);
+    transition:
+      border-color 200ms var(--ease),
+      color 200ms var(--ease);
+  }
+
+  .line-link:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  /* Hero */
+  .hero {
+    justify-content: flex-end;
+    padding-bottom: 64px;
+  }
+
+  .who {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .who-pic {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    object-fit: cover;
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    /* A 1px ring that separates the photo from the ground, not a shadow. */
+    box-shadow: 0 0 0 1px var(--avatar-ring);
+  }
+
+  .who-initials {
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .who-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .who-status i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-success);
+  }
+
+  .hero-h {
+    font-size: clamp(52px, 8.2vw, 132px);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    font-weight: 600;
+  }
+
+  .hero-h .line {
+    display: block;
+    white-space: nowrap;
+  }
+
+  .hero-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    margin-top: 56px;
+  }
+
+  .hero-sub {
+    max-width: 34ch;
+    color: var(--color-text-muted);
+    font-size: 18px;
+    line-height: 1.55;
+  }
+
+  .hero-stack {
+    margin-top: 20px;
+    color: var(--color-text-muted);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .hero-stack span {
+    white-space: nowrap;
+  }
+
+  .hero-stack .k {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  .hero-stack span + span::before {
+    content: "·";
+    margin: 0 10px;
+    opacity: 0.6;
+  }
+
+  .hero-act {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .hero-scroll {
+    white-space: nowrap;
+    padding: 14px 0;
+    transition: color 200ms var(--ease);
+  }
+
+  .hero-scroll:hover {
+    color: var(--color-text);
+  }
+
+  /* Selected work (option-b.html .work): a plain stacked list; pinned steps live in @supports. */
+  .work {
+    position: relative;
+  }
+
+  .work-stage {
+    position: relative;
+    overflow: clip;
+    isolation: isolate;
+    padding: 0 var(--gutter);
+  }
+
+  .work-stage > :not(.depth) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .work-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-top: 104px;
+  }
+
+  .work-count {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cn {
+    display: inline-grid;
+  }
+
+  .cn b {
+    grid-area: 1 / 1;
+    font-weight: inherit;
+  }
+
+  .cn b + b {
     visibility: hidden;
-    transform: scale(1.015);
-    transition:
-      opacity 450ms var(--ease-out),
-      transform 600ms var(--ease-out),
-      visibility 0s 450ms;
   }
 
-  .proof-slide.is-active {
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    transition:
-      opacity 450ms var(--ease-out),
-      transform 600ms var(--ease-out),
-      visibility 0s;
+  .proj {
+    min-height: var(--win);
+    display: flex;
+    align-items: center;
+    padding: 72px 0;
+    scroll-snap-align: start;
   }
 
-  .proof-fill {
+  .proj-pin {
+    width: 100%;
+  }
+
+  .proj-label {
+    margin-bottom: 20px;
+  }
+
+  .wt {
+    font-size: clamp(56px, 9vw, 150px);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  .wt-a {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.06em;
+    border-radius: 2px;
+  }
+
+  /* D-06: an accent line sweeps in from the left, the arrow slides in. */
+  .wt-a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0.04em;
+    min-height: 2px;
+    border-radius: 1px;
+    background: var(--color-accent);
     transform: scaleX(0);
-    transform-origin: left center;
-    animation: proof-fill var(--slide-ms) linear forwards;
+    transform-origin: 0 50%;
+    transition: transform 550ms var(--ease);
   }
 
-  .hero-proof:hover .proof-fill,
-  .hero-proof:focus-within .proof-fill,
-  .hero-proof.is-paused .proof-fill {
-    animation-play-state: paused;
+  .wt-a .go {
+    display: inline-block;
+    margin-left: 0.33em;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 0.42em;
+    color: var(--color-accent);
+    opacity: 0;
+    transform: translateX(-0.5em);
+    transition:
+      opacity 250ms var(--ease),
+      transform 450ms var(--ease);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .proof-fill {
-      transform: scaleX(1);
+  .wt-a:hover::after,
+  .wt-a:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  .wt-a:hover .go,
+  .wt-a:focus-visible .go {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (hover: none) {
+    .wt-a .go {
+      opacity: 0.7;
+      transform: none;
     }
   }
 
-  .fade-in {
-    animation: fade-in 200ms var(--ease-out);
+  .wd {
+    margin-top: 28px;
+    max-width: 40ch;
+    color: var(--color-text-muted);
+    font-size: clamp(18px, 1.5vw, 22px);
+    line-height: 1.5;
+    text-wrap: pretty;
   }
 
-  /* Pulsing ring for StatusDot; transform/opacity only so it stays on the compositor. */
-  .status-dot::after {
+  .proj-links {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 32px;
+  }
+
+  .has-pic {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 56px;
+    align-items: center;
+  }
+
+  .has-pic .wt {
+    font-size: clamp(48px, 5vw, 88px);
+  }
+
+  .shot {
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+  }
+
+  .shot .pic {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    max-height: 52svh;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  /* E-17: the title block when the screenshot fails to load. */
+  .shot > div {
+    aspect-ratio: 16 / 10;
+  }
+
+  .work-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    padding: 8px 0 28px;
+  }
+
+  .work-foot > .line-link {
+    flex: none;
+    white-space: nowrap;
+  }
+
+  /* The rail only steers the pinned steps; the plain list has no step targets (E-30). */
+  .rail {
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+    gap: 4px 28px;
+    font-size: 15px;
+  }
+
+  .rail a {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    color: var(--color-text-muted);
+    transition: color 200ms var(--ease);
+  }
+
+  .rail a::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  .rail a:hover {
+    color: var(--color-text);
+  }
+
+  .marks {
+    display: none;
+  }
+
+  @media (max-width: 767px) {
+    .work-head {
+      padding-top: 88px;
+    }
+
+    .wt {
+      font-size: 15vw;
+    }
+
+    .has-pic {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 24px;
+    }
+
+    .has-pic .shot {
+      order: -1;
+    }
+
+    .shot .pic {
+      max-height: none;
+    }
+
+    .has-pic .wt {
+      font-size: 12vw;
+    }
+
+    .work-foot {
+      justify-content: flex-start;
+      padding-bottom: 20px;
+    }
+  }
+
+  /* About */
+  .statement {
+    margin-top: 20px;
+    max-width: 22ch;
+    font-size: clamp(34px, 4.2vw, 64px);
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+    font-weight: 500;
+  }
+
+  .split2 {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 40px var(--gutter);
+    align-items: start;
+  }
+
+  .about-body {
+    max-width: 46ch;
+    color: var(--color-text-muted);
+  }
+
+  .about-body p + p {
+    margin-top: 18px;
+  }
+
+  .facts {
+    display: grid;
+    gap: 10px;
+    color: var(--color-text-muted);
+    font-size: 16px;
+  }
+
+  .facts ul {
+    display: grid;
+    gap: 10px;
+  }
+
+  .facts ul + h3 {
+    margin-top: 14px;
+  }
+
+  .facts strong {
+    font-weight: 500;
+  }
+
+  /* Highlight: <s> is drawn as an accent line; the end state (dimmed, struck) is the default. */
+  .strike s {
+    position: relative;
+    white-space: nowrap;
+    text-decoration: none;
+    color: var(--color-text-muted);
+  }
+
+  .strike s::after {
     content: "";
     position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: var(--color-success);
-    animation: pulse-ring 2.2s var(--ease-pulse) infinite;
+    left: -0.04em;
+    right: -0.04em;
+    top: 56%;
+    height: 0.07em;
+    border-radius: 0.04em;
+    background: var(--color-accent);
+    transform-origin: 0 50%;
+  }
+
+  .stats {
+    margin-top: 56px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px 88px;
+  }
+
+  .stats b {
+    display: block;
+    font-size: clamp(52px, 6vw, 104px);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stats p > span {
+    display: block;
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--color-text-muted);
+  }
+
+  .num {
+    --n: var(--to);
+    counter-reset: n var(--n);
+    font-style: normal;
+  }
+
+  .num::after {
+    content: counter(n);
+  }
+
+  .note {
+    margin-top: 40px;
+    font-size: 15px;
+    color: var(--color-text-muted);
+  }
+
+  .bridge {
+    margin-top: 48px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 20px;
+    font-size: clamp(18px, 1.5vw, 22px);
+  }
+
+  .bridge .line-link {
+    color: var(--color-accent);
+    border-color: currentColor;
+  }
+
+  .bridge .line-link:hover {
+    color: var(--color-text);
+  }
+
+  /* Contact */
+  .contact {
+    padding-top: 140px;
+  }
+
+  .talk {
+    margin-top: 20px;
+    max-width: 14ch;
+    font-size: clamp(56px, 8vw, 128px);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    font-weight: 600;
+  }
+
+  .pitch {
+    margin-top: 32px;
+    max-width: 46ch;
+    color: var(--color-text-muted);
+    font-size: clamp(18px, 1.5vw, 22px);
+    line-height: 1.5;
+  }
+
+  .acts {
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .reach {
+    margin-top: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 36px;
+    font-size: 17px;
+  }
+
+  .reach-mail {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 16px;
+  }
+
+  .clock {
+    margin-top: 20px;
+    color: var(--color-text-muted);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 767px) {
+    .ch {
+      padding: 88px var(--gutter) 56px;
+    }
+
+    /* Hero: centred, the headline carries the screen; the label steps back. */
+    .hero {
+      justify-content: center;
+      padding: 96px var(--gutter) 48px;
+    }
+
+    .who {
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .who-pic {
+      width: 44px;
+      height: 44px;
+      font-size: 16px;
+    }
+
+    .who .ch-label {
+      letter-spacing: 0.02em;
+      text-transform: none;
+      line-height: 1.45;
+    }
+
+    .who-loc {
+      display: none;
+    }
+
+    .hero-h {
+      font-size: 13.6vw;
+      line-height: 0.96;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-h .line {
+      white-space: normal;
+    }
+
+    .hero-foot {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 28px;
+      margin-top: 32px;
+    }
+
+    .hero-sub {
+      font-size: 17px;
+    }
+
+    .hero-stack {
+      margin-top: 14px;
+      font-size: 14px;
+    }
+
+    .hero-scroll {
+      display: none;
+    }
+
+    .statement {
+      font-size: 9vw;
+    }
+
+    .split2 {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      margin-top: 36px;
+    }
+
+    .stats {
+      margin-top: 36px;
+      gap: 24px 40px;
+    }
+
+    .stats b {
+      font-size: 13vw;
+    }
+
+    .bridge {
+      margin-top: 36px;
+    }
+
+    .contact {
+      padding-top: 104px;
+    }
+
+    .talk {
+      font-size: 13vw;
+    }
+
+    .acts {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  /* Short phones (375 × 667): the hero starts under the bar and tightens, so role, H1 and
+     "Email me" stay above the cookie banner (AC-1). option-b.html has no banner to fit. */
+  @media (max-width: 767px) and (max-height: 740px) {
+    .hero {
+      justify-content: flex-start;
+      padding-top: 76px;
+      padding-bottom: 32px;
+    }
+
+    .who {
+      margin-bottom: 16px;
+    }
+
+    .hero-foot {
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .hero-stack {
+      margin-top: 10px;
+    }
   }
 }
 
-@keyframes hl-draw {
-  from {
-    transform: skew(-10deg) rotate(-1.2deg) scaleX(0);
+/* ---------- Work page (Delta APP_FLOW S-02, option-b.html .workpage/.filters/.row/.cols) ---------- */
+@layer components {
+  .workpage {
+    justify-content: flex-start;
+    padding-top: 140px;
+    scroll-snap-align: none;
   }
-  to {
-    transform: skew(-10deg) rotate(-1.2deg) scaleX(1);
+
+  .wp-title {
+    font-size: clamp(96px, 15vw, 232px);
+    line-height: 0.88;
+    letter-spacing: -0.05em;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Lint "numbering" defended: the published project count next to the H1 (S-02 step 1). */
+  .wp-title sup {
+    position: relative;
+    top: -2.6em;
+    margin-left: 0.35em;
+    font-size: 0.14em;
+    letter-spacing: 0;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+  }
+
+  .wp-sub {
+    margin-top: 32px;
+    max-width: 46ch;
+    color: var(--color-text-muted);
+    font-size: clamp(18px, 1.5vw, 22px);
+    line-height: 1.5;
+  }
+
+  .filters {
+    margin-top: 48px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .filters button {
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ink) 8%, transparent);
+    color: var(--color-text-muted);
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color 200ms var(--ease),
+      color 200ms var(--ease);
+  }
+
+  .filters button:hover {
+    color: var(--color-text);
+  }
+
+  .filters button[aria-pressed="true"] {
+    background: var(--color-text);
+    color: var(--color-bg);
+  }
+
+  .filters .fc {
+    margin-left: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rows[data-filter="panasonic"] .row:not([data-group="panasonic"]),
+  .rows[data-filter="web"] .row:not([data-group="web"]),
+  .rows[data-filter="ai"] .row:not([data-group="ai"]) {
+    display: none;
+  }
+
+  /* Lint "hairline" defended: rules between the rows of a real list (option-b.html). The top rule
+     sits on the list and each row draws its bottom one, so a filtered list still closes. */
+  .rows {
+    margin-top: 40px;
+    border-top: 1px solid var(--faint); /* taste-skill-ignore: rows of a real list */
+  }
+
+  .row {
+    border-bottom: 1px solid var(--faint); /* taste-skill-ignore */
+  }
+
+  /* The hash target and the row JS scrolls to: clear of the sticky bar. */
+  .case {
+    scroll-margin-top: 88px;
+  }
+
+  .row-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto 150px 28px;
+    align-items: center;
+    gap: 24px;
+    padding: clamp(24px, 2.6vw, 40px) 0;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .row-head::-webkit-details-marker {
+    display: none;
+  }
+
+  .row-t {
+    grid-area: 1 / 1;
+    font-size: clamp(36px, 5vw, 80px);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    font-weight: 500;
+    text-wrap: balance;
+    transition:
+      transform 400ms var(--ease),
+      color 200ms var(--ease);
+  }
+
+  .row-m {
+    grid-area: 1 / 2;
+    color: var(--color-text-muted);
+    font-size: 15px;
+    text-align: right;
+  }
+
+  .row-y {
+    grid-area: 1 / 3;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pm {
+    grid-area: 1 / 4;
+    position: relative;
+    justify-self: end;
+    width: 20px;
+    height: 20px;
+  }
+
+  .pm::before,
+  .pm::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1.5px;
+    margin-top: -0.75px;
+    background: currentColor;
+    transition: transform 300ms var(--ease);
+  }
+
+  .pm::after {
+    transform: rotate(90deg);
+  }
+
+  .case[open] .pm::after {
+    transform: rotate(0deg);
+  }
+
+  .row-head:hover .row-t,
+  .row-head:focus-visible .row-t,
+  .case[open] .row-t {
+    transform: translateX(14px);
+    color: var(--color-accent);
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 24px;
+    padding: 4px 0 48px;
+  }
+
+  .cols .ch-label {
+    margin-bottom: 10px;
+  }
+
+  .cols .val,
+  .cols li {
+    font-size: 17px;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+
+  .cols li {
+    color: var(--color-text-muted);
+  }
+
+  .cols ul {
+    padding-left: 1.1em;
+    list-style: disc;
+  }
+
+  .cols li + li {
+    margin-top: 6px;
+  }
+
+  .cols .val + .ch-label {
+    margin-top: 20px;
+  }
+
+  .case-act {
+    margin-top: 20px;
+  }
+
+  .work-empty {
+    margin-top: 48px;
+    max-width: 46ch;
+    font-size: clamp(18px, 1.5vw, 22px);
+    line-height: 1.5;
+  }
+
+  .work-empty .line-link {
+    margin-top: 16px;
+    font-size: 17px;
+  }
+
+  @media (max-width: 767px) {
+    .workpage {
+      padding-top: 104px;
+    }
+
+    .wp-title {
+      font-size: 30vw;
+    }
+
+    .row-head {
+      grid-template-columns: minmax(0, 1fr) 20px;
+      gap: 4px 12px;
+      padding: 24px 0;
+    }
+
+    .row-t {
+      font-size: 9vw;
+    }
+
+    .row-m {
+      grid-area: 2 / 1;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .row-y {
+      display: none;
+    }
+
+    .pm {
+      grid-area: 1 / 2;
+    }
+
+    .row-head:hover .row-t,
+    .row-head:focus-visible .row-t,
+    .case[open] .row-t {
+      transform: none;
+    }
+
+    .cols {
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding: 0 0 32px;
+    }
   }
 }
 
-@keyframes pulse-ring {
-  0% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-  70%,
-  100% {
-    transform: scale(2.8);
-    opacity: 0;
+/* S-02 without JS the filter could not work, so it is not shown and every row stays (E-07). */
+html:not([data-theme]) .filters {
+  display: none;
+}
+
+/* A case row opens smoothly where the browser can animate <details> (D-24); elsewhere at once. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (interpolate-size: allow-keywords) {
+    .case {
+      interpolate-size: allow-keywords;
+    }
+
+    .case::details-content {
+      block-size: 0;
+      overflow: clip;
+      transition:
+        block-size 450ms var(--ease),
+        content-visibility 450ms var(--ease) allow-discrete;
+    }
+
+    .case[open]::details-content {
+      block-size: auto;
+    }
   }
 }
 
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
+/* O-04 without JS: the inline theme script never ran, so the toggle would do nothing (E-07).
+   Unlayered so it beats the toggle's display utility. */
+html:not([data-theme]) .theme-toggle {
+  display: none;
 }
 
-@keyframes draw-x {
-  from {
-    transform: scaleX(0);
-  }
-}
-
-@keyframes mark-draw {
-  from {
-    background-size: 0% 100%;
-  }
-}
-
-@keyframes proof-fill {
+@keyframes grow-x {
   to {
     transform: scaleX(1);
   }
 }
 
-@keyframes fade-in {
+@keyframes depth-drift {
   from {
+    transform: translateY(-16%);
+  }
+  to {
+    transform: translateY(16%);
+  }
+}
+
+@keyframes glow-drift {
+  from {
+    transform: translate(-6vw, -12%) scale(0.85);
+  }
+  to {
+    transform: translate(6vw, 12%) scale(1.15);
+  }
+}
+
+/* Selected work: each project takes its turn on the pinned stage (option-b.html). */
+@keyframes step {
+  0% {
     opacity: 0;
+    visibility: hidden;
+    transform: translateY(70px) scale(0.97);
+    filter: blur(8px);
+  }
+  28%,
+  72% {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-70px) scale(0.97);
+    filter: blur(8px);
   }
 }
 
-@keyframes stack-drift {
+@keyframes step-num {
+  0% {
+    visibility: hidden;
+  }
+  1%,
+  99% {
+    visibility: visible;
+  }
+  100% {
+    visibility: hidden;
+  }
+}
+
+@keyframes step-near {
   from {
-    transform: translate(10px, -10px);
+    transform: translateY(90px);
   }
   to {
-    transform: translate(10px, 22px);
+    transform: translateY(-90px);
   }
 }
 
-@keyframes drift-down {
+@keyframes step-mid {
+  from {
+    transform: translateY(26px);
+  }
   to {
-    transform: translateY(96px);
+    transform: translateY(-26px);
   }
 }
 
-@keyframes header-bg-shrink {
-  to {
-    transform: scaleY(0.8125);
-    border-bottom-color: var(--color-border);
+@keyframes rail-on {
+  0%,
+  100% {
+    color: var(--color-text-muted);
+  }
+  28%,
+  72% {
+    color: var(--color-text);
   }
 }
 
-@keyframes header-row-shrink {
-  to {
-    transform: translateY(-6px);
+@keyframes rail-dot {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  28%,
+  72% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
-/* Scroll-driven motion (PRD section 8). Unsupported browsers keep the static end state. */
+@keyframes work-drift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-30%);
+  }
+}
+
+@keyframes work-glow {
+  from {
+    transform: translate(0, 0) scale(0.9);
+  }
+  to {
+    transform: translate(70vw, -14vh) scale(1.15);
+  }
+}
+
+/* D-10: the H1 rises in without an opacity change, so it counts as LCP from the first frame. */
+@keyframes hero-up {
+  from {
+    transform: translateY(40%);
+  }
+}
+
+/* Each chapter comes into focus, then leaves (D-08). */
+@keyframes ch-focus {
+  0% {
+    opacity: 0;
+    transform: translateY(80px) scale(0.97);
+    filter: blur(8px);
+  }
+  36%,
+  64% {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) scale(0.97);
+    filter: blur(8px);
+  }
+}
+
+@keyframes ch-focus-out {
+  0%,
+  50% {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) scale(0.97);
+    filter: blur(8px);
+  }
+}
+
+@keyframes ch-focus-in {
+  0% {
+    opacity: 0;
+    transform: translateY(80px) scale(0.97);
+    filter: blur(8px);
+  }
+  45%,
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes fill {
+  to {
+    background-size:
+      100% 100%,
+      100% 100%;
+  }
+}
+
+@keyframes strike-dim {
+  from {
+    color: var(--color-text);
+  }
+}
+
+@keyframes strike-line {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes count {
+  from {
+    --n: var(--from);
+  }
+}
+
+/* The Highlight numbers count as integers (CSS counter). Unregistered, they jump to the end. */
+@property --n {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-snap-type: y proximity;
+  }
+
+  .hero-h .line {
+    animation: hero-up 900ms var(--ease) both;
+  }
+
+  .hero-h .line:nth-child(2) {
+    animation-delay: 90ms;
+  }
+}
+
+/* While the cookie banner is open, snap would undo the scroll that lifts a focused control above
+   it (CookieConsent, WCAG 2.4.11). */
+html:has(.consent-banner) {
+  scroll-snap-type: none;
+}
+
+/* Scroll-driven motion (D-08). Unsupported browsers and reduced motion keep the static end state:
+   every chapter visible, the statement in full ink, the numbers final, the words struck (E-30). */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .site-header::before {
-      animation: header-bg-shrink linear both;
+    .scroll-progress {
+      animation: grow-x linear both;
       animation-timeline: scroll(root);
-      animation-range: 0 64px;
     }
 
-    .site-header-inner {
-      animation: header-row-shrink linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 64px;
+    /* Parallax: the depth layer lags behind its chapter. */
+    .chapter .depth-layer {
+      animation: depth-drift linear both;
+      animation-timeline: --ch;
+      animation-range: cover 0% cover 100%;
     }
 
-    .hero-texture::before {
-      animation: drift-down linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 100vh;
+    .chapter .depth-glow {
+      animation: glow-drift linear both;
+      animation-timeline: --ch;
+      animation-range: cover 0% cover 100%;
     }
 
-    @media (min-width: 64rem) {
-      .proof-stack::before {
-        animation: stack-drift linear both;
-        animation-timeline: scroll(root);
-        animation-range: 0 100vh;
+    .ch > .ch-inner {
+      animation: ch-focus linear both;
+      animation-timeline: --ch;
+      animation-range: cover 0% cover 100%;
+    }
+
+    /* The hero is on screen at load: it only leaves. Contact is the end: it only arrives. */
+    .hero > .ch-inner {
+      animation-name: ch-focus-out;
+    }
+
+    .contact > .ch-inner {
+      animation-name: ch-focus-in;
+    }
+
+    /* The Work page is a long list, not one screen: it never blurs (option-b.html). */
+    .workpage > .ch-inner {
+      animation: none;
+    }
+
+    /* About is taller than one phone screen: it stays in focus there. */
+    @media (max-width: 767px) {
+      #about > .ch-inner {
+        animation: none;
       }
     }
 
-    .reveal {
-      animation: rise linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 70%;
+    /* About: the statement fills in line by line as it arrives. */
+    .fill {
+      color: transparent;
+      /* Lint "gradient" defended: two flat colours clipped to the text (text fill, D-08). */
+      background-image:
+        linear-gradient(var(--color-text), var(--color-text)),
+        linear-gradient(
+          color-mix(in srgb, var(--ink) 20%, transparent),
+          color-mix(in srgb, var(--ink) 20%, transparent)
+        );
+      background-repeat: no-repeat;
+      background-size:
+        0% 100%,
+        100% 100%;
+      background-clip: text;
+      animation: fill linear both;
+      animation-timeline: --ch;
+      animation-range: cover 22% cover 50%;
     }
 
-    .reveal-late {
-      animation-range: entry 15% entry 85%;
+    /* Highlight: "five passwords" gets struck out, then the numbers count to their value. */
+    .strike s {
+      animation: strike-dim linear both;
+      animation-timeline: --ch;
+      animation-range: cover 30% cover 46%;
     }
 
-    .draw-on-view {
-      transform-origin: left center;
-      animation: draw-x linear both;
-      animation-timeline: view();
-      animation-range: entry 10% cover 35%;
+    .strike s::after {
+      animation: strike-line linear both;
+      animation-timeline: --ch;
+      animation-range: cover 30% cover 46%;
     }
 
-    .hl-on-view .hl::before {
-      animation: hl-draw linear both;
-      animation-timeline: view();
-      animation-range: entry 20% cover 50%;
+    .num {
+      animation: count linear both;
+      animation-timeline: --ch;
+      animation-range: cover 30% cover 50%;
     }
 
-    .mark-on-view mark {
-      animation: mark-draw linear both;
-      animation-timeline: view();
-      animation-range: entry 60% cover 45%;
+    /* Selected work: the stage stays, the projects take turns, one scroll step each. Every
+       step is centred on its snap point; --r0/--r1 come from selectedWorkRanges(). */
+    .work.is-pinned {
+      view-timeline: --work block;
+    }
+
+    .is-pinned .work-stage {
+      position: sticky;
+      top: 0;
+      height: var(--win);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .is-pinned .work-head {
+      padding-top: 96px;
+    }
+
+    .is-pinned .pn {
+      display: none;
+    }
+
+    .is-pinned .work-list {
+      flex: 1;
+    }
+
+    .is-pinned .proj {
+      position: absolute;
+      inset: 0;
+      min-height: 0;
+      padding: 0;
+      scroll-snap-align: none;
+      animation: step linear both;
+      animation-timeline: --work;
+      animation-range: contain var(--r0) contain var(--r1);
+    }
+
+    .is-pinned .cn b {
+      animation: step-num linear both;
+      animation-timeline: --work;
+      animation-range: contain var(--r0) contain var(--r1);
+    }
+
+    .is-pinned .cn b + b {
+      visibility: visible;
+    }
+
+    .is-pinned .proj .pic {
+      animation: step-near linear both;
+      animation-timeline: --work;
+      animation-range: contain var(--r0) contain var(--r1);
+    }
+
+    .is-pinned .proj .wt {
+      animation: step-mid linear both;
+      animation-timeline: --work;
+      animation-range: contain var(--r0) contain var(--r1);
+    }
+
+    .is-pinned .rail {
+      display: flex;
+    }
+
+    .is-pinned .rail a {
+      animation: rail-on linear both;
+      animation-timeline: --work;
+      animation-range: contain var(--r0) contain var(--r1);
+    }
+
+    .is-pinned .rail a::before {
+      animation: rail-dot linear both;
+      animation-timeline: --work;
+      animation-range: contain var(--r0) contain var(--r1);
+    }
+
+    .is-pinned .depth-layer {
+      animation: work-drift linear both;
+      animation-timeline: --work;
+      animation-range: contain 0% contain 100%;
+    }
+
+    .is-pinned .depth-glow {
+      animation: work-glow linear both;
+      animation-timeline: --work;
+      animation-range: contain 0% contain 100%;
+    }
+
+    .is-pinned .marks {
+      display: block;
+      margin-top: calc(var(--win) * -1);
+    }
+
+    .marks i {
+      display: block;
+      height: var(--win);
+      scroll-snap-align: start;
+    }
+
+    @media (max-width: 767px) {
+      .is-pinned .work-head {
+        padding-top: 88px;
+      }
+
+      .is-pinned .rail {
+        display: none;
+      }
     }
   }
 }

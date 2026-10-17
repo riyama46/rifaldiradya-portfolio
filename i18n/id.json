@@ -1,114 +1,161 @@
 {
   "nav": {
-    "work": "Hasil Kerja",
-    "email": "Email saya",
-    "skip": "Langsung ke konten",
+    "work": "Karya",
+    "about": "Tentang",
+    "skip": "Lewati ke konten",
     "label": "Utama"
   },
   "language": {
     "label": "Bahasa"
   },
-  "hero": {
-    "title": "Landing Page Siap Pakai dalam Hitungan <hl>Hari</hl>, <dim>Bukan Minggu</dim>",
-    "subtitle": "Saya bikin landing page dari brief sampai live, cepat dan rapi. Butuh dashboard atau web app yang lebih kompleks? Saya juga bisa bantu.",
-    "ctaPrimary": "Lihat Hasil Kerja",
-    "ctaSecondary": "Kirim Brief via Email",
-    "proofLabel": "Karya terbaru",
-    "proofAria": "Lihat {title} (buka di tab baru)"
+  "theme": {
+    "toDark": "Ganti ke mode gelap",
+    "toLight": "Ganti ke mode terang"
   },
-  "meta": {
-    "available": "Menerima project baru",
-    "location": "Berbasis di Indonesia",
-    "remote": "Kerja remote"
+  "cta": "Kirim email",
+  "hero": {
+    "role": "Software engineer · Full-stack .NET",
+    "loc": "Jabodetabek",
+    "open": "Terbuka untuk posisi full-time dan proyek",
+    "l1": "Membangun software HR",
+    "l2": "untuk <em>ribuan karyawan.</em>",
+    "sub": "Empat tahun membangun dan menjaga sistem HR 13 perusahaan grup Panasonic: ratusan pengguna HR, ribuan data karyawan.",
+    "stack": "Stack",
+    "scroll": "Gulir ↓",
+    "avatarAlt": "Rifaldi Radya Pratama"
   },
   "seo": {
     "siteName": "Rifaldi Radya Pratama",
-    "ogAlt": "Rifaldi Radya Pratama, landing page siap pakai dalam hitungan hari, bukan minggu",
+    "ogAlt": "Rifaldi Radya Pratama, software engineer. Membangun software HR untuk ribuan karyawan.",
     "home": {
-      "title": "Rifaldi Radya Pratama — Jasa Landing Page Cepat",
-      "description": "Landing page siap pakai dalam hitungan hari, bukan minggu. Web developer dari Indonesia. Lihat hasil kerjanya langsung."
+      "title": "Rifaldi Radya Pratama, Software Engineer (Full-Stack .NET)",
+      "description": "Software engineer yang membangun sistem HR 13 perusahaan grup Panasonic. C#, ASP.NET, SQL Server, dan Azure. Berbasis di Jabodetabek."
     },
     "work": {
-      "title": "Hasil Kerja — Landing Page oleh Rifaldi Radya Pratama",
-      "description": "Kumpulan landing page yang sudah live, dibuat oleh Rifaldi Radya Pratama. Klik dan lihat situs aslinya."
+      "title": "Karya: Sistem HR, Website, Alat AI | Rifaldi Radya Pratama",
+      "description": "Sistem HR di Panasonic, website, dan alat AI karya Rifaldi Radya Pratama. Buka satu baris untuk melihat apa itu, yang saya kerjakan, dan stack-nya."
     },
     "privacy": {
-      "title": "Privasi — Rifaldi Radya Pratama",
-      "description": "Cara rifaldiradya.com menangani cookie analitik, pilihan bahasa, dan email. Tanpa akun, tanpa formulir, tanpa pelacakan tanpa izin."
+      "title": "Privasi | Rifaldi Radya Pratama",
+      "description": "Cara rifaldiradya.com menangani cookie analitik, pilihan bahasa dan tema, unduhan CV, dan email. Tanpa pelacakan tanpa izin."
     }
-  },
-  "slider": {
-    "pause": "Jeda slideshow",
-    "play": "Putar slideshow"
-  },
-  "label": {
-    "services": "Layanan",
-    "work": "Hasil Kerja",
-    "about": "Tentang",
-    "contact": "Kontak"
-  },
-  "services": {
-    "title": "Yang saya kerjakan",
-    "primary": {
-      "badge": "Fokus utama",
-      "title": "Landing Page Development",
-      "desc": "Cepat, fokus konversi, siap tayang dalam hitungan hari."
-    },
-    "secondary": {
-      "badge": "Untuk proyek lebih besar",
-      "title": "Web App & Dashboard",
-      "desc": "Untuk kebutuhan yang lebih kompleks dari sekadar landing page."
-    }
-  },
-  "steps": {
-    "1": "Brief",
-    "2": "Pengerjaan",
-    "3": "Live",
-    "1d": "Kamu kirim tujuannya",
-    "2d": "Saya desain dan coding",
-    "3d": "Online, siap dibagikan"
   },
   "work": {
-    "featuredTitle": "Karya pilihan",
-    "viewAll": "Lihat semua karya",
-    "viewAllCount": "Lihat semua karya ({n})",
-    "empty": "Karya baru sedang disiapkan. Sementara itu, ceritakan kebutuhanmu."
+    "h": "Karya pilihan",
+    "all": "Lihat semua karya →",
+    "rail": "Proyek",
+    "open": "Buka situsnya ↗",
+    "empty": "Karya baru sedang disiapkan. Sementara itu, ini cara menghubungi saya."
   },
-  "workPage": {
-    "title": "Hasil Kerja",
-    "intro": "Landing page yang sudah live. Klik dan lihat situs aslinya.",
-    "cta": "Suka dengan hasilnya?"
+  "wp": {
+    "label": "Semua karya",
+    "sub": {
+      "panasonic": {
+        "one": "{n} proyek di sistem HR Panasonic",
+        "other": "{n} proyek di sistem HR Panasonic"
+      },
+      "web": {
+        "one": "{n} website",
+        "other": "{n} website"
+      },
+      "ai": {
+        "one": "alat AI yang saya pakai setiap hari",
+        "other": "alat AI yang saya pakai setiap hari"
+      },
+      "and2": " dan ",
+      "andN": ", dan ",
+      "end": "Buka satu baris untuk melihat detailnya.",
+      "n": [
+        "nol",
+        "satu",
+        "dua",
+        "tiga",
+        "empat",
+        "lima",
+        "enam",
+        "tujuh",
+        "delapan",
+        "sembilan",
+        "sepuluh"
+      ]
+    },
+    "filter": "Saring proyek",
+    "all": "Semua"
   },
-  "card": {
-    "live": "Live",
-    "visit": "Lihat situs",
-    "visitShort": "Lihat",
-    "visitAria": "Lihat {title} (buka di tab baru)"
+  "c": {
+    "is": "Apa ini",
+    "did": "Yang saya kerjakan",
+    "stack": "Stack",
+    "status": "Status",
+    "walk": "Email untuk minta walkthrough"
+  },
+  "group": {
+    "panasonic": "Panasonic",
+    "web": "Website",
+    "ai": "Alat AI"
   },
   "about": {
-    "title": "Siapa yang akan bekerja denganmu",
-    "lead": "Saya Rifaldi, web developer yang <mark>sehari-hari bekerja full-time membangun website</mark>, dan menerima project landing page freelance untuk founder dan bisnis kecil.",
-    "body": "Cara kerja saya sederhana: terima brief, ubah jadi <strong>halaman yang cepat dan rapi</strong>, lalu <mark>tayang dalam hitungan hari, bukan minggu</mark>. Kamu berurusan dengan satu orang dari pesan pertama sampai launch, jadi tidak ada yang hilang di antara desainer, developer, dan project manager."
+    "h": "Tentang",
+    "s": "Saya membangun sistem yang menjalankan perusahaan: absensi, lembur, payroll.",
+    "p1": "Saya satu dari tiga developer di sistem HR yang dipakai 13 perusahaan grup Panasonic. Enam di antaranya saya pegang sendiri, mulai dari analisis kebutuhan, estimasi, pengembangan, sampai instalasi di server mereka. Saya juga melatih pengguna di setiap rollout, menyiapkan dokumen audit SOX, dan membimbing anak magang.",
+    "p2": "Sebelum coding, saya editor video. Saya kuliah informatika di IPB dan Telkom University, dan sekarang menempuh Magister Manajemen SDM dengan tesis tentang presenteeism, work-life balance, dan burnout.",
+    "edu": "Pendidikan",
+    "education": [
+      "<strong>S1 Informatika</strong>, Telkom University, 2022",
+      "<strong>D3 Manajemen Informatika</strong>, IPB University, 2018",
+      "<strong>Magister Manajemen, SDM</strong>, Universitas Pancasila, target lulus 2027"
+    ],
+    "cert": "Sertifikasi",
+    "certs": [
+      "<strong>Junior Web Programmer</strong>, BNSP, 2019",
+      "<strong>UI/UX Design Bootcamp</strong>, Digital Skola, 2022"
+    ]
   },
-  "facts": {
-    "basedLabel": "Berbasis di",
-    "based": "Indonesia ({timezone})",
-    "workLabel": "Bekerja dengan",
-    "work": "Klien dari mana saja, secara remote",
-    "focusLabel": "Fokus",
-    "focus": "Landing page, web app & dashboard",
-    "langLabel": "Bahasa",
-    "lang": "Indonesia, Inggris",
-    "stackLabel": "Stack"
+  "case": {
+    "meta": "Sorotan · Panasonic · Berjalan sejak awal 2023",
+    "t": "<s>Lima password</s> jadi satu login.",
+    "st1": "password per orang",
+    "st2p": "±",
+    "st2n": "±200",
+    "st2": "staf dengan satu login",
+    "st3": "perusahaan grup di HRMS",
+    "blur": "Tampilan HRMS bersifat internal; saya bisa menunjukkannya saat wawancara."
   },
-  "cta": {
-    "title": "Punya halaman yang mau <hl>diluncurkan</hl>?",
-    "sub": "Kirim brief singkat: halamannya untuk apa dan kapan dibutuhkan. Saya akan balas dengan langkah selanjutnya.",
-    "button": "Kirim brief via email",
-    "or": "atau salin"
+  "bridge": {
+    "q": "Perlu sistem seperti ini di perusahaan Anda?",
+    "go": "Lanjut ke kontak ↓"
+  },
+  "ct": {
+    "label": "Kontak",
+    "h": "Ada posisi atau <em>proyek?</em>",
+    "hMore": "Punya proyek seperti <em>ini?</em>",
+    "pitch": "Sedang mencari developer full-time, atau perlu sistem HR dan aplikasi internal dibangun? Ceritakan singkat kebutuhannya, saya balas lewat email.",
+    "role": "Email soal posisi full-time",
+    "project": "Email soal proyek",
+    "linkedin": "LinkedIn ↗",
+    "github": "GitHub ↗"
+  },
+  "cv": {
+    "download": "Unduh CV (PDF)"
+  },
+  "mail": {
+    "general": {
+      "s": "Halo Rifaldi"
+    },
+    "role": {
+      "s": "Posisi full-time: ",
+      "b": "Perusahaan:\nPosisi dan tautan lowongan:\nWaktu yang cocok untuk ngobrol:\n"
+    },
+    "project": {
+      "s": "Proyek: ",
+      "b": "Yang ingin dibangun:\nTarget waktu:\nKisaran anggaran:\n"
+    },
+    "walk": {
+      "s": "Walkthrough: {title}",
+      "b": "Perusahaan:\nPosisi yang dibuka:\nWaktu yang cocok untuk ngobrol:\n"
+    }
   },
   "email": {
-    "subject": "Tanya project dari rifaldiradya.com",
     "copy": "Salin email",
     "copied": "Tersalin",
     "copyFallback": "Tekan Ctrl/Cmd+C untuk menyalin"
@@ -127,16 +174,17 @@
   "footer": {
     "privacy": "Privasi",
     "cookies": "Pengaturan cookie",
-    "linkedinAria": "LinkedIn (buka di tab baru)"
+    "top": "Kembali ke atas ↑",
+    "home": "Kembali ke beranda ↑"
   },
   "privacy": {
     "title": "Privasi",
-    "updated": "Terakhir diperbarui: 29 September 2026",
+    "updated": "Terakhir diperbarui: 17 Oktober 2026",
     "intro": "Situs ini dibuat sederhana: tanpa akun, tanpa formulir kontak, dan tanpa analytics kecuali kamu mengizinkannya.",
     "collectTitle": "Data yang dikumpulkan",
-    "collectBody": "Jika kamu menekan Terima di banner cookie, Google Analytics 4 mencatat data penggunaan anonim: halaman yang dibuka, perkiraan wilayah dan jenis perangkat, serta klik pada tombol email dan link project. Data ini tidak memberi tahu saya siapa kamu. Jika kamu menekan Tolak atau mengabaikan banner, Google Analytics tidak berjalan dan tidak memasang cookie.",
-    "cookiesTitle": "Cookie",
-    "cookieName": "Cookie",
+    "collectBody": "Jika kamu menekan Terima di banner cookie, Google Analytics 4 mencatat data penggunaan anonim: halaman yang dibuka, perkiraan wilayah dan jenis perangkat, serta klik pada tombol email, unduhan CV, link proyek, baris case yang dibuka, dan tombol tema. Data ini tidak memberi tahu saya siapa kamu. Jika kamu menekan Tolak atau mengabaikan banner, Google Analytics tidak berjalan dan tidak memasang cookie.",
+    "cookiesTitle": "Cookie dan penyimpanan browser",
+    "cookieName": "Nama",
     "cookiePurpose": "Kegunaan",
     "cookieDuration": "Masa berlaku",
     "cookies": [
@@ -154,12 +202,24 @@
         "name": "_ga, _ga_*",
         "purpose": "Google Analytics, hanya dipasang setelah kamu menekan Terima.",
         "duration": "Hingga 2 tahun (diatur Google)"
+      },
+      {
+        "name": "rr-theme",
+        "purpose": "Local storage. Mengingat mode terang atau gelap. Tetap di browsermu dan tidak pernah dikirim ke mana pun.",
+        "duration": "Sampai kamu menghapus data situs"
+      },
+      {
+        "name": "rr-case-from-home",
+        "purpose": "Session storage. Penanda sekali pakai saat kamu membuka proyek dari homepage, agar kunjungan itu tidak terhitung dua kali. Isinya hanya nama singkat proyek.",
+        "duration": "Dihapus saat dibaca, atau saat tab ditutup"
       }
     ],
+    "cvTitle": "Unduhan CV",
+    "cvBody": "CV adalah file PDF biasa yang disajikan dari situs ini. Mengunduhnya tidak memasang cookie. Jika kamu menerima analytics, kliknya dihitung sebagai unduhan CV, tanpa detail apa pun tentang kamu.",
     "changeTitle": "Mengubah pilihan",
     "changeBody": "Gunakan “Pengaturan cookie” di bagian bawah setiap halaman untuk mengubah pilihanmu kapan saja. Beralih ke Tolak juga menghapus cookie Google Analytics.",
     "emailTitle": "Saat kamu mengirim email",
-    "emailBody": "Pesanmu hanya dipakai untuk membalas dan membahas project-mu. Pesan itu tidak dimasukkan ke mailing list dan tidak dibagikan ke siapa pun.",
+    "emailBody": "Pesanmu hanya dipakai untuk membalas dan membahas posisi atau proyeknya. Pesan itu tidak dimasukkan ke mailing list dan tidak dibagikan ke siapa pun.",
     "contactTitle": "Pertanyaan",
     "contactBody": "Kirim email ke {email} untuk pertanyaan apa pun tentang halaman ini."
   },

@@ -3,10 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { adminStrings } from "@/components/admin/strings";
-import { Button } from "@/components/ui/Button";
 
 // UF-10: API-02, then the login page; refresh drops any cached admin view from the router.
-export function LogoutButton() {
+export function LogoutButton({ className }: { className?: string }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
 
@@ -18,8 +17,14 @@ export function LogoutButton() {
   }
 
   return (
-    <Button variant="secondary" size="sm" loading={pending} onClick={logout}>
+    <button
+      type="button"
+      onClick={logout}
+      disabled={pending}
+      aria-busy={pending || undefined}
+      className={`${className ?? ""} cursor-pointer disabled:cursor-wait disabled:opacity-60`}
+    >
       {adminStrings.logout}
-    </Button>
+    </button>
   );
 }

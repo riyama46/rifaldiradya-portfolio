@@ -1,4 +1,5 @@
 import { CspMeta } from "@/components/site/CspMeta";
+import { ThemeScript } from "@/components/site/ThemeScript";
 import type { Metadata } from "next";
 import { adminStrings } from "@/components/admin/strings";
 import { fontVariables } from "@/lib/fonts";
@@ -12,11 +13,12 @@ export const metadata: Metadata = {
 
 export default function AdminRootLayout({ children }: LayoutProps<"/admin">) {
   return (
-    <html lang="en" className={fontVariables}>
+    <html lang="en" className={fontVariables} suppressHydrationWarning>
       <head>
         <CspMeta />
+        <ThemeScript />
       </head>
-      <body>{children}</body>
+      <body className="admin-shell">{children}</body>
     </html>
   );
 }

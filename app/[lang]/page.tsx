@@ -1,22 +1,16 @@
 import type { Metadata } from "next";
-import { About } from "@/components/site/About";
+import { AboutChapter } from "@/components/site/AboutChapter";
+import { ContactChapter } from "@/components/site/ContactChapter";
+import { Footer } from "@/components/site/Footer";
 import { Hero } from "@/components/site/Hero";
-import { HeroProofPanel, type ProofSlide } from "@/components/site/HeroProofPanel";
+import { HighlightChapter } from "@/components/site/HighlightChapter";
 import { JsonLd } from "@/components/site/JsonLd";
-import { ProjectGrid } from "@/components/site/ProjectGrid";
 import { SelectedWork } from "@/components/site/SelectedWork";
-import { Services } from "@/components/site/Services";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import { ArrowIcon } from "@/components/ui/ArrowIcon";
-import { Button } from "@/components/ui/Button";
-import { getDictionary, interpolate, localePath } from "@/i18n";
+import { SiteBar } from "@/components/site/SiteBar";
+import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/i18n/server";
-import {
-  HOMEPAGE_GRID_LIMIT,
-  selectHomepageProjects,
-  toPublicProject,
-} from "@/lib/projects/public";
-import { getPublicAvatar } from "@/lib/images/store";
+import { getSiteSettings } from "@/lib/images/store";
+import { selectSelectedWork, toPublicProject } from "@/lib/projects/public";
 import { getPublishedProjects } from "@/lib/projects/queries";
 import { homeJsonLd } from "@/lib/seo/jsonld";
 import { buildMetadata, siteOrigin } from "@/lib/seo/metadata";
@@ -30,67 +24,36 @@ export async function generateMetadata({ params }: PageProps<"/[lang]">): Promis
   return buildMetadata({ lang, path: "/", page: dict.seo.home, dict });
 }
 
-// S-01 (App Flow): Hero → 01 Services → 02 Selected work → 03 About; the 04 CTA is in the footer.
+// Delta APP_FLOW S-01: Hero → Selected work → About → Highlight → Contact → footer.
+// E-25: without show_on_home projects the Selected work chapter is not rendered and the hero
+// "Scroll ↓" points at About instead.
 export default async function HomePage({ params }: PageProps<"/[lang]">) {
   const lang = await resolveLocale(params);
   const dict = getDictionary(lang);
 
-  const [projects, avatar] = await Promise.all([getPublishedProjects(), getPublicAvatar()]);
-  const published = projects.map((project) => toPublicProject(project, lang));
-  const { heroPanel, grid, total } = selectHomepageProjects(published);
-
-  const slides: ProofSlide[] = heroPanel.map((project) => ({
-    id: project.id,
-    slug: project.slug,
-    title: project.title,
-    liveUrl: project.liveUrl,
-    liveHost: project.liveHost,
-    thumbnail: project.thumbnail,
-    ariaLabel: interpolate(dict.hero.proofAria, { title: project.title }),
-  }));
-
-  const viewAllLabel =
-    total > HOMEPAGE_GRID_LIMIT
-      ? interpolate(dict.work.viewAllCount, { n: total })
-      : dict.work.viewAll;
+  const [projects, { avatar, availabilityOn }] = await Promise.all([
+    getPublishedProjects(),
+    getSiteSettings(),
+  ]);
+  const selected = selectSelectedWork(projects.map((project) => toPublicProject(project, lang)));
 
   return (
     <>
       <JsonLd data={homeJsonLd(lang, siteOrigin())} />
-      <SiteHeader lang={lang} dict={dict} path="/" />
+      <SiteBar lang={lang} dict={dict} path="/" />
       <main id="content" tabIndex={-1}>
         <Hero
           dict={dict}
           avatar={avatar}
-          proofPanel={
-            slides.length > 0 ? (
-              <HeroProofPanel
-                slides={slides}
-                labels={{
-                  proofLabel: dict.hero.proofLabel,
-                  visitShort: dict.card.visitShort,
-                  live: dict.card.live,
-                  pause: dict.slider.pause,
-                  play: dict.slider.play,
-                }}
-              />
-            ) : undefined
-          }
+          availabilityOn={availabilityOn}
+          scrollTarget={selected.length > 0 ? "#work" : "#about"}
         />
-        <Services dict={dict} />
-        <SelectedWork dict={dict}>
-          {grid.length > 0 ? (
-            <>
-              <ProjectGrid projects={grid} dict={dict} />
-              <Button href={localePath("/work", lang)} variant="ghost" className="mt-8">
-                {viewAllLabel}
-                <ArrowIcon direction="right" />
-              </Button>
-            </>
-          ) : undefined}
-        </SelectedWork>
-        <About dict={dict} />
+        {selected.length > 0 && <SelectedWork lang={lang} dict={dict} projects={selected} />}
+        <AboutChapter dict={dict} />
+        <HighlightChapter dict={dict} />
+        <ContactChapter dict={dict} />
       </main>
+      <Footer lang={lang} dict={dict} back="top" />
     </>
   );
 }

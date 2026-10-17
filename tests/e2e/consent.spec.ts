@@ -1,4 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
+import { hasCredentials, missingCredentials } from "./helpers";
+import { published, withSelectedWork } from "./projects-fixture";
 
 // UF-05 (O-03 + GA4). The build uses the test ID G-E2ETEST1 (playwright.config.ts). Requests to
 // Google are intercepted: nothing leaves the machine, and the test sees exactly when gtag.js is
@@ -104,35 +106,79 @@ test("Cookie settings reopens the banner with the choice marked; switching to Re
   );
 });
 
-test("events: email and project clicks are tracked after consent", async ({ page, context }) => {
+test("events: email kinds, CV, and project clicks are tracked after consent", async ({
+  page,
+  context,
+}) => {
+  test.skip(!hasCredentials, missingCredentials); // the Work part creates projects
   await watchGtag(page);
   await context.addCookies([{ name: "consent", value: "granted", url: "http://localhost:3100" }]);
+  // mailto would open a mail app, a CV link would download, a live site would open a tab: keep the
+  // clicks (and their events), stop the navigation.
+  await page.addInitScript(() =>
+    document.addEventListener("click", (event) => {
+      const link = (event.target as Element).closest("a");
+      if (link?.matches("[href^='mailto:'], [download], [target=_blank]")) event.preventDefault();
+    }),
+  );
   await page.goto("/");
   await page.waitForLoadState("networkidle");
 
-  // mailto would open a mail app; keep the click but stop the navigation.
-  await page.evaluate(() =>
-    document.addEventListener("click", (event) => {
-      if ((event.target as Element).closest("a[href^='mailto:']")) event.preventDefault();
-    }),
+  await page.locator("#top").getByRole("link", { name: "Email me" }).click();
+  await page
+    .locator("#contact")
+    .getByRole("link", { name: "Email about a full-time role" })
+    .click();
+  await page.locator("#about").getByRole("link", { name: "Download CV (PDF)" }).click();
+  expect(await events(page)).toEqual(
+    expect.arrayContaining([
+      [
+        "contact_email_click",
+        { kind: "general", location: "hero", method: "mailto", language: "en" },
+      ],
+      [
+        "contact_email_click",
+        { kind: "role", location: "contact", method: "mailto", language: "en" },
+      ],
+      ["cv_download", { location: "about", language: "en" }],
+    ]),
   );
-  await page.getByRole("link", { name: "Email Me About Your Project", exact: true }).click();
-  expect(await events(page)).toContainEqual([
-    "contact_email_click",
-    { location: "hero", method: "mailto", language: "en" },
-  ]);
 
-  // Project links open the live site in a new tab; keep the click, stop the tab.
-  await page.goto("/work");
-  await page.waitForLoadState("networkidle");
-  await page.evaluate(() =>
-    document.addEventListener("click", (event) => {
-      if ((event.target as Element).closest("a[target=_blank]")) event.preventDefault();
-    }),
+  // Work: opening a row, its live site, and a walkthrough email (with the project slug).
+  await withSelectedWork(
+    page,
+    [
+      published("E2E Site", { case_action: "site", live_url: "https://example.com" }),
+      published("E2E Walk", { case_action: "walkthrough" }),
+    ],
+    async ([site, walk]) => {
+      await page.goto("/work");
+      await page.waitForLoadState("networkidle");
+      const siteCase = page.locator(`#case-${site.slug}`);
+      await siteCase.locator("summary").click();
+      await siteCase.locator("a[data-placement=case]").click();
+      const walkCase = page.locator(`#case-${walk.slug}`);
+      await walkCase.locator("summary").click();
+      await walkCase.locator("a[data-kind=walkthrough]").click();
+
+      const sent = await events(page);
+      expect(sent).toContainEqual([
+        "project_link_click",
+        { project_slug: site.slug, page: "work", placement: "case", language: "en" },
+      ]);
+      expect(sent.filter(([name]) => name === "case_open")).toHaveLength(2);
+      expect(sent).toContainEqual([
+        "contact_email_click",
+        {
+          kind: "walkthrough",
+          location: "case",
+          method: "mailto",
+          language: "en",
+          project_slug: walk.slug,
+        },
+      ]);
+    },
   );
-  await page.locator("article a[data-placement=card]:not([aria-hidden])").first().click();
-  const projectClick = (await events(page)).find(([name]) => name === "project_link_click");
-  expect(projectClick?.[1]).toMatchObject({ page: "work", placement: "card", language: "en" });
 });
 
 test.describe("phones", () => {
@@ -147,7 +193,7 @@ test.describe("phones", () => {
     await expect(banner(page)).toBeVisible();
 
     const box = (await banner(page).boundingBox())!;
-    const cta = (await page.getByRole("link", { name: "See the Work" }).boundingBox())!;
+    const cta = (await page.locator("#top").getByRole("link", { name: "Email me" }).boundingBox())!;
     expect(box.height).toBeLessThanOrEqual(130);
     expect(cta.y + cta.height).toBeLessThanOrEqual(box.y);
 
@@ -169,10 +215,10 @@ test.describe("laptops", () => {
     await page.goto("/");
     await expect(banner(page)).toBeVisible();
 
-    const pause = page.getByRole("button", { name: "Pause slideshow" });
-    await pause.focus();
+    const cta = page.locator("#top").getByRole("link", { name: "Email me" });
+    await cta.focus();
     const cover = (await banner(page).boundingBox())!;
-    const control = (await pause.boundingBox())!;
+    const control = (await cta.boundingBox())!;
     const overlaps =
       control.y + control.height > cover.y &&
       control.x + control.width > cover.x &&

@@ -1,12 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
+  addLine,
   addTags,
+  canAddLine,
   emptyValues,
+  filledLines,
   firstErrorField,
   isDirty,
+  pasteLines,
+  removeLine,
   toPayload,
   validate,
   valuesFromInput,
+  visualFields,
   type FormValues,
 } from "@/components/admin/project-form-model";
 
@@ -27,30 +33,73 @@ const filled: FormValues = {
   tags: ["Next.js"],
 };
 
+/** Every "required to publish" field filled in, with a number card as the visual. */
+const complete: FormValues = {
+  ...filled,
+  meta_en: "Concept · Café",
+  meta_id: "Konsep · Kafe",
+  case_is_en: "A one-page site for a coffee shop.",
+  case_is_id: "Situs satu halaman untuk kedai kopi.",
+  case_did_en: ["Design and build.", ""],
+  case_did_id: ["Desain dan pembuatan."],
+  status_en: "Live, 2026",
+  status_id: "Berjalan, 2026",
+  visual_type: "number",
+  card_number: "1",
+  card_caption_en: "page",
+  card_caption_id: "halaman",
+  published: true,
+};
+
 describe("project form model", () => {
-  it("starts as App Flow UF-07 step 1: empty, draft, not featured, no position field", () => {
-    expect(emptyValues).toMatchObject({ published: false, featured: false, tags: [] });
+  it("starts as App Flow UF-07 step 1: empty, draft, not on the homepage, no position", () => {
+    expect(emptyValues).toMatchObject({
+      published: false,
+      show_on_home: false,
+      tags: [],
+      group: "web",
+      case_action: "site",
+      visual_type: "screenshot",
+      case_did_en: [""],
+    });
     expect(emptyValues).not.toHaveProperty("sort_order");
   });
 
-  it("a filled draft is valid; publishing it without an image is not (E-16)", () => {
+  it("a filled draft is valid; publishing it reports every missing publish field", () => {
     expect(validate(filled)).toEqual({});
-    expect(validate({ ...filled, published: true })).toHaveProperty("thumbnail");
-    expect(
-      validate({
-        ...filled,
-        published: true,
-        thumbnail,
-        thumbnail_alt_en: "a",
-        thumbnail_alt_id: "b",
-      }),
-    ).toEqual({});
+    expect(Object.keys(validate({ ...filled, published: true })).sort()).toEqual(
+      ["case_did_en", "case_did_id", "case_is_en", "case_is_id"]
+        .concat(["meta_en", "meta_id", "status_en", "status_id", "thumbnail"])
+        .sort(),
+    );
+  });
+
+  it("publishes once every section is complete (blank lines don't count)", () => {
+    expect(validate(complete)).toEqual({});
+    expect(validate({ ...complete, case_did_en: ["", " "] })).toHaveProperty("case_did_en");
+  });
+
+  it("checks only the chosen visual", () => {
+    expect(validate({ ...complete, card_caption_id: "" })).toHaveProperty("card_caption_id");
+    expect(validate({ ...complete, visual_type: "screenshot" })).toHaveProperty("thumbnail");
+    expect(validate({ ...complete, visual_type: "screenshot", thumbnail })).toMatchObject({
+      thumbnail_alt_en: "Screenshot alt (EN) is required.",
+    });
+  });
+
+  it("an empty live URL is reported with the case button wording (AC-8)", () => {
+    expect(validate({ ...filled, live_url: "" }).live_url).toBe(
+      "Add a live URL, or choose another button.",
+    );
+    expect(validate({ ...complete, live_url: "", case_action: "walkthrough" })).toEqual({});
+    expect(validate({ ...complete, live_url: "", case_action: "none" })).toEqual({});
   });
 
   it("reports the first error in on-screen order", () => {
     const errors = validate(emptyValues);
     expect(firstErrorField(errors)).toBe("title_en");
     expect(firstErrorField({ thumbnail: "bad", live_url: "bad" })).toBe("live_url");
+    expect(firstErrorField({ case_did_id: "bad", meta_en: "bad" })).toBe("meta_en");
     expect(firstErrorField({})).toBeNull();
   });
 
@@ -64,10 +113,63 @@ describe("project form model", () => {
   });
 
   it("round-trips a stored project and detects changes", () => {
-    const values = valuesFromInput(toPayload(filled));
-    expect(values).toEqual(filled);
+    const values = valuesFromInput(toPayload(complete));
+    expect(values).toEqual(complete);
     expect(isDirty(values, { ...values })).toBe(false);
-    expect(isDirty(values, { ...values, featured: true })).toBe(true);
+    expect(isDirty(values, { ...values, show_on_home: true })).toBe(true);
+  });
+
+  it("gives a v1 project without v2 fields one empty line to type into (E-27)", () => {
+    const values = valuesFromInput({ ...toPayload(filled), case_did_en: null, case_did_id: [] });
+    expect(values.case_did_en).toEqual([""]);
+    expect(values.case_did_id).toEqual([""]);
+  });
+
+  it("knows which fields belong to each visual pane", () => {
+    expect(visualFields.number).toEqual(["card_number", "card_caption_en", "card_caption_id"]);
+    expect(visualFields.screenshot).toEqual(["thumbnail", "thumbnail_alt_en", "thumbnail_alt_id"]);
+  });
+});
+
+describe("What I did lines (LinesInput)", () => {
+  it("adds lines up to 8", () => {
+    expect(addLine(["a"])).toEqual(["a", ""]);
+    const eight = Array<string>(8).fill("x");
+    expect(canAddLine(eight)).toBe(false);
+    expect(addLine(eight)).toBe(eight);
+  });
+
+  it("removes a line and always leaves one field", () => {
+    expect(removeLine(["a", "b", "c"], 1)).toEqual(["a", "c"]);
+    expect(removeLine(["a"], 0)).toEqual([""]);
+  });
+
+  it("counts only the lines that will be saved", () => {
+    expect(filledLines(["a", " ", "", "b"])).toBe(2);
+  });
+
+  it("splits a multi-line paste into one line each, at the cursor", () => {
+    // Empty field (the usual copy from the content sheet), Windows line breaks, a blank line.
+    expect(pasteLines([""], 0, "One.\r\nTwo.\r\n\r\nThree.", 0, 0)).toEqual({
+      lines: ["One.", "Two.", "Three."],
+      focus: 2,
+    });
+    // Into the middle of an existing line: text before the cursor starts the first pasted line,
+    // text after it ends the last one; the lines around stay.
+    expect(pasteLines(["keep", "abXYcd", "tail"], 1, "1\n2", 2, 4)).toEqual({
+      lines: ["keep", "ab1", "2cd", "tail"],
+      focus: 2,
+    });
+  });
+
+  it("leaves a single-line paste to the input", () => {
+    expect(pasteLines([""], 0, "Just one line.", 0, 0)).toBeNull();
+    expect(pasteLines([""], 0, "Just one line.\n\n", 0, 0)).toBeNull();
+  });
+
+  it("keeps lines beyond 8 so validation can flag them", () => {
+    const nine = Array.from({ length: 9 }, (_, i) => `L${i}`).join("\n");
+    expect(pasteLines([""], 0, nine, 0, 0)?.lines).toHaveLength(9);
   });
 });
 
@@ -79,11 +181,11 @@ describe("addTags (chip input)", () => {
     });
   });
 
-  it("refuses duplicates (case-insensitive), a 5th tag, and tags over 24 characters", () => {
+  it("refuses duplicates (case-insensitive), a 7th item, and items over 24 characters", () => {
     expect(addTags(["Next.js"], "next.js").error).toMatch(/already added/);
-    expect(addTags(["a", "b", "c", "d"], "e")).toEqual({
-      tags: ["a", "b", "c", "d"],
-      error: "Use up to 4 tags.",
+    expect(addTags(["a", "b", "c", "d", "e", "f"], "g")).toEqual({
+      tags: ["a", "b", "c", "d", "e", "f"],
+      error: "Use up to 6 items.",
     });
     expect(addTags([], "x".repeat(25)).error).toBe("Keep it under 24 characters (25 now).");
   });

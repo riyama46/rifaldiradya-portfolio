@@ -42,9 +42,13 @@ type MigratableDatabase = {
 
 /**
  * Applies pending migrations. Idempotent. A MySQL named lock makes concurrent callers (several
- * server processes starting at once) run one after another instead of racing.
+ * server processes starting at once) run one after another instead of racing. `migrations` is only
+ * narrowed by tests (a v1 database built from the first migrations, AC-14).
  */
-export async function runMigrations(env: DatabaseEnv): Promise<void> {
+export async function runMigrations(
+  env: DatabaseEnv,
+  migrations: MigrationMeta[] = loadMigrations(),
+): Promise<void> {
   const connection = await mysql.createConnection({
     host: env.DATABASE_HOST,
     port: env.DATABASE_PORT,
@@ -67,7 +71,7 @@ export async function runMigrations(env: DatabaseEnv): Promise<void> {
 
     try {
       const db = drizzle(connection) as unknown as MigratableDatabase;
-      await db.dialect.migrate(loadMigrations(), db.session, { migrationsFolder: "(embedded)" });
+      await db.dialect.migrate(migrations, db.session, { migrationsFolder: "(embedded)" });
     } finally {
       await connection.query("SELECT RELEASE_LOCK(?)", [LOCK_NAME]);
     }

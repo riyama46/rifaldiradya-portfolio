@@ -21,9 +21,11 @@ export function homeJsonLd(lang: Locale, origin: string): Json {
         name: siteConfig.name,
         url: `${origin}${localePath("/", lang)}`,
         jobTitle: siteConfig.role,
-        email: `mailto:${siteConfig.email}`,
-        knowsAbout: ["Landing page development", "Web development", "Next.js"],
-        sameAs: [siteConfig.social.linkedin],
+        email: `mailto:${siteConfig.contactEmail}`,
+        worksFor: { "@type": "Organization", name: siteConfig.employer },
+        knowsAbout: [...siteConfig.knowsAbout],
+        // GitHub joins only once it is filled in (D-19).
+        sameAs: [siteConfig.social.linkedin, siteConfig.social.github].filter(Boolean),
       },
       {
         "@type": "WebSite",
@@ -42,7 +44,7 @@ export function workJsonLd(
   lang: Locale,
   origin: string,
   title: string,
-  projects: Pick<PublicProject, "title" | "liveUrl">[],
+  projects: Pick<PublicProject, "title" | "slug" | "liveUrl">[],
 ): Json {
   const { person, website } = ids(origin);
   return {
@@ -59,7 +61,8 @@ export function workJsonLd(
         "@type": "ListItem",
         position: index + 1,
         name: project.title,
-        url: project.liveUrl,
+        // Projects without a site point at their case row (Delta PRD section 9).
+        url: project.liveUrl ?? `${origin}${localePath("/work", lang)}#case-${project.slug}`,
       })),
     },
   };

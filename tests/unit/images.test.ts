@@ -10,6 +10,7 @@ import {
   pickVariantWidth,
   variantWidthsFor,
 } from "@/lib/images/rules";
+import { avatarSources } from "@/lib/images/store";
 import { checkVariants } from "@/lib/images/upload";
 
 // Minimal but valid file headers, enough for inspectImage (the rest of a real file is pixel data).
@@ -163,32 +164,48 @@ describe("source file checks (browser, before compressing)", () => {
   });
 });
 
-describe("avatar images (S-14 profile photo)", () => {
+describe("avatar images (S-14 profile photo, 640 since v2.0.0)", () => {
   const square = (width: number) => webpVp8x(width, width);
 
-  it("crops a centred square and always stores 160 and 320 px", () => {
+  it("crops a centred square and always stores 320 and 640 px", () => {
     expect(cropFor(3000, 4000, "avatar")).toEqual({ x: 0, y: 500, width: 3000, height: 3000 });
     expect(cropFor(4000, 3000, "avatar")).toEqual({ x: 500, y: 0, width: 3000, height: 3000 });
-    expect(variantWidthsFor(3000, "avatar")).toEqual([160, 320]);
-    expect(heightFor(320, "avatar")).toBe(320);
+    expect(variantWidthsFor(3000, "avatar")).toEqual([320, 640]);
+    expect(heightFor(640, "avatar")).toBe(640);
   });
 
-  it("needs a 320 px source", () => {
-    expect(checkSourceSize(300, 900, "avatar")).toEqual({
+  it("needs a 640 px source", () => {
+    expect(checkSourceSize(600, 900, "avatar")).toEqual({
       kind: "width",
-      width: 300,
-      minimum: 320,
+      width: 600,
+      minimum: 640,
     });
     expect(checkSourceSize(800, 300, "avatar")).toEqual({ kind: "short", height: 300 });
-    expect(checkSourceSize(320, 320, "avatar")).toBeNull();
+    expect(checkSourceSize(640, 640, "avatar")).toBeNull();
   });
 
-  it("the server accepts exactly 160 + 320 squares, and never a thumbnail set as an avatar", () => {
-    expect(checkVariants([square(160), square(320)], "avatar").ok).toBe(true);
-    expect(checkVariants([square(160), webpVp8x(320, 200)], "avatar").ok).toBe(false);
-    expect(checkVariants([square(160)], "avatar")).toMatchObject({ code: "IMAGE_TOO_SMALL" });
+  it("the server accepts exactly 320 + 640 squares, and never a thumbnail set as an avatar", () => {
+    expect(checkVariants([square(320), square(640)], "avatar").ok).toBe(true);
+    expect(checkVariants([square(320), webpVp8x(640, 400)], "avatar").ok).toBe(false);
+    expect(checkVariants([square(320)], "avatar")).toMatchObject({ code: "IMAGE_TOO_SMALL" });
+    // The v1 set (160 + 320) is too small now.
+    expect(checkVariants([square(160), square(320)], "avatar")).toMatchObject({
+      code: "IMAGE_TOO_SMALL",
+    });
     const thumbnail = [640, 960, 1280, 1600].map((w) => webpVp8x(w, heightFor(w)));
     expect(checkVariants(thumbnail, "avatar").ok).toBe(false);
-    expect(checkVariants([square(160), square(320)], "thumbnail").ok).toBe(false);
+    expect(checkVariants([square(320), square(640)], "thumbnail").ok).toBe(false);
+  });
+
+  it("srcset lists only widths the photo has, so a v1 320 px photo stays as it is (E-32)", () => {
+    const id = "01JIMAGE000000000000000000";
+    expect(avatarSources({ id, format: "webp", width: 640 })).toEqual({
+      src: `/media/${id}-640.webp`,
+      srcSet: `/media/${id}-320.webp 320w, /media/${id}-640.webp 640w`,
+    });
+    expect(avatarSources({ id, format: "jpeg", width: 320 })).toEqual({
+      src: `/media/${id}-320.jpg`,
+      srcSet: `/media/${id}-320.jpg 320w`,
+    });
   });
 });

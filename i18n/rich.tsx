@@ -1,24 +1,19 @@
 import type { ReactNode } from "react";
 
-// Only these markers are rendered; anything else stays literal text (no HTML injection).
-const TAG_PATTERN = /<(hl|dim|mark|strong)>(.*?)<\/\1>/g;
+// Only these markers are rendered (Delta APP_FLOW section 11); anything else stays literal text
+// (no HTML injection). <em> is the one accent word of a heading, <s> is struck-through text.
+const TAG_PATTERN = /<(em|s|strong)>(.*?)<\/\1>/g;
 
 function renderTag(tag: string, content: string, key: number): ReactNode {
   switch (tag) {
-    case "hl":
+    case "em":
       return (
-        <span key={key} className="hl">
+        <em key={key} className="ac">
           {content}
-        </span>
+        </em>
       );
-    case "dim":
-      return (
-        <span key={key} className="dim">
-          {content}
-        </span>
-      );
-    case "mark":
-      return <mark key={key}>{content}</mark>;
+    case "s":
+      return <s key={key}>{content}</s>;
     default:
       return (
         <strong key={key} className="font-medium text-text">

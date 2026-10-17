@@ -28,7 +28,7 @@ describe("dictionaries", () => {
   });
 
   it("only uses allowed rich-text tags, balanced", () => {
-    const allowed = new Set(["hl", "dim", "mark", "strong"]);
+    const allowed = new Set(["em", "s", "strong"]);
     for (const text of [...leafValues(en), ...leafValues(id)]) {
       const tags = [...text.matchAll(/<\/?([a-z]+)>/g)].map((m) => m[1]);
       for (const tag of tags) expect(allowed.has(tag), `${tag} in "${text}"`).toBe(true);
@@ -55,7 +55,7 @@ describe("dictionaries", () => {
 
   it("returns the dictionary for each locale", () => {
     expect(getDictionary("en").nav.work).toBe("Work");
-    expect(getDictionary("id").nav.work).toBe("Hasil Kerja");
+    expect(getDictionary("id").nav.work).toBe("Karya");
   });
 });
 

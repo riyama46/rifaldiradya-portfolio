@@ -1,57 +1,108 @@
-import type { Locale } from "@/i18n";
+import { interpolate, type Dictionary, type Locale } from "@/i18n";
 import type { Project } from "@/lib/db/schema";
+import { PROJECT_GROUPS, type CaseAction, type ProjectGroup } from "./validation";
 
-/** Public DTO per locale (App Flow section 9). Never contains draft-only or admin fields. */
+export type ScreenshotVisual = {
+  type: "screenshot";
+  url: string;
+  width: number;
+  height: number;
+  alt: string;
+};
+export type NumberVisual = { type: "number"; number: string; caption: string };
+
+/**
+ * Public DTO per locale (CHANGE v2.0.0, Delta APP_FLOW section 9). Never contains draft-only or
+ * admin fields, nor the deprecated `featured` (D-22). Case parts that are still empty are null or
+ * [] so the page can hide them (E-27); `visual` is null when the chosen visual is incomplete.
+ */
 export type PublicProject = {
   id: string;
   slug: string;
+  group: ProjectGroup;
   title: string;
+  meta: string | null;
+  side: string | null;
   summary: string;
-  liveUrl: string;
-  /** Host shown in the hero browser frame, e.g. "staging0.rifaldiradya.com". */
-  liveHost: string;
-  tags: string[];
-  thumbnail: { url: string; width: number; height: number; alt: string } | null;
-  featured: boolean;
+  caseIs: string | null;
+  caseDid: string[];
+  stack: string[];
+  status: string | null;
+  caseAction: CaseAction;
+  /** Only an https URL ever reaches a page (SDD section 6). */
+  liveUrl: string | null;
+  visual: ScreenshotVisual | NumberVisual | null;
+  showOnHome: boolean;
 };
 
-export const HERO_PANEL_LIMIT = 3;
-export const HOMEPAGE_GRID_LIMIT = 6;
+export const SELECTED_WORK_LIMIT = 5;
+export const STACK_LIMIT = 6;
 
-function hostOf(url: string): string {
+function httpsUrl(url: string | null): string | null {
+  if (!url) return null;
   try {
-    return new URL(url).host;
+    return new URL(url).protocol === "https:" ? url : null;
   } catch {
-    return url;
+    return null;
   }
 }
 
+function visualOf(project: Project, lang: Locale): PublicProject["visual"] {
+  if (project.visualType === "number") {
+    const caption = lang === "id" ? project.cardCaptionId : project.cardCaptionEn;
+    return project.cardNumber && caption
+      ? { type: "number", number: project.cardNumber, caption }
+      : null;
+  }
+  if (
+    project.thumbnailUrl === null ||
+    project.thumbnailWidth === null ||
+    project.thumbnailHeight === null
+  ) {
+    return null;
+  }
+  return {
+    type: "screenshot",
+    url: project.thumbnailUrl,
+    width: project.thumbnailWidth,
+    height: project.thumbnailHeight,
+    alt: (lang === "id" ? project.thumbnailAltId : project.thumbnailAltEn) ?? "",
+  };
+}
+
 export function toPublicProject(project: Project, lang: Locale): PublicProject {
-  const alt = lang === "id" ? project.thumbnailAltId : project.thumbnailAltEn;
-  const hasThumbnail =
-    project.thumbnailUrl !== null &&
-    project.thumbnailWidth !== null &&
-    project.thumbnailHeight !== null;
+  const id = lang === "id";
+  const liveUrl = httpsUrl(project.liveUrl);
+
+  // E-28: a site button without a usable URL (old or broken data) becomes no button.
+  let caseAction = project.caseAction;
+  if (caseAction === "site" && !liveUrl) {
+    console.warn(`[projects] "${project.slug}": case action "site" without a live URL, hidden.`);
+    caseAction = "none";
+  }
 
   return {
     id: project.id,
     slug: project.slug,
-    title: lang === "id" ? project.titleId : project.titleEn,
-    summary: lang === "id" ? project.summaryId : project.summaryEn,
-    liveUrl: project.liveUrl,
-    liveHost: hostOf(project.liveUrl),
-    tags: project.tags.slice(0, 4),
-    thumbnail: hasThumbnail
-      ? {
-          url: project.thumbnailUrl!,
-          width: project.thumbnailWidth!,
-          height: project.thumbnailHeight!,
-          alt: alt ?? "",
-        }
-      : null,
-    featured: project.featured,
+    group: project.group,
+    title: id ? project.titleId : project.titleEn,
+    meta: (id ? project.metaId : project.metaEn) || null,
+    side: (id ? project.sideId : project.sideEn) || null,
+    summary: id ? project.summaryId : project.summaryEn,
+    caseIs: (id ? project.caseIsId : project.caseIsEn) || null,
+    caseDid: (id ? project.caseDidId : project.caseDidEn) ?? [],
+    stack: project.tags.slice(0, STACK_LIMIT),
+    status: (id ? project.statusId : project.statusEn) || null,
+    caseAction,
+    liveUrl,
+    visual: visualOf(project, lang),
+    showOnHome: project.showOnHome,
   };
 }
+
+/** The screenshot of a project, or null (number cards appear only from v2.1.0, D-11). */
+export const screenshotOf = (project: Pick<PublicProject, "visual">) =>
+  project.visual?.type === "screenshot" ? project.visual : null;
 
 /** Standard order (App Flow section 9): sort_order asc, then newest first. */
 export function compareProjects(
@@ -62,19 +113,64 @@ export function compareProjects(
 }
 
 /**
- * Homepage split (App Flow S-01): hero panel = first 3 featured; Selected work grid = first 6
- * published regardless of `featured`, plus the total for "View all work ({n})".
- * Input must already be published-only and in standard order.
+ * Selected work (Delta SDD section 5): from the published list in standard order, the projects
+ * with show_on_home, at most 5. Derived in memory from the one query the homepage makes.
  */
-export function selectHomepageProjects<T extends { featured: boolean }>(projects: readonly T[]) {
-  return {
-    heroPanel: projects.filter((project) => project.featured).slice(0, HERO_PANEL_LIMIT),
-    grid: projects.slice(0, HOMEPAGE_GRID_LIMIT),
-    total: projects.length,
-  };
+export function selectSelectedWork<T extends { showOnHome: boolean }>(projects: readonly T[]) {
+  return projects.filter((project) => project.showOnHome).slice(0, SELECTED_WORK_LIMIT);
 }
 
-/** Grid goes to 3 columns at >=1200px only with 3+ cards (App Flow S-02, E-04). */
-export function gridColumnsClass(count: number): string {
-  return count >= 3 ? "md:grid-cols-2 xl:grid-cols-3" : "md:grid-cols-2";
+/**
+ * Scroll range of each pinned Selected work step, as % of the chapter's `contain` range
+ * (option-b.html): step i is centred on its snap point i / (n - 1), half a step either side.
+ * n = 5 gives -12.5/12.5, 12.5/37.5 … 87.5/112.5. A single project is not pinned: [].
+ */
+export function selectedWorkRanges(n: number): { r0: string; r1: string }[] {
+  if (n < 2) return [];
+  const step = 100 / (n - 1);
+  const pct = (value: number) => `${Math.round(value * 1000) / 1000}%`;
+  return Array.from({ length: n }, (_, i) => ({
+    r0: pct(i * step - step / 2),
+    r1: pct(i * step + step / 2),
+  }));
+}
+
+/**
+ * Filter buttons of the Work page (Delta APP_FLOW S-02 step 2): one per group that has projects,
+ * in the fixed order Panasonic, Websites, AI tools. An empty group gets no button.
+ */
+export function groupCounts(
+  projects: readonly Pick<PublicProject, "group">[],
+): { group: ProjectGroup; count: number }[] {
+  return PROJECT_GROUPS.map((group) => ({
+    group,
+    count: projects.filter((project) => project.group === group).length,
+  })).filter(({ count }) => count > 0);
+}
+
+/**
+ * Work page sub (D-30): one phrase per group that has projects, in the filter order, so the
+ * sentence always matches the counts on the filter buttons. Numbers up to ten are written as
+ * words. No projects → null (E-01 empty state says the rest).
+ */
+export function workSub(
+  groups: readonly { group: ProjectGroup; count: number }[],
+  sub: Dictionary["wp"]["sub"],
+  lang: Locale,
+): string | null {
+  if (groups.length === 0) return null;
+
+  const plural = new Intl.PluralRules(lang);
+  const parts = groups.map(({ group, count }) =>
+    interpolate(sub[group][plural.select(count) === "one" ? "one" : "other"], {
+      n: sub.n[count] ?? count,
+    }),
+  );
+  const last = parts.pop() as string;
+  const list =
+    parts.length === 0
+      ? last
+      : `${parts.join(", ")}${parts.length === 1 ? sub.and2 : sub.andN}${last}`;
+
+  return `${list.charAt(0).toLocaleUpperCase(lang)}${list.slice(1)}. ${sub.end}`;
 }

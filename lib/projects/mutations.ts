@@ -5,7 +5,7 @@ import { mediaUrl } from "@/lib/images/rules";
 import { deleteImageIfUnused, getImage } from "@/lib/images/store";
 import { getProjectById } from "./queries";
 import { slugify, uniqueSlug } from "./slug";
-import type { ProjectInput, ProjectInputRaw } from "./validation";
+import { messages, SHOW_ON_HOME_MAX, type ProjectInput, type ProjectInputRaw } from "./validation";
 
 // Writes for API-03/04/05/08 (SDD section 4: DB access stays in lib/projects, lib/images, lib/auth).
 //
@@ -24,10 +24,24 @@ export function toProjectInput(project: Project): ProjectInputRaw {
   return {
     title_en: project.titleEn,
     title_id: project.titleId,
+    group: project.group,
+    meta_en: project.metaEn,
+    meta_id: project.metaId,
+    side_en: project.sideEn,
+    side_id: project.sideId,
     summary_en: project.summaryEn,
     summary_id: project.summaryId,
-    live_url: project.liveUrl,
+    show_on_home: project.showOnHome,
+    case_is_en: project.caseIsEn,
+    case_is_id: project.caseIsId,
+    case_did_en: project.caseDidEn,
+    case_did_id: project.caseDidId,
     tags: project.tags,
+    status_en: project.statusEn,
+    status_id: project.statusId,
+    case_action: project.caseAction,
+    live_url: project.liveUrl,
+    visual_type: project.visualType,
     thumbnail: hasThumbnail
       ? {
           public_id: project.thumbnailPublicId!,
@@ -38,7 +52,9 @@ export function toProjectInput(project: Project): ProjectInputRaw {
       : null,
     thumbnail_alt_en: project.thumbnailAltEn,
     thumbnail_alt_id: project.thumbnailAltId,
-    featured: project.featured,
+    card_number: project.cardNumber,
+    card_caption_en: project.cardCaptionEn,
+    card_caption_id: project.cardCaptionId,
     published: project.published,
   };
 }
@@ -54,23 +70,66 @@ export function toProjectJson(project: Project) {
   };
 }
 
+// The deprecated `featured` column (D-22) is never read or written: inserts take its default.
 function toColumns(input: ProjectInput) {
   return {
     titleEn: input.title_en,
     titleId: input.title_id,
+    group: input.group,
+    metaEn: input.meta_en,
+    metaId: input.meta_id,
+    sideEn: input.side_en,
+    sideId: input.side_id,
     summaryEn: input.summary_en,
     summaryId: input.summary_id,
-    liveUrl: input.live_url,
+    showOnHome: input.show_on_home,
+    caseIsEn: input.case_is_en,
+    caseIsId: input.case_is_id,
+    caseDidEn: input.case_did_en,
+    caseDidId: input.case_did_id,
     tags: input.tags,
+    statusEn: input.status_en,
+    statusId: input.status_id,
+    caseAction: input.case_action,
+    liveUrl: input.live_url,
+    visualType: input.visual_type,
     thumbnailPublicId: input.thumbnail?.public_id ?? null,
     thumbnailUrl: input.thumbnail?.url ?? null,
     thumbnailWidth: input.thumbnail?.width ?? null,
     thumbnailHeight: input.thumbnail?.height ?? null,
     thumbnailAltEn: input.thumbnail_alt_en,
     thumbnailAltId: input.thumbnail_alt_id,
-    featured: input.featured,
+    cardNumber: input.card_number,
+    cardCaptionEn: input.card_caption_en,
+    cardCaptionId: input.card_caption_id,
     published: input.published,
   };
+}
+
+/** E-26: thrown when saving would put a 6th project in Selected work. API-03/04 answer 422. */
+export class ShowOnHomeLimitError extends Error {
+  constructor() {
+    super(messages.showOnHomeFull);
+    this.name = "ShowOnHomeLimitError";
+  }
+}
+
+type Transaction = Parameters<Parameters<ReturnType<typeof getDb>["transaction"]>[0]>[0];
+
+/**
+ * E-26: at most 5 projects with show_on_home, drafts included. Runs inside the save transaction
+ * with the rows locked, so two saves at once can't both take the 5th place. A project that is
+ * already on may always be saved again.
+ */
+async function assertShowOnHomeRoom(tx: Transaction, input: ProjectInput, selfId?: string) {
+  if (!input.show_on_home) return;
+  const rows = await tx
+    .select({ id: projects.id })
+    .from(projects)
+    .where(eq(projects.showOnHome, true))
+    .for("update");
+  const others = rows.filter((row) => row.id !== selfId);
+  if (others.length >= SHOW_ON_HOME_MAX) throw new ShowOnHomeLimitError();
 }
 
 async function freeSlug(title: string): Promise<string> {
@@ -105,6 +164,7 @@ export async function createProject(input: ProjectInput): Promise<Project> {
     const slug = await freeSlug(input.title_en);
     try {
       const id = await getDb().transaction(async (tx) => {
+        await assertShowOnHomeRoom(tx, input);
         await tx
           .update(projects)
           .set({ sortOrder: sql`${projects.sortOrder} + 1`, ...keepUpdatedAt });
@@ -148,7 +208,10 @@ export async function updateProject(
   existing: Project,
   input: ProjectInput,
 ): Promise<Project | null> {
-  await getDb().update(projects).set(toColumns(input)).where(eq(projects.id, existing.id));
+  await getDb().transaction(async (tx) => {
+    await assertShowOnHomeRoom(tx, input, existing.id);
+    await tx.update(projects).set(toColumns(input)).where(eq(projects.id, existing.id));
+  });
   const updated = await getProjectById(existing.id);
 
   const previous = existing.thumbnailPublicId;

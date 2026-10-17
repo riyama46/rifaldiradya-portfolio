@@ -13,11 +13,15 @@ type ToastProps = {
   onDone?: () => void;
 };
 
-const tones: Record<ToastTone, string> = {
-  success: "border-l-success bg-surface-raised",
-  warning: "border-l-accent bg-accent-soft",
-  error: "border-l-danger bg-surface-raised",
+// admin.html toast: inverted ink panel; the tone is the dot, the message says the rest.
+const dots: Record<ToastTone, string> = {
+  success: "bg-success",
+  warning: "bg-accent",
+  error: "bg-danger",
 };
+
+const panel =
+  "pointer-events-auto flex max-w-sm items-center gap-2.5 rounded-lg bg-text px-4 py-3 text-small font-medium text-bg shadow-lg"; // taste-skill-ignore: a toast floats over the page
 
 const subscribe = () => () => {};
 
@@ -49,12 +53,8 @@ export function Toast({ message, tone = "success", duration = 4000, onDone }: To
       className="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex justify-center md:inset-x-auto md:right-6 md:bottom-6"
     >
       {hydrated && !hidden && (
-        <p
-          className={cn(
-            "pointer-events-auto max-w-sm rounded-button border border-l-4 border-border px-4 py-3 text-small font-medium shadow-card",
-            tones[tone],
-          )}
-        >
+        <p className={panel}>
+          <span aria-hidden="true" className={cn("size-2 shrink-0 rounded-full", dots[tone])} />
           {message}
         </p>
       )}

@@ -13,6 +13,14 @@ import {
 afterEach(() => vi.unstubAllEnvs());
 
 describe("SEO copy (PRD section 9 limits)", () => {
+  it.each(["en", "id"] as const)("%s meta never mentions availability (D-26)", (lang) => {
+    const { seo } = getDictionary(lang);
+    const text = JSON.stringify(seo).toLowerCase();
+    for (const word of ["open to", "available", "terbuka untuk", "menerima"]) {
+      expect(text).not.toContain(word);
+    }
+  });
+
   it.each(["en", "id"] as const)("%s titles ≤ 60 and descriptions ≤ 155 characters", (lang) => {
     const { seo } = getDictionary(lang);
     for (const page of [seo.home, seo.work, seo.privacy]) {
@@ -96,17 +104,20 @@ describe("JSON-LD", () => {
     expect(person).toMatchObject({
       "@type": "Person",
       name: "Rifaldi Radya Pratama",
-      jobTitle: "Web Developer",
+      jobTitle: "Software Engineer",
       url: "https://rifaldiradya.com/id",
+      worksFor: { "@type": "Organization", name: "PT Panasonic Manufacturing Indonesia" },
+      knowsAbout: ["C#", "ASP.NET", "SQL Server", "Microsoft Azure", "Next.js", "TypeScript"],
+      // GitHub is empty, so only LinkedIn (D-19, AC-13).
       sameAs: ["https://www.linkedin.com/in/rifaldiradya"],
     });
     expect(website).toMatchObject({ "@type": "WebSite", inLanguage: "id-ID" });
   });
 
-  it("work page: an ItemList of the live projects in page order", () => {
+  it("work page: an ItemList of the projects in page order", () => {
     const data = workJsonLd("en", origin, "Work", [
-      { title: "Clinic", liveUrl: "https://a.example" },
-      { title: "Coffee", liveUrl: "https://b.example" },
+      { title: "Clinic", slug: "clinic", liveUrl: "https://a.example" },
+      { title: "Coffee", slug: "coffee", liveUrl: "https://b.example" },
     ]);
     expect(data).toMatchObject({
       "@type": "CollectionPage",
@@ -120,9 +131,20 @@ describe("JSON-LD", () => {
     });
   });
 
+  it("work page: a project without a site points at its case row (Delta PRD section 9)", () => {
+    const data = workJsonLd("id", origin, "Karya", [
+      { title: "HR System", slug: "hr-system", liveUrl: null },
+    ]);
+    expect(data).toMatchObject({
+      mainEntity: {
+        itemListElement: [{ url: "https://rifaldiradya.com/id/work#case-hr-system" }],
+      },
+    });
+  });
+
   it("escapes < so a project title can never close the script tag", () => {
     const data = workJsonLd("en", origin, "Work", [
-      { title: "</script><script>alert(1)</script>", liveUrl: "https://a.example" },
+      { title: "</script><script>alert(1)</script>", slug: "x", liveUrl: "https://a.example" },
     ]);
     const json = serializeJsonLd(data);
     expect(json).not.toContain("</script>");
