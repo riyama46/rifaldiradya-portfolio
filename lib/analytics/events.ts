@@ -1,16 +1,27 @@
 import { analyticsEnabled } from "./config";
 import { getConsent } from "./consent";
 
-// The GA4 events of App Flow section 11 (page_view is sent by gtag itself), typed strictly.
+// The GA4 events of Delta APP_FLOW section 11 (page_view is sent by gtag itself), typed strictly.
+// Key events in GA4: contact_email_click and cv_download.
 type Language = "en" | "id";
 export type CaseOpenSource = "home_title" | "row" | "hash";
 
+const KINDS = ["general", "role", "project", "walkthrough"] as const;
+const LOCATIONS = ["bar", "hero", "contact", "work_contact", "case"] as const;
+const CV_LOCATIONS = ["about", "contact"] as const;
+const PLACEMENTS = ["home", "case"] as const;
+
 export type AnalyticsEvents = {
   contact_email_click: {
-    location: "bar" | "hero" | "footer" | "work_page";
+    kind: (typeof KINDS)[number];
+    location: (typeof LOCATIONS)[number];
     method: "mailto" | "copy";
     language: Language;
+    /** Only for kind "walkthrough": the project the email asks about. */
+    project_slug?: string;
   };
+  /** The static web CV (D-14). */
+  cv_download: { location: (typeof CV_LOCATIONS)[number]; language: Language };
   project_link_click: {
     project_slug: string;
     page: "home" | "work";
@@ -62,23 +73,34 @@ export function takeCaseFromHome(slug: string): boolean {
   }
 }
 
-const LOCATIONS = ["bar", "hero", "footer", "work_page"] as const;
-const PLACEMENTS = ["home", "case"] as const;
 const includes = <T extends string>(list: readonly T[], value: string | undefined): value is T =>
   list.includes(value as T);
 
 /**
  * Server-rendered links declare their event with data attributes, so they stay Server Components:
- *   data-track="contact_email_click" data-location="hero" data-method="mailto"
+ *   data-track="contact_email_click" data-kind="role" data-location="contact" data-method="mailto"
+ *   data-track="cv_download" data-location="about"
  *   data-track="project_link_click" data-slug="…" data-placement="case"
  * One delegated listener (AnalyticsEvents) turns a click into track(). Returns false when the
  * attributes don't describe a valid event (never sends half-filled events).
  */
 export function trackFromElement(element: HTMLElement, pathname: string, language: Language) {
-  const { track: name, location, method, slug, placement, source } = element.dataset;
+  const { track: name, kind, location, method, slug, placement, source } = element.dataset;
   const page = pathname === "/work" || pathname === "/id/work" ? "work" : "home";
-  if (name === "contact_email_click" && includes(LOCATIONS, location)) {
-    track(name, { location, method: method === "copy" ? "copy" : "mailto", language });
+  if (name === "contact_email_click" && includes(KINDS, kind) && includes(LOCATIONS, location)) {
+    // A walkthrough email names its project; the other kinds never carry a slug.
+    if (kind === "walkthrough" && !slug) return false;
+    track(name, {
+      kind,
+      location,
+      method: method === "copy" ? "copy" : "mailto",
+      language,
+      ...(kind === "walkthrough" && { project_slug: slug }),
+    });
+    return true;
+  }
+  if (name === "cv_download" && includes(CV_LOCATIONS, location)) {
+    track(name, { location, language });
     return true;
   }
   if (name === "project_link_click" && slug && includes(PLACEMENTS, placement)) {

@@ -103,7 +103,7 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
 
 ## Fase E — SEO, analytics, privasi
 
-- [ ] **T-32 SEO + analytics + Privacy.**
+- [x] **T-32 SEO + analytics + Privacy.**
   - Meta baru, JSON-LD (Person, ItemList dengan URL case), OG ulang (`scripts/og-images.mts`), `events.ts` v2 + atribut `data-track`.
   - Privacy EN/ID (`rr-theme`, CV, `sessionStorage` `rr-case-from-home` dari T-31: penanda sekali pakai agar klik judul home tidak terhitung dua kali sebagai `case_open`).
   - `site-config` LinkedIn baru + `github` kosong.

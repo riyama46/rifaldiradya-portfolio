@@ -74,6 +74,10 @@ export default async function PrivacyPage({ params }: PageProps<"/[lang]/privacy
               </table>
             </Section>
 
+            <Section title={privacy.cvTitle}>
+              <p>{privacy.cvBody}</p>
+            </Section>
+
             <Section title={privacy.changeTitle}>
               <p>{privacy.changeBody}</p>
               <CookieSettingsButton

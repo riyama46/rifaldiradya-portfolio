@@ -26,18 +26,18 @@
   },
   "seo": {
     "siteName": "Rifaldi Radya Pratama",
-    "ogAlt": "Rifaldi Radya Pratama, landing pages that launch in days, not weeks",
+    "ogAlt": "Rifaldi Radya Pratama, software engineer. Building HR software for thousands.",
     "home": {
-      "title": "Rifaldi Radya Pratama — Fast Landing Page Developer",
-      "description": "Landing pages that launch in days, not weeks. Web developer based in Indonesia, working with clients worldwide. See live work."
+      "title": "Rifaldi Radya Pratama, Software Engineer (Full-Stack .NET)",
+      "description": "Software engineer building the HR system 13 Panasonic group companies run on. C#, ASP.NET, SQL Server and Azure. Based in Jakarta, Indonesia."
     },
     "work": {
-      "title": "Work — Landing Pages by Rifaldi Radya Pratama",
-      "description": "Live landing pages built by Rifaldi Radya Pratama. Click through to see real, working sites."
+      "title": "Work: HR Systems, Websites, AI Tools | Rifaldi Radya Pratama",
+      "description": "HR systems inside Panasonic, websites and AI tools by Rifaldi Radya Pratama. Open a row for what it is, what I did and the stack."
     },
     "privacy": {
-      "title": "Privacy — Rifaldi Radya Pratama",
-      "description": "How rifaldiradya.com handles analytics cookies, your language choice, and email. No accounts, no forms, no tracking without consent."
+      "title": "Privacy | Rifaldi Radya Pratama",
+      "description": "How rifaldiradya.com handles analytics cookies, your language and theme choice, the CV download and email. No tracking without consent."
     }
   },
   "work": {
@@ -150,12 +150,12 @@
   },
   "privacy": {
     "title": "Privacy",
-    "updated": "Last updated: 29 September 2026",
+    "updated": "Last updated: 17 October 2026",
     "intro": "This site keeps things simple: no accounts, no contact forms, and no analytics unless you allow them.",
     "collectTitle": "What is collected",
-    "collectBody": "If you click Accept on the cookie banner, Google Analytics 4 records anonymous usage data: which pages are viewed, the rough region and device type, and clicks on the email buttons and project links. It does not tell me who you are. If you click Reject or ignore the banner, Google Analytics does not run and sets no cookies.",
-    "cookiesTitle": "Cookies",
-    "cookieName": "Cookie",
+    "collectBody": "If you click Accept on the cookie banner, Google Analytics 4 records anonymous usage data: which pages are viewed, the rough region and device type, and clicks on the email buttons, the CV download, project links, opened case rows and the theme switch. It does not tell me who you are. If you click Reject or ignore the banner, Google Analytics does not run and sets no cookies.",
+    "cookiesTitle": "Cookies and browser storage",
+    "cookieName": "Name",
     "cookiePurpose": "Purpose",
     "cookieDuration": "Duration",
     "cookies": [
@@ -173,12 +173,24 @@
         "name": "_ga, _ga_*",
         "purpose": "Google Analytics, set only after you click Accept.",
         "duration": "Up to 2 years (set by Google)"
+      },
+      {
+        "name": "rr-theme",
+        "purpose": "Local storage. Remembers light or dark mode. It stays in your browser and is never sent anywhere.",
+        "duration": "Until you clear site data"
+      },
+      {
+        "name": "rr-case-from-home",
+        "purpose": "Session storage. A one-time mark when you open a project from the homepage, so that visit is not counted twice. It holds only the project’s short name.",
+        "duration": "Removed when read, or when the tab closes"
       }
     ],
+    "cvTitle": "The CV download",
+    "cvBody": "The CV is a plain PDF file served from this site. Downloading it sets no cookie. If you accepted analytics, the click is counted as a CV download, without any details about you.",
     "changeTitle": "Changing your choice",
     "changeBody": "Use “Cookie settings” at the bottom of any page to change your choice at any time. Switching to Reject also removes the Google Analytics cookies.",
     "emailTitle": "When you email me",
-    "emailBody": "Your message is used only to reply and talk about your project. It is not added to a mailing list or shared with anyone.",
+    "emailBody": "Your message is used only to reply and talk about the role or project. It is not added to a mailing list or shared with anyone.",
     "contactTitle": "Questions",
     "contactBody": "Email {email} about anything on this page."
   },

@@ -26,18 +26,18 @@
   },
   "seo": {
     "siteName": "Rifaldi Radya Pratama",
-    "ogAlt": "Rifaldi Radya Pratama, landing page siap pakai dalam hitungan hari, bukan minggu",
+    "ogAlt": "Rifaldi Radya Pratama, software engineer. Membangun software HR untuk ribuan karyawan.",
     "home": {
-      "title": "Rifaldi Radya Pratama — Jasa Landing Page Cepat",
-      "description": "Landing page siap pakai dalam hitungan hari, bukan minggu. Web developer dari Indonesia. Lihat hasil kerjanya langsung."
+      "title": "Rifaldi Radya Pratama, Software Engineer (Full-Stack .NET)",
+      "description": "Software engineer yang membangun sistem HR 13 perusahaan grup Panasonic. C#, ASP.NET, SQL Server, dan Azure. Berbasis di Jabodetabek."
     },
     "work": {
-      "title": "Hasil Kerja — Landing Page oleh Rifaldi Radya Pratama",
-      "description": "Kumpulan landing page yang sudah live, dibuat oleh Rifaldi Radya Pratama. Klik dan lihat situs aslinya."
+      "title": "Karya: Sistem HR, Website, Alat AI | Rifaldi Radya Pratama",
+      "description": "Sistem HR di Panasonic, website, dan alat AI karya Rifaldi Radya Pratama. Buka satu baris untuk melihat apa itu, yang saya kerjakan, dan stack-nya."
     },
     "privacy": {
-      "title": "Privasi — Rifaldi Radya Pratama",
-      "description": "Cara rifaldiradya.com menangani cookie analitik, pilihan bahasa, dan email. Tanpa akun, tanpa formulir, tanpa pelacakan tanpa izin."
+      "title": "Privasi | Rifaldi Radya Pratama",
+      "description": "Cara rifaldiradya.com menangani cookie analitik, pilihan bahasa dan tema, unduhan CV, dan email. Tanpa pelacakan tanpa izin."
     }
   },
   "work": {
@@ -150,12 +150,12 @@
   },
   "privacy": {
     "title": "Privasi",
-    "updated": "Terakhir diperbarui: 29 September 2026",
+    "updated": "Terakhir diperbarui: 17 Oktober 2026",
     "intro": "Situs ini dibuat sederhana: tanpa akun, tanpa formulir kontak, dan tanpa analytics kecuali kamu mengizinkannya.",
     "collectTitle": "Data yang dikumpulkan",
-    "collectBody": "Jika kamu menekan Terima di banner cookie, Google Analytics 4 mencatat data penggunaan anonim: halaman yang dibuka, perkiraan wilayah dan jenis perangkat, serta klik pada tombol email dan link project. Data ini tidak memberi tahu saya siapa kamu. Jika kamu menekan Tolak atau mengabaikan banner, Google Analytics tidak berjalan dan tidak memasang cookie.",
-    "cookiesTitle": "Cookie",
-    "cookieName": "Cookie",
+    "collectBody": "Jika kamu menekan Terima di banner cookie, Google Analytics 4 mencatat data penggunaan anonim: halaman yang dibuka, perkiraan wilayah dan jenis perangkat, serta klik pada tombol email, unduhan CV, link proyek, baris case yang dibuka, dan tombol tema. Data ini tidak memberi tahu saya siapa kamu. Jika kamu menekan Tolak atau mengabaikan banner, Google Analytics tidak berjalan dan tidak memasang cookie.",
+    "cookiesTitle": "Cookie dan penyimpanan browser",
+    "cookieName": "Nama",
     "cookiePurpose": "Kegunaan",
     "cookieDuration": "Masa berlaku",
     "cookies": [
@@ -173,12 +173,24 @@
         "name": "_ga, _ga_*",
         "purpose": "Google Analytics, hanya dipasang setelah kamu menekan Terima.",
         "duration": "Hingga 2 tahun (diatur Google)"
+      },
+      {
+        "name": "rr-theme",
+        "purpose": "Local storage. Mengingat mode terang atau gelap. Tetap di browsermu dan tidak pernah dikirim ke mana pun.",
+        "duration": "Sampai kamu menghapus data situs"
+      },
+      {
+        "name": "rr-case-from-home",
+        "purpose": "Session storage. Penanda sekali pakai saat kamu membuka proyek dari homepage, agar kunjungan itu tidak terhitung dua kali. Isinya hanya nama singkat proyek.",
+        "duration": "Dihapus saat dibaca, atau saat tab ditutup"
       }
     ],
+    "cvTitle": "Unduhan CV",
+    "cvBody": "CV adalah file PDF biasa yang disajikan dari situs ini. Mengunduhnya tidak memasang cookie. Jika kamu menerima analytics, kliknya dihitung sebagai unduhan CV, tanpa detail apa pun tentang kamu.",
     "changeTitle": "Mengubah pilihan",
     "changeBody": "Gunakan “Pengaturan cookie” di bagian bawah setiap halaman untuk mengubah pilihanmu kapan saja. Beralih ke Tolak juga menghapus cookie Google Analytics.",
     "emailTitle": "Saat kamu mengirim email",
-    "emailBody": "Pesanmu hanya dipakai untuk membalas dan membahas project-mu. Pesan itu tidak dimasukkan ke mailing list dan tidak dibagikan ke siapa pun.",
+    "emailBody": "Pesanmu hanya dipakai untuk membalas dan membahas posisi atau proyeknya. Pesan itu tidak dimasukkan ke mailing list dan tidak dibagikan ke siapa pun.",
     "contactTitle": "Pertanyaan",
     "contactBody": "Kirim email ke {email} untuk pertanyaan apa pun tentang halaman ini."
   },

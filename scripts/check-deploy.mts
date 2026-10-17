@@ -1,4 +1,4 @@
-// Checks a live deployment from the outside (T-22). Read-only: only GET requests, no login.
+// Checks a live deployment from the outside (T-22; v2 checks added in T-32). Read-only: only GET requests, no login.
 //   node scripts/check-deploy.mts https://rifaldiradya.com --production
 //   node scripts/check-deploy.mts https://devstaging.rifaldiradya.com
 // --production expects an indexable site (robots allow, index meta, www → non-www redirect);
@@ -78,6 +78,24 @@ check(
 );
 check("JSON-LD in the HTML", html.includes('<script type="application/ld+json">'));
 
+// v2 content (Delta SDD section 10): new meta, LinkedIn, no GitHub while it is empty (AC-13)
+const title = /<title>([^<]+)<\/title>/.exec(html)?.[1]?.replaceAll("&amp;", "&");
+check(
+  "v2 title on /",
+  title === "Rifaldi Radya Pratama, Software Engineer (Full-Stack .NET)",
+  `got ${title}`,
+);
+check(
+  "v2 chapters on /",
+  ["#top", "#about", "#contact"].every((id) => html.includes(`id="${id.slice(1)}"`)),
+);
+check(
+  "LinkedIn links to /in/rifaldiradya (page + JSON-LD)",
+  (html.match(/https:\/\/www\.linkedin\.com\/in\/rifaldiradya/g) ?? []).length >= 2,
+);
+check("No GitHub link while it is empty (D-19)", !html.includes("github.com"));
+check("Download CV link on /", html.includes('href="/cv/rifaldi-radya-pratama-cv.pdf"'));
+
 // robots.txt and sitemap
 const robots = await (await get("/robots.txt")).text();
 check(
@@ -98,6 +116,12 @@ check(
 // Static files and admin
 check("favicon.ico", (await get("/favicon.ico")).status === 200);
 check("OG image", (await get("/og/en.png")).status === 200);
+const cv = await get("/cv/rifaldi-radya-pratama-cv.pdf");
+check(
+  "CV PDF → 200 application/pdf",
+  cv.status === 200 && (cv.headers.get("content-type") ?? "").includes("application/pdf"),
+  `got ${cv.status} ${cv.headers.get("content-type") ?? ""}`,
+);
 const admin = await get("/admin/login");
 check(
   "Admin sends X-Robots-Tag noindex",
