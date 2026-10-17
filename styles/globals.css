@@ -3,7 +3,7 @@
 /*
  * Design tokens v2 (Delta PRD section 8, Delta SDD section 8). Two layers:
  * 1. theme tokens per theme on :root; values copied from docs/design/v2/option-b.html (public) and
- *    admin.html (--panel, --field, --ok, --danger);
+ *    admin.html (--panel, --field, --ok, --warn, --danger);
  * 2. the Tailwind mapping in @theme below. Components use the mapped utilities, never raw values.
  * Rules: --calm is glow colour only, --faint is decorative lines only; neither is ever text.
  */
@@ -23,6 +23,7 @@
   --panel: #121212;
   --field: #0e0e0e;
   --ok: #3fbf6f;
+  --warn: #e2b24a;
   --danger: #ff6b6b;
 }
 
@@ -43,6 +44,7 @@
     --panel: #ffffff;
     --field: #ffffff;
     --ok: #1a7f45;
+    --warn: #a06b00;
     --danger: #c62828;
   }
 }
@@ -62,6 +64,7 @@
   --panel: #ffffff;
   --field: #ffffff;
   --ok: #1a7f45;
+  --warn: #a06b00;
   --danger: #c62828;
 }
 
@@ -119,6 +122,7 @@
   --color-on-accent: var(--accent-ink);
   /* Admin only (status text and destructive actions). */
   --color-success: var(--ok);
+  --color-warning: var(--warn);
   --color-danger: var(--danger);
 
   --font-sans: var(--font-archivo), "Helvetica Neue", Arial, sans-serif;
@@ -201,8 +205,11 @@
     color: var(--color-accent);
   }
 
+  /* Admin is dense work UI (admin.html): 16px body at every width, not the public 18px. */
   .admin-shell {
     --radius-button: 6px;
+    font-size: 1rem;
+    line-height: 1.5;
   }
 
   /* Sticky navbar. Its box never changes height (no layout shift); on scroll the background

@@ -1,29 +1,50 @@
 import type { UploadedImage } from "@/components/admin/ImageUploader";
 import {
+  CASE_DID_LINES_MAX,
   fieldErrors,
+  fieldLabels,
   projectInputSchema,
   TAG_MAX,
   TAGS_MAX,
   messages,
+  type CaseAction,
   type ProjectField,
+  type ProjectGroup,
   type ProjectInputRaw,
+  type VisualType,
 } from "@/lib/projects/validation";
 
-// Form state for S-12/S-13 and its mapping to ProjectInput. Pure, so it is unit tested.
-// v1 form until T-26 rebuilds it per section: the v2 case fields are not on it yet. They are not
-// sent either, so API-04 keeps their stored values; the server still reports them when missing.
+// Form state for S-12/S-13 (CHANGE v2.0.0 Delta APP_FLOW section 6) and its mapping to
+// ProjectInput. Pure, so it is unit tested. Every field is sent on save; the shared schema trims
+// text and turns "" into null, and drops blank "What I did" lines.
 
 export type FormValues = {
   title_en: string;
   title_id: string;
+  group: ProjectGroup;
+  meta_en: string;
+  meta_id: string;
+  side_en: string;
+  side_id: string;
   summary_en: string;
   summary_id: string;
-  live_url: string;
+  show_on_home: boolean;
+  case_is_en: string;
+  case_is_id: string;
+  case_did_en: string[];
+  case_did_id: string[];
   tags: string[];
+  status_en: string;
+  status_id: string;
+  case_action: CaseAction;
+  live_url: string;
+  visual_type: VisualType;
   thumbnail: UploadedImage | null;
   thumbnail_alt_en: string;
   thumbnail_alt_id: string;
-  show_on_home: boolean;
+  card_number: string;
+  card_caption_en: string;
+  card_caption_id: string;
   published: boolean;
 };
 
@@ -33,29 +54,64 @@ export type FieldErrors = Partial<Record<ProjectField, string>>;
 export const emptyValues: FormValues = {
   title_en: "",
   title_id: "",
+  group: "web",
+  meta_en: "",
+  meta_id: "",
+  side_en: "",
+  side_id: "",
   summary_en: "",
   summary_id: "",
-  live_url: "",
+  show_on_home: false,
+  case_is_en: "",
+  case_is_id: "",
+  case_did_en: [""],
+  case_did_id: [""],
   tags: [],
+  status_en: "",
+  status_id: "",
+  case_action: "site",
+  live_url: "",
+  visual_type: "screenshot",
   thumbnail: null,
   thumbnail_alt_en: "",
   thumbnail_alt_id: "",
-  show_on_home: false,
+  card_number: "",
+  card_caption_en: "",
+  card_caption_id: "",
   published: false,
 };
+
+/** Stored lines, or one empty line to type into. */
+const lines = (value: string[] | null | undefined) => (value && value.length > 0 ? value : [""]);
 
 export function valuesFromInput(input: ProjectInputRaw): FormValues {
   return {
     title_en: input.title_en ?? "",
     title_id: input.title_id ?? "",
+    group: input.group ?? "web",
+    meta_en: input.meta_en ?? "",
+    meta_id: input.meta_id ?? "",
+    side_en: input.side_en ?? "",
+    side_id: input.side_id ?? "",
     summary_en: input.summary_en ?? "",
     summary_id: input.summary_id ?? "",
-    live_url: input.live_url ?? "",
+    show_on_home: input.show_on_home ?? false,
+    case_is_en: input.case_is_en ?? "",
+    case_is_id: input.case_is_id ?? "",
+    case_did_en: lines(input.case_did_en),
+    case_did_id: lines(input.case_did_id),
     tags: input.tags ?? [],
+    status_en: input.status_en ?? "",
+    status_id: input.status_id ?? "",
+    case_action: input.case_action ?? "site",
+    live_url: input.live_url ?? "",
+    visual_type: input.visual_type ?? "screenshot",
     thumbnail: input.thumbnail ?? null,
     thumbnail_alt_en: input.thumbnail_alt_en ?? "",
     thumbnail_alt_id: input.thumbnail_alt_id ?? "",
-    show_on_home: input.show_on_home ?? false,
+    card_number: input.card_number ?? "",
+    card_caption_en: input.card_caption_en ?? "",
+    card_caption_id: input.card_caption_id ?? "",
     published: input.published ?? false,
   };
 }
@@ -74,26 +130,35 @@ export function validate(values: FormValues): FieldErrors {
   return result.success ? {} : fieldErrors(result.error);
 }
 
-/** Order of fields on screen, for "focus the first error". */
-export const fieldOrder: ProjectField[] = [
-  "title_en",
-  "title_id",
-  "summary_en",
-  "summary_id",
-  "live_url",
-  "tags",
-  "thumbnail",
-  "thumbnail_alt_en",
-  "thumbnail_alt_id",
-  "show_on_home",
-  "published",
-];
+/** Order of fields on screen (S-12 table order), for "focus the first error" and the summary. */
+export const fieldOrder = Object.keys(fieldLabels) as ProjectField[];
 
 export const firstErrorField = (errors: FieldErrors) =>
   fieldOrder.find((field) => errors[field] !== undefined) ?? null;
 
 export const isDirty = (initial: FormValues, current: FormValues) =>
   JSON.stringify(initial) !== JSON.stringify(current);
+
+/** Fields that belong to each Visual type; the other type's pane is hidden unless it has errors. */
+export const visualFields: Record<VisualType, ProjectField[]> = {
+  screenshot: ["thumbnail", "thumbnail_alt_en", "thumbnail_alt_id"],
+  number: ["card_number", "card_caption_en", "card_caption_id"],
+};
+
+/** "What I did" (LinesInput): add a line at the end, up to 8. */
+export const canAddLine = (current: string[]) => current.length < CASE_DID_LINES_MAX;
+
+export const addLine = (current: string[]) => (canAddLine(current) ? [...current, ""] : current);
+
+/** Removing the last remaining line leaves one empty line, so there is always a field to type in. */
+export function removeLine(current: string[], index: number) {
+  const next = current.filter((_, position) => position !== index);
+  return next.length > 0 ? next : [""];
+}
+
+/** Lines that will be saved (blank ones are dropped), for the "n lines, max 8" counter. */
+export const filledLines = (current: string[]) =>
+  current.filter((line) => line.trim() !== "").length;
 
 /** Chip input (S-12 Stack): Enter or comma adds; 0–6 unique items of 1–24 characters. */
 export function addTags(tags: string[], raw: string): { tags: string[]; error: string | null } {
