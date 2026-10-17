@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { CookieSettingsButton } from "@/components/overlays/CookieSettingsButton";
-import { SiteHeader } from "@/components/site/SiteHeader";
+import { Footer } from "@/components/site/Footer";
+import { SiteBar } from "@/components/site/SiteBar";
 import { Container } from "@/components/ui/Container";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/i18n/server";
@@ -34,8 +35,8 @@ export default async function PrivacyPage({ params }: PageProps<"/[lang]/privacy
 
   return (
     <>
-      <SiteHeader lang={lang} dict={dict} path="/privacy" />
-      <main id="content" tabIndex={-1}>
+      <SiteBar lang={lang} dict={dict} path="/privacy" />
+      <main id="content" tabIndex={-1} className="pt-16">
         <Container className="pt-10 pb-16 lg:pt-18 lg:pb-24">
           <article className="max-w-[65ch]">
             <h1 className="text-display">{privacy.title}</h1>
@@ -100,6 +101,7 @@ export default async function PrivacyPage({ params }: PageProps<"/[lang]/privacy
           </article>
         </Container>
       </main>
+      <Footer lang={lang} dict={dict} />
     </>
   );
 }

@@ -212,26 +212,198 @@
     line-height: 1.5;
   }
 
-  /* Sticky navbar. Its box never changes height (no layout shift); on scroll the background
-     scales down and the row nudges up, which reads as "shrinking" (PRD section 8). */
-  .site-header {
-    isolation: isolate;
+  /* ---------- Public shell (Delta App Flow G2, option-b.html .bar/.progress/.depth/.foot) ---------- */
+
+  /* Fixed bar over the chapters. The scrim fades into the page instead of drawing an edge; it
+     takes no clicks, only the links and buttons do. */
+  .site-bar {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px var(--gutter) 20px;
+    /* Lint "gradient" defended: neutral scrim into the page, no hard edge (option-b.html). */
+    background: linear-gradient(to bottom, var(--bg) 55%, transparent);
     pointer-events: none;
   }
 
-  .site-header::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: color-mix(in oklab, var(--color-bg) 92%, transparent);
-    border-bottom: 1px solid transparent;
-    transform-origin: top;
+  .site-bar a,
+  .site-bar button {
+    pointer-events: auto;
   }
 
-  .site-header a,
-  .site-header button {
-    pointer-events: auto;
+  .site-bar-name {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    border-radius: 2px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  .site-bar-nav {
+    display: flex;
+    align-items: center;
+    gap: clamp(10px, 2.4vw, 32px);
+  }
+
+  /* Bar labels: 13px uppercase, 44px tall touch target through the vertical padding. */
+  .bar-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    border-radius: 2px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: color 200ms var(--ease);
+  }
+
+  .bar-link:hover,
+  .bar-link[aria-current="page"] {
+    color: var(--color-accent);
+  }
+
+  /* EN|ID: the current language is ink with an accent line under it. */
+  .lang-link[aria-current="true"] {
+    color: var(--color-text);
+  }
+
+  .lang-link[aria-current="true"]::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    bottom: 8px;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--color-accent);
+  }
+
+  .scroll-progress {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 60;
+    height: 2px;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    pointer-events: none;
+  }
+
+  /* A chapter holds a depth layer under its content and is its own view timeline. */
+  .chapter {
+    position: relative;
+    overflow: clip;
+    isolation: isolate;
+    view-timeline: --ch block;
+  }
+
+  .chapter > :not(.depth) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .depth {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    /* Lint "gradient" defended: edge mask, not a fill. */
+    mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+  }
+
+  .depth-layer {
+    position: absolute;
+    inset: -20% 0;
+  }
+
+  .depth-dots {
+    position: absolute;
+    inset: 0;
+    /* Lint "gradient" defended: dot pattern Pal asked for (D-08). */
+    background-image: radial-gradient(var(--dot) 1.2px, transparent 1.8px);
+    background-size: 32px 32px;
+  }
+
+  .depth-glow {
+    position: absolute;
+    left: var(--gx, 70%);
+    top: var(--gy, 40%);
+    width: 70vmax;
+    height: 70vmax;
+    margin: -35vmax 0 0 -35vmax;
+    border-radius: 50%;
+    /* Lint "gradient" defended: chapter light Pal asked for (D-08). */
+    background: radial-gradient(circle, var(--glow, transparent), transparent 62%);
+  }
+
+  /* Light per chapter (data-zone); --k softens it in the light theme. */
+  [data-zone="top"] {
+    --gx: 88%;
+    --gy: 30%;
+    --glow: color-mix(in srgb, var(--accent) calc(14% * var(--k)), transparent);
+  }
+
+  [data-zone="work"],
+  [data-zone="all"] {
+    --gx: 12%;
+    --gy: 55%;
+    --glow: color-mix(in srgb, var(--accent) calc(24% * var(--k)), transparent);
+  }
+
+  [data-zone="about"] {
+    --gx: 8%;
+    --gy: 70%;
+    --glow: color-mix(in srgb, var(--calm) calc(9% * var(--k)), transparent);
+  }
+
+  [data-zone="highlight"] {
+    --gx: 86%;
+    --gy: 64%;
+    --glow: color-mix(in srgb, var(--accent) calc(17% * var(--k)), transparent);
+  }
+
+  [data-zone="contact"],
+  [data-zone="more"] {
+    --gx: 30%;
+    --gy: 24%;
+    --glow: color-mix(in srgb, var(--accent) calc(26% * var(--k)), transparent);
+  }
+
+  .site-foot {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 24px;
+    padding: 24px var(--gutter) 32px;
+    font-size: 14px;
+    color: var(--color-text-muted);
+  }
+
+  .foot-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: color 200ms var(--ease);
+  }
+
+  .foot-link:hover {
+    color: var(--color-text);
   }
 
   /* Faint 32px grid behind the hero, fading out towards the edges (PRD signature motif). */
@@ -337,6 +509,30 @@ html:not([data-theme]) .theme-toggle {
   }
 }
 
+@keyframes grow-x {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes depth-drift {
+  from {
+    transform: translateY(-16%);
+  }
+  to {
+    transform: translateY(16%);
+  }
+}
+
+@keyframes glow-drift {
+  from {
+    transform: translate(-6vw, -12%) scale(0.85);
+  }
+  to {
+    transform: translate(6vw, 12%) scale(1.15);
+  }
+}
+
 @keyframes proof-fill {
   to {
     transform: scaleX(1);
@@ -364,32 +560,25 @@ html:not([data-theme]) .theme-toggle {
   }
 }
 
-@keyframes header-bg-shrink {
-  to {
-    transform: scaleY(0.8125);
-    border-bottom-color: var(--color-border);
-  }
-}
-
-@keyframes header-row-shrink {
-  to {
-    transform: translateY(-6px);
-  }
-}
-
 /* Scroll-driven motion (PRD section 8). Unsupported browsers keep the static end state. */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .site-header::before {
-      animation: header-bg-shrink linear both;
+    .scroll-progress {
+      animation: grow-x linear both;
       animation-timeline: scroll(root);
-      animation-range: 0 64px;
     }
 
-    .site-header-inner {
-      animation: header-row-shrink linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 64px;
+    /* Parallax: the depth layer lags behind its chapter. */
+    .chapter .depth-layer {
+      animation: depth-drift linear both;
+      animation-timeline: --ch;
+      animation-range: cover 0% cover 100%;
+    }
+
+    .chapter .depth-glow {
+      animation: glow-drift linear both;
+      animation-timeline: --ch;
+      animation-range: cover 0% cover 100%;
     }
 
     .hero-texture::before {

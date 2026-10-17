@@ -2,8 +2,8 @@ import { CspMeta } from "@/components/site/CspMeta";
 import { ThemeScript } from "@/components/site/ThemeScript";
 import { Analytics } from "@/components/overlays/Analytics";
 import { CookieConsent } from "@/components/overlays/CookieConsent";
-import { Footer } from "@/components/site/Footer";
 import { HashFocus } from "@/components/site/HashFocus";
+import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { SkipLink } from "@/components/site/SkipLink";
 import { getDictionary, locales } from "@/i18n";
 import { resolveLocale } from "@/i18n/server";
@@ -17,7 +17,8 @@ export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
-// App Flow G2 shell. The navbar is rendered by each page because it needs the page path.
+// Delta App Flow G2 shell. The bar and the footer are rendered by each page: the language toggle
+// needs the page path and the footer's back link differs per page.
 export default async function PublicLayout({ children, params }: LayoutProps<"/[lang]">) {
   const lang = await resolveLocale(params);
   const dict = getDictionary(lang);
@@ -30,8 +31,8 @@ export default async function PublicLayout({ children, params }: LayoutProps<"/[
       </head>
       <body>
         <SkipLink label={dict.nav.skip} />
+        <ScrollProgress />
         {children}
-        <Footer lang={lang} dict={dict} />
         <HashFocus />
         <CookieConsent lang={lang} dict={dict} />
         <Analytics lang={lang} />

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { EmptyState } from "@/components/site/EmptyState";
 import { JsonLd } from "@/components/site/JsonLd";
 import { ProjectGrid } from "@/components/site/ProjectGrid";
-import { SiteHeader } from "@/components/site/SiteHeader";
+import { Footer } from "@/components/site/Footer";
+import { SiteBar } from "@/components/site/SiteBar";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { getDictionary } from "@/i18n";
@@ -30,8 +31,8 @@ export default async function WorkPage({ params }: PageProps<"/[lang]/work">) {
   return (
     <>
       <JsonLd data={workJsonLd(lang, siteOrigin(), dict.workPage.title, projects)} />
-      <SiteHeader lang={lang} dict={dict} path="/work" />
-      <main id="content" tabIndex={-1}>
+      <SiteBar lang={lang} dict={dict} path="/work" />
+      <main id="content" tabIndex={-1} className="pt-16">
         <Container className="pt-10 pb-16 lg:pt-18 lg:pb-24">
           <h1 className="text-display">{dict.workPage.title}</h1>
           <p className="mt-4 max-w-[58ch] text-text-muted lg:text-body-lg">{dict.workPage.intro}</p>
@@ -57,6 +58,7 @@ export default async function WorkPage({ params }: PageProps<"/[lang]/work">) {
           </div>
         </Container>
       </main>
+      <Footer lang={lang} dict={dict} back="home" />
     </>
   );
 }

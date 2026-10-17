@@ -6,7 +6,8 @@ import { JsonLd } from "@/components/site/JsonLd";
 import { ProjectGrid } from "@/components/site/ProjectGrid";
 import { SelectedWork } from "@/components/site/SelectedWork";
 import { Services } from "@/components/site/Services";
-import { SiteHeader } from "@/components/site/SiteHeader";
+import { Footer } from "@/components/site/Footer";
+import { SiteBar } from "@/components/site/SiteBar";
 import { ArrowIcon } from "@/components/ui/ArrowIcon";
 import { Button } from "@/components/ui/Button";
 import { getDictionary, interpolate, localePath } from "@/i18n";
@@ -59,8 +60,8 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
   return (
     <>
       <JsonLd data={homeJsonLd(lang, siteOrigin())} />
-      <SiteHeader lang={lang} dict={dict} path="/" />
-      <main id="content" tabIndex={-1}>
+      <SiteBar lang={lang} dict={dict} path="/" />
+      <main id="content" tabIndex={-1} className="pt-16">
         <Hero
           dict={dict}
           avatar={avatar}
@@ -93,6 +94,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
         </SelectedWork>
         <About dict={dict} />
       </main>
+      <Footer lang={lang} dict={dict} back="top" />
     </>
   );
 }

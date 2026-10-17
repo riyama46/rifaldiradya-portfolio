@@ -55,7 +55,7 @@ describe("dictionaries", () => {
 
   it("returns the dictionary for each locale", () => {
     expect(getDictionary("en").nav.work).toBe("Work");
-    expect(getDictionary("id").nav.work).toBe("Hasil Kerja");
+    expect(getDictionary("id").nav.work).toBe("Karya");
   });
 });
 

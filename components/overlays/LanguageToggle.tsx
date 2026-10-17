@@ -41,31 +41,26 @@ export function LanguageToggle({ lang, path, label }: LanguageToggleProps) {
   }
 
   return (
-    <div role="group" aria-label={label} className="flex items-center text-small font-medium">
-      {(["en", "id"] as const).map((locale, index) => {
-        const isActive = locale === lang;
-        const itemClass = "inline-flex min-h-11 min-w-9 items-center justify-center rounded-sm";
-        return (
-          <span key={locale} className="flex items-center">
-            {index > 0 && <span aria-hidden="true" className="h-3.5 w-px bg-border" />}
-            {isActive ? (
-              // The current language is not a link: an <a> without href is an uncrawlable link
-              // (Lighthouse SEO), and clicking it does nothing anyway (App Flow O-01).
-              <span lang={locale} aria-current="true" className={cn(itemClass, "text-accent")}>
-                {LOCALE_LABELS[locale]}
-              </span>
-            ) : (
-              <a
-                href={targetHref}
-                onClick={onSwitch}
-                lang={locale}
-                hrefLang={locale}
-                className={cn(itemClass, "text-text-muted hover:text-text")}
-              >
-                {LOCALE_LABELS[locale]}
-              </a>
-            )}
+    <div role="group" aria-label={label} className="flex items-center gap-0.5">
+      {(["en", "id"] as const).map((locale) => {
+        const itemClass = "bar-link lang-link px-1.5";
+        return locale === lang ? (
+          // The current language is not a link: an <a> without href is an uncrawlable link
+          // (Lighthouse SEO), and clicking it does nothing anyway (App Flow O-01).
+          <span key={locale} lang={locale} aria-current="true" className={itemClass}>
+            {LOCALE_LABELS[locale]}
           </span>
+        ) : (
+          <a
+            key={locale}
+            href={targetHref}
+            onClick={onSwitch}
+            lang={locale}
+            hrefLang={locale}
+            className={cn(itemClass, "text-text-muted hover:text-text")}
+          >
+            {LOCALE_LABELS[locale]}
+          </a>
         );
       })}
     </div>
