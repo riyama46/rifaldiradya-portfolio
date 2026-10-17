@@ -2,8 +2,8 @@
 
 ## Specs (source of truth)
 
-- Current: docs/specs/ (cek `version` dan `status: current` di header tiap file). Live: v1.0.1 (tag git di `main`).
-- Active change: docs/changes/v2.0.0-showcase-redesign/CHANGE.md (urutan build: tasks.md di folder yang sama)
+- Current: docs/specs/ (cek `version` dan `status: current` di header tiap file). Live: v2.0.0 (tag git di `main`).
+- Active change: none (berikutnya: docs/changes/v2.1.0-pointer-layer/CHANGE.md, status `proposed`)
   → Implement ONLY what the active change describes. Where it conflicts with docs/specs, the change wins.
 - docs/changes/archive/ is history only — never use it as requirements.
 - Versions: PATCH = fix/tidy (builder directly) · MINOR = something new · MAJOR = direction/structure change. MINOR/MAJOR are planned as a CHANGE.md first (docs/changes/vX.Y.Z-name/CHANGE.md).
@@ -20,7 +20,7 @@
 
 ## Aturan keras
 
-- Next.js 16 App Router, TypeScript strict, Tailwind v4 token dari styles/globals.css.
+- Next.js 16 App Router, TypeScript strict, Tailwind v4 token dari styles/globals.css; `--calm`/`--faint` bukan untuk teks.
 - Pakai proxy.ts, bukan middleware.ts.
 - Tidak ada dependency baru tanpa izin; tidak ada dependency native.
 - Tidak ada auto-redirect bahasa; locale hanya dari URL.
@@ -29,8 +29,8 @@
 - Tidak ada teks UI hardcode; semua dari i18n/en.json dan i18n/id.json.
 - Akses DB hanya di lib/projects, lib/images, dan lib/auth.
 - Jangan menambah layar, field, fitur, atau library di luar docs.
-- Animasi hanya yang ada di tabel Motion PRD; hanya CSS kecuali rotasi HeroProofPanel; tanpa fade-in di H1/subheadline/panel hero.
-- String kamus dengan penanda (<hl>, <dim>, <mark>, <strong>) dirender lewat richText(), jangan dangerouslySetInnerHTML.
+- Motion scroll hanya CSS (`@supports` + fallback statis); JS klien hanya untuk komponen di PRD §10; tanpa fade-in pada H1.
+- String kamus dengan penanda (<em>, <s>, <strong>) dirender lewat richText(), jangan dangerouslySetInnerHTML.
 - Folder baru dibuat saat task yang membutuhkannya dikerjakan, mengikuti struktur SDD bagian 4 (tanpa file placeholder kosong).
 
 ## Cara kerja per task

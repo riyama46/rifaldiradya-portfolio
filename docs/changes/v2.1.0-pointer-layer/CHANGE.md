@@ -10,7 +10,7 @@ date: 2026-10-17
 
 # Change v2.1.0 — Lapisan pointer dan preview admin
 
-> **Status: direncanakan, belum disetujui untuk build.** Bagian ini sengaja ditunda dari v2.0.0 (D-27 di `docs/changes/v2.0.0-showcase-redesign/CHANGE.md`). Mulai build setelah v2.0.0 live. Pal cukup bilang "approve dan build v2.1.0".
+> **Status: direncanakan, belum disetujui untuk build.** Bagian ini sengaja ditunda dari v2.0.0 (D-27 di `docs/decisions/DECISIONS.md`; change v2.0.0 diarsipkan di `docs/changes/archive/2026-10-18-v2.0.0-showcase-redesign/`). Mulai build setelah v2.0.0 live. Pal cukup bilang "approve dan build v2.1.0".
 >
 > Sebelum build, builder wajib:
 > 1. memastikan v2.0.0 sudah dirilis dan sudah di-merge ke `docs/specs/`;
