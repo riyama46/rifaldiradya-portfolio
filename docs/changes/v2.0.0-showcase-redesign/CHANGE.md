@@ -79,6 +79,7 @@ Keputusan D-01 s.d. D-13 disepakati di sesi desain 15–17 Okt 2026; D-14 dst. d
 - **D-26 — Meta description tidak menyebut status ketersediaan.** · Alasan: kalau availability disembunyikan lewat admin (D-16), meta yang ter-cache di Google tetap akan menyebut "open to roles".
 - **D-27 — Rilis dibagi v2.0.0 dan v2.1.0.** v2.0.0 berisi semua yang menentukan struktur, data, dan tampilan; v2.1.0 (MINOR) hanya menambah lapisan pointer JS dan preview admin. · Alasan: Pal sedang aktif melamar, jadi situs perlu live lebih cepat; mayoritas pengunjung memakai HP sehingga tidak melihat lapisan pointer; lapisan itu satu komponen terisolasi dan risiko terbesar untuk INP/Lighthouse dan QA lintas browser. Atribut `data-cursor` dan token cahaya per bab sudah dipasang di v2.0.0, jadi v2.1.0 tidak membongkar apa pun.
 - **D-28 — Dokumen desain.** Tidak ada `DESIGN_SPEC.md` terpisah (konvensi v1: visual di PRD §8). PRD §8 v2 merujuk token dan komponen dari mockup v2; nilai token tercatat di Delta PRD §8.
+- **D-29 — Konten final diisi sekali, langsung di produksi setelah rilis.** Staging hanya diisi 2–3 proyek uji (mencakup tiap jenis tombol case dan visual) untuk QA; 7 proyek, `show_on_home` + urutan, dan foto ≥ 640 diisi Pal di admin produksi setelah v2.0.0 deploy. AC-2 diverifikasi di produksi setelah konten terisi. · Alasan: database devstaging dan produksi terpisah (SDD §10), jadi mengisi di staging berarti mengisi dua kali. · Konsekuensi: sampai Pal selesai mengisi, proyek v1 di produksi tampil di layout v2 dengan default migrasi `0004`; T-33 memeriksa tampilan itu di devstaging sebelum rilis, dan pengisian dilakukan segera setelah deploy. (2026-10-18)
 
 ## Delta: PRD
 
@@ -184,7 +185,7 @@ Keputusan D-01 s.d. D-13 disepakati di sesi desain 15–17 Okt 2026; D-14 dst. d
 - **§10 NFR Privasi.** Tetap tanpa data pengunjung di server. Tambahan: `localStorage` `rr-theme` (preferensi tampilan, tidak dikirim ke mana pun), disebut di halaman Privacy. Why: D-23.
 - **§11 Constraints.** Font: Archivo. Previously: Space Grotesk + IBM Plex Sans. Why: D-03.
 - **§12 Dependensi konten (v2).**
-  - [ ] Isi 7 proyek di admin staging (teks EN/ID dari `T` di mockup: `w*`, `r*`, `c*`, `peek.*`), atur `show_on_home` dan urutan (D-18).
+  - [ ] Isi 7 proyek di admin **produksi** setelah rilis (teks EN/ID dari `T` di mockup: `w*`, `r*`, `c*`, `peek.*`), atur `show_on_home` dan urutan (D-18, D-29). Staging: 2–3 proyek uji saja.
   - [ ] PDF CV versi web: varian Software Engineer tanpa nomor HP, diekspor dari DOCX, dibersihkan metadata generator, nama `rifaldi-radya-pratama-cv.pdf`.
   - [ ] Foto profil ≥ 640 × 640 px diunggah ulang di S-14 (yang sekarang 320 px).
   - [ ] Konfirmasi akhir teks hero dan About.
@@ -475,7 +476,7 @@ Tidak ada `DESIGN_SPEC.md` di v1 (visual ada di PRD §8). Perubahan desain terca
 Requirement ID merujuk ke daftar acceptance di Delta PRD (F1, F2, F5, F7, F8) dan edge case di Delta APP_FLOW.
 
 - **AC-1 (F1, D-04, D-10).** Given HP 375 × 667 dengan banner consent, When membuka `/`, Then label peran, H1, dan "Email me" terlihat tanpa scroll, dan LCP adalah H1 tanpa animasi opacity.
-- **AC-2 (F1, D-18).** Given 7 proyek published dengan 5 `show_on_home`, When membuka `/`, Then Selected work menampilkan tepat 5 sesuai urutan admin dengan penghitung 01/05…05/05.
+- **AC-2 (F1, D-18).** Given 7 proyek published dengan 5 `show_on_home`, When membuka `/`, Then Selected work menampilkan tepat 5 sesuai urutan admin dengan penghitung 01/05…05/05. Diverifikasi di produksi setelah konten diisi (D-29); di staging cukup dengan proyek uji.
 - **AC-3 (F1, D-06).** Given item "HR System" di Selected work, When judul diklik, Then `/work#case-hr-system` terbuka dengan baris itu terbuka dan terfokus, dan `case_open` (source `home_title`) terkirim bila consent.
 - **AC-4 (F2, D-05, D-24).** Given halaman Work, When filter "Panasonic" dipilih, Then hanya 3 baris Panasonic tampil dan tombol aktif `aria-pressed=true`; Given JS mati, Then semua baris tampil dan bisa dibuka.
 - **AC-5 (F5, D-07, D-25).** Given case Single Sign-On (`walkthrough`), When tombol diklik, Then mailto berisi subject "Walkthrough: Single Sign-On" dan body sesuai bahasa halaman.
