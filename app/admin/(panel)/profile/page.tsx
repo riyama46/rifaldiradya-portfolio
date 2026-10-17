@@ -3,19 +3,21 @@ import { ProfileForm } from "@/components/admin/ProfileForm";
 import { adminStrings } from "@/components/admin/strings";
 import { requireAdmin } from "@/lib/auth/guard";
 import { mediaUrl } from "@/lib/images/rules";
-import { getProfilePhoto } from "@/lib/images/store";
+import { getAvailability, getProfilePhoto } from "@/lib/images/store";
 
 export const metadata: Metadata = { title: adminStrings.profile.title };
 
-// S-14 Profile (DECISIONS T-18b): the hero byline photo.
+// S-14 Profile (CHANGE v2.0.0 Delta APP_FLOW section 6): hero photo and the availability switch.
 export default async function ProfilePage() {
   await requireAdmin("/admin/profile");
-  const photo = await getProfilePhoto();
+  const [photo, availabilityOn] = await Promise.all([getProfilePhoto(), getAvailability()]);
 
   return (
     <>
-      <h1 className="mb-8 text-heading">{adminStrings.profile.title}</h1>
+      <h1 className="text-heading">{adminStrings.profile.title}</h1>
+      <p className="mt-1.5 mb-10 text-text-muted">{adminStrings.profile.intro}</p>
       <ProfileForm
+        availabilityOn={availabilityOn}
         initial={
           photo
             ? {

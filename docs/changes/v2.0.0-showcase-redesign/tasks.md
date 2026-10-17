@@ -53,7 +53,7 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
 
 ## Fase C — Admin (gate: Pal bisa mengisi 7 proyek di staging)
 
-- [ ] **T-26 Admin proyek dan profil.**
+- [x] **T-26 Admin proyek dan profil.**
   - S-11 (kolom, info, filter grup; hapus featured + E-08).
   - S-12/S-13 per bagian: `LinesInput`, `SegmentedControl`, `CaseActionField`, `VisualField`, Stack maks. 6; tanpa preview live.
   - S-14: foto 640 + switch availability.

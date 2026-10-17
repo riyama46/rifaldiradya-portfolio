@@ -1,18 +1,22 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import {
-  useEffect,
-  useRef,
-  useState,
-  type FormEvent,
-  type KeyboardEvent,
-  type ReactNode,
-} from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { CaseActionField } from "@/components/admin/CaseActionField";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
-import { ImageUploader } from "@/components/admin/ImageUploader";
 import {
-  addTags,
+  Counter,
+  describedBy,
+  Field,
+  FormSection,
+  inputBorder,
+  inputClass,
+  Pair,
+} from "@/components/admin/FormField";
+import { LinesInput } from "@/components/admin/LinesInput";
+import {
+  fieldOrder,
+  filledLines,
   firstErrorField,
   isDirty,
   toPayload,
@@ -20,91 +24,52 @@ import {
   type FieldErrors,
   type FormValues,
 } from "@/components/admin/project-form-model";
+import { SegmentedControl } from "@/components/admin/SegmentedControl";
+import { StackInput } from "@/components/admin/StackInput";
 import { adminStrings, type NoticeKey } from "@/components/admin/strings";
+import { VisualField } from "@/components/admin/VisualField";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 import { Toggle } from "@/components/ui/Toggle";
 import { cn } from "@/lib/cn";
 import {
-  ALT_MAX,
+  CASE_DID_LINES_MAX,
+  CASE_IS_MAX,
   fieldLabels,
-  LIVE_URL_MAX,
+  messages,
+  META_MAX,
+  PROJECT_GROUPS,
+  SIDE_MAX,
+  STATUS_MAX,
   SUMMARY_MAX,
+  TAGS_MAX,
   TITLE_MAX,
   type ProjectField,
 } from "@/lib/projects/validation";
 
 const t = adminStrings.form;
 
-const inputClass =
-  "w-full rounded-button border bg-field px-3.5 py-3 text-base text-text transition-colors";
-
-type ProjectFormProps =
-  | { mode: "create"; initial: FormValues }
-  | { mode: "edit"; initial: FormValues; projectId: string; savedPublicId: string | null };
+type ProjectFormProps = {
+  initial: FormValues;
+  /** E-26: five other projects already have "Show in Selected work" on. */
+  selectedWorkFull: boolean;
+} & ({ mode: "create" } | { mode: "edit"; projectId: string; savedPublicId: string | null });
 
 type ApiErrorBody = { error?: { code?: string; fields?: FieldErrors } };
 
-function describedBy(field: ProjectField, errors: FieldErrors, hasHelp: boolean) {
-  const ids = [hasHelp && `${field}-help`, errors[field] && `${field}-error`].filter(Boolean);
-  return ids.length > 0 ? ids.join(" ") : undefined;
-}
-
-function Field({
-  field,
-  errors,
-  help,
-  counter,
-  children,
-}: {
-  field: ProjectField;
-  errors: FieldErrors;
-  help?: string;
-  counter?: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-baseline justify-between gap-3">
-        <label htmlFor={field} className="text-small font-medium">
-          {fieldLabels[field]}
-        </label>
-        {counter}
-      </div>
-      {children}
-      {help && (
-        <p id={`${field}-help`} className="text-small text-text-muted">
-          {help}
-        </p>
-      )}
-      {errors[field] && (
-        <p id={`${field}-error`} className="text-small font-medium text-danger">
-          {errors[field]}
-        </p>
-      )}
-    </div>
-  );
-}
-
-function Counter({ value, max }: { value: string; max: number }) {
-  const over = value.trim().length > max;
-  return (
-    <span
-      aria-hidden="true"
-      className={cn("text-small tabular-nums", over ? "text-danger" : "text-text-muted")}
-    >
-      {t.counter(value.trim().length, max)}
-    </span>
-  );
-}
+type TextField = {
+  [K in keyof FormValues]: FormValues[K] extends string ? K : never;
+}[keyof FormValues] &
+  ProjectField;
 
 /**
- * S-12 / S-13 (App Flow section 6, UF-07…UF-10). The shared Zod schema validates on blur and
- * before submit; the server validates again and its field errors are shown the same way.
+ * S-12 / S-13 (CHANGE v2.0.0 Delta APP_FLOW section 6, UF-07…UF-10), in the sections of
+ * admin.html without the live preview (v2.1.0). The shared Zod schema validates on blur and
+ * before submit; the server validates again (and checks E-26) and its field errors show the same way.
  */
 export function ProjectForm(props: ProjectFormProps) {
   const router = useRouter();
-  const { initial } = props;
+  const { initial, selectedWorkFull } = props;
   const savedPublicId = props.mode === "edit" ? props.savedPublicId : null;
 
   const [values, setValues] = useState<FormValues>(initial);
@@ -116,11 +81,13 @@ export function ProjectForm(props: ProjectFormProps) {
   const [saving, setSaving] = useState(false);
   const [sessionExpired, setSessionExpired] = useState(false);
   const [toast, setToast] = useState<{ id: number; message: string } | null>(null);
-  const [tagDraft, setTagDraft] = useState("");
   const [tagError, setTagError] = useState<string | null>(null);
   const [dialog, setDialog] = useState<"discard" | "delete" | null>(null);
   const [deleting, setDeleting] = useState(false);
   const leaving = useRef(false);
+  const showToast = (message: string) =>
+    setToast((previous) => ({ id: (previous?.id ?? 0) + 1, message }));
+  const focusAfterRender = useRef<ProjectField | null>(null);
 
   const dirty = isDirty(initial, values);
   const clientErrors = validate(values);
@@ -131,6 +98,9 @@ export function ProjectForm(props: ProjectFormProps) {
     if (submitted || touched[field]) errors[field] ??= message;
   }
   if (tagError) errors.tags = tagError;
+
+  // The switch can always be turned off; it can only be turned on while there is room (E-26).
+  const showOnHomeLocked = selectedWorkFull && !values.show_on_home;
 
   // Browser navigation away with unsaved changes (App Flow S-12).
   useEffect(() => {
@@ -143,6 +113,14 @@ export function ProjectForm(props: ProjectFormProps) {
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
 
+  // A field in the hidden Visual pane is rendered only once its error shows; focus it after that.
+  useEffect(() => {
+    const field = focusAfterRender.current;
+    if (!field) return;
+    focusAfterRender.current = null;
+    document.getElementById(field)?.focus();
+  });
+
   function set<K extends keyof FormValues>(field: K, value: FormValues[K]) {
     setValues((current) => ({ ...current, [field]: value }));
     setServerErrors((current) => {
@@ -153,8 +131,7 @@ export function ProjectForm(props: ProjectFormProps) {
     });
   }
 
-  const blur = (field: ProjectField) => () =>
-    setTouched((current) => ({ ...current, [field]: true }));
+  const touch = (field: ProjectField) => setTouched((current) => ({ ...current, [field]: true }));
 
   function leave(notice?: NoticeKey) {
     leaving.current = true;
@@ -162,14 +139,14 @@ export function ProjectForm(props: ProjectFormProps) {
   }
 
   function focusField(field: ProjectField) {
-    document.getElementById(field)?.focus();
+    const element = document.getElementById(field);
+    if (element) element.focus();
+    else focusAfterRender.current = field;
   }
 
   function showErrors(next: FieldErrors) {
     setSummary(true);
     const first = firstErrorField(next);
-    // Every field input is already rendered (alt fields only exist with a thumbnail, and then
-    // they are too), so focus can move right away; no animation frame, which a hidden tab skips.
     if (first) focusField(first);
   }
 
@@ -216,10 +193,10 @@ export function ProjectForm(props: ProjectFormProps) {
         setServerErrors(body.error.fields);
         showErrors(body.error.fields);
       } else {
-        setToast({ id: Date.now(), message: t.saveFailed }); // E-13
+        showToast(t.saveFailed); // E-13
       }
     } catch {
-      setToast({ id: Date.now(), message: t.saveFailed });
+      showToast(t.saveFailed);
     }
     setSaving(false);
   }
@@ -250,62 +227,55 @@ export function ProjectForm(props: ProjectFormProps) {
       }
       setDialog(null);
       if (response.status === 401) setSessionExpired(true);
-      else setToast({ id: Date.now(), message: t.danger.failed });
+      else showToast(t.danger.failed);
     } catch {
       setDialog(null);
-      setToast({ id: Date.now(), message: t.danger.failed });
+      showToast(t.danger.failed);
     }
     setDeleting(false);
   }
 
-  function commitTags(raw: string) {
-    const result = addTags(values.tags, raw);
-    set("tags", result.tags);
-    setTagError(result.error);
-    setTagDraft(result.error ? raw.trim() : "");
-  }
-
-  function onTagKey(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "Enter" || event.key === ",") {
-      event.preventDefault();
-      commitTags(tagDraft);
-    } else if (event.key === "Backspace" && tagDraft === "" && values.tags.length > 0) {
-      set("tags", values.tags.slice(0, -1));
-      setTagError(null);
-    }
-  }
-
-  const text = (
-    field:
-      | "title_en"
-      | "title_id"
-      | "summary_en"
-      | "summary_id"
-      | "live_url"
-      | "thumbnail_alt_en"
-      | "thumbnail_alt_id",
-  ) => ({
+  const text = (field: TextField, hasHelp = false) => ({
     id: field,
     name: field,
     value: values[field],
     onChange: (event: { target: { value: string } }) => set(field, event.target.value),
-    onBlur: blur(field),
+    onBlur: () => touch(field),
     "aria-invalid": errors[field] ? true : undefined,
-    className: cn(inputClass, errors[field] ? "border-danger" : "border-text-muted"),
+    "aria-describedby": describedBy(field, errors, hasHelp),
+    className: cn(inputClass, inputBorder(Boolean(errors[field]))),
   });
 
+  /** Text input or textarea with its label and n/max counter. */
+  const textField = (
+    field: TextField,
+    max: number,
+    options: { help?: string; multiline?: boolean } = {},
+  ) => (
+    <Field
+      field={field}
+      label={fieldLabels[field]}
+      errors={errors}
+      help={options.help}
+      aside={<Counter value={values[field]} max={max} />}
+    >
+      {options.multiline ? (
+        <textarea rows={3} {...text(field, Boolean(options.help))} />
+      ) : (
+        <input {...text(field, Boolean(options.help))} />
+      )}
+    </Field>
+  );
+
   const errorList = (Object.entries(errors) as [ProjectField, string][]).sort(
-    ([a], [b]) => Object.keys(fieldLabels).indexOf(a) - Object.keys(fieldLabels).indexOf(b),
+    ([a], [b]) => fieldOrder.indexOf(a) - fieldOrder.indexOf(b),
   );
 
   return (
     <>
-      <form onSubmit={onSubmit} noValidate className="grid gap-8">
+      <form onSubmit={onSubmit} noValidate className="max-w-[860px]">
         {sessionExpired && (
-          <p
-            role="alert"
-            className="rounded-button border-l-4 border-l-accent bg-accent/12 px-4 py-3"
-          >
+          <p role="alert" className="mb-6 rounded-button bg-accent/12 px-4 py-3">
             {t.sessionExpired}{" "}
             <a
               href="/admin/login"
@@ -319,10 +289,7 @@ export function ProjectForm(props: ProjectFormProps) {
         )}
 
         {summary && errorList.length > 0 && (
-          <div
-            role="alert"
-            className="rounded-card border border-l-4 border-border border-l-danger bg-surface p-4"
-          >
+          <div role="alert" className="mb-8 rounded-card bg-danger/10 p-4">
             <p className="font-medium">{t.errorSummary}</p>
             <ul className="mt-2 grid gap-1 text-small">
               {errorList.map(([field, message]) => (
@@ -345,170 +312,163 @@ export function ProjectForm(props: ProjectFormProps) {
           </div>
         )}
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Field
-            field="title_en"
-            errors={errors}
-            counter={<Counter value={values.title_en} max={TITLE_MAX} />}
-          >
-            <input
-              {...text("title_en")}
-              aria-describedby={describedBy("title_en", errors, false)}
+        <FormSection id="basics" title={t.sections.basics.title}>
+          <Pair>
+            {textField("title_en", TITLE_MAX)}
+            {textField("title_id", TITLE_MAX)}
+          </Pair>
+          <div className="grid gap-1.5">
+            <span id="group-label" className="text-small font-medium">
+              {fieldLabels.group}
+            </span>
+            <SegmentedControl
+              id="group"
+              labelledBy="group-label"
+              describedBy="group-help"
+              options={PROJECT_GROUPS.map((value) => ({ value, label: t.groups[value] }))}
+              value={values.group}
+              onChange={(value) => set("group", value)}
             />
-          </Field>
-          <Field
-            field="title_id"
-            errors={errors}
-            counter={<Counter value={values.title_id} max={TITLE_MAX} />}
-          >
-            <input
-              {...text("title_id")}
-              aria-describedby={describedBy("title_id", errors, false)}
-            />
-          </Field>
-          <Field
-            field="summary_en"
-            errors={errors}
-            help={t.help.summary_en}
-            counter={<Counter value={values.summary_en} max={SUMMARY_MAX} />}
-          >
-            <textarea
-              rows={3}
-              {...text("summary_en")}
-              aria-describedby={describedBy("summary_en", errors, true)}
-            />
-          </Field>
-          <Field
-            field="summary_id"
-            errors={errors}
-            counter={<Counter value={values.summary_id} max={SUMMARY_MAX} />}
-          >
-            <textarea
-              rows={3}
-              {...text("summary_id")}
-              aria-describedby={describedBy("summary_id", errors, false)}
-            />
-          </Field>
-        </div>
-
-        <Field field="live_url" errors={errors} help={t.help.live_url}>
-          <input
-            type="url"
-            inputMode="url"
-            autoComplete="url"
-            placeholder="https://"
-            maxLength={LIVE_URL_MAX + 20}
-            {...text("live_url")}
-            aria-describedby={describedBy("live_url", errors, true)}
-          />
-        </Field>
-
-        <Field field="tags" errors={errors} help={t.help.tags}>
-          <div
-            className={cn(
-              "flex flex-wrap items-center gap-2 rounded-button border bg-field px-2 py-2 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent",
-              errors.tags ? "border-danger" : "border-text-muted",
-            )}
-          >
-            {values.tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center gap-1 rounded-full bg-accent/12 py-1 pr-1 pl-3 text-small"
-              >
-                {tag}
-                <button
-                  type="button"
-                  aria-label={t.removeTag(tag)}
-                  onClick={() => {
-                    set(
-                      "tags",
-                      values.tags.filter((item) => item !== tag),
-                    );
-                    setTagError(null);
-                  }}
-                  className="grid size-7 cursor-pointer place-items-center rounded-full hover:bg-surface"
-                >
-                  <span aria-hidden="true">×</span>
-                </button>
-              </span>
-            ))}
-            <input
-              id="tags"
-              value={tagDraft}
-              onChange={(event) => {
-                setTagDraft(event.target.value);
-                setTagError(null);
-              }}
-              onKeyDown={onTagKey}
-              onBlur={() => {
-                if (tagDraft.trim()) commitTags(tagDraft);
-                blur("tags")();
-              }}
-              aria-invalid={errors.tags ? true : undefined}
-              aria-describedby={describedBy("tags", errors, true)}
-              className="min-w-40 flex-1 bg-transparent px-1.5 py-1.5 text-base outline-none"
-            />
-          </div>
-        </Field>
-
-        {/* A group label, not <label htmlFor>: that would rename the "Replace" button "Thumbnail". */}
-        <div role="group" aria-labelledby="thumbnail-label" className="grid gap-1.5">
-          <p id="thumbnail-label" className="text-small font-medium">
-            {fieldLabels.thumbnail}
-          </p>
-          <ImageUploader
-            id="thumbnail"
-            value={values.thumbnail}
-            savedPublicId={savedPublicId}
-            onChange={(image) => {
-              set("thumbnail", image);
-              setTouched((current) => ({ ...current, thumbnail: true }));
-            }}
-            onBusyChange={setUploading}
-            describedBy={errors.thumbnail ? "thumbnail-error" : undefined}
-            invalid={Boolean(errors.thumbnail)}
-          />
-          {errors.thumbnail && (
-            <p id="thumbnail-error" className="text-small font-medium text-danger">
-              {errors.thumbnail}
+            <p id="group-help" className="text-small text-text-muted">
+              {t.help.group}
             </p>
-          )}
-        </div>
-
-        {values.thumbnail && (
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Field
-              field="thumbnail_alt_en"
-              errors={errors}
-              help={t.help.thumbnail_alt_en}
-              counter={<Counter value={values.thumbnail_alt_en} max={ALT_MAX} />}
-            >
-              <input
-                {...text("thumbnail_alt_en")}
-                aria-describedby={describedBy("thumbnail_alt_en", errors, true)}
-              />
-            </Field>
-            <Field
-              field="thumbnail_alt_id"
-              errors={errors}
-              counter={<Counter value={values.thumbnail_alt_id} max={ALT_MAX} />}
-            >
-              <input
-                {...text("thumbnail_alt_id")}
-                aria-describedby={describedBy("thumbnail_alt_id", errors, false)}
-              />
-            </Field>
           </div>
-        )}
+          <Pair>
+            {textField("meta_en", META_MAX, { help: t.help.meta_en })}
+            {textField("meta_id", META_MAX)}
+          </Pair>
+          <Pair>
+            {textField("side_en", SIDE_MAX, { help: t.help.side_en })}
+            {textField("side_id", SIDE_MAX)}
+          </Pair>
+        </FormSection>
 
-        <div className="grid gap-5">
-          <Toggle
-            id="show_on_home"
-            label={fieldLabels.show_on_home}
-            description={t.help.show_on_home}
-            checked={values.show_on_home}
-            onChange={(checked) => set("show_on_home", checked)}
+        <FormSection
+          id="homepage"
+          title={t.sections.homepage.title}
+          help={t.sections.homepage.help}
+        >
+          <Pair>
+            {textField("summary_en", SUMMARY_MAX, { help: t.help.summary_en, multiline: true })}
+            {textField("summary_id", SUMMARY_MAX, { multiline: true })}
+          </Pair>
+          <div className="grid gap-1.5">
+            <Toggle
+              id="show_on_home"
+              label={fieldLabels.show_on_home}
+              description={showOnHomeLocked ? messages.showOnHomeFull : t.help.show_on_home}
+              checked={values.show_on_home}
+              disabled={showOnHomeLocked}
+              onChange={(checked) => set("show_on_home", checked)}
+            />
+            {errors.show_on_home && (
+              <p id="show_on_home-error" className="text-small font-medium text-danger">
+                {errors.show_on_home}
+              </p>
+            )}
+          </div>
+        </FormSection>
+
+        <FormSection id="case" title={t.sections.case.title} help={t.sections.case.help}>
+          <Pair>
+            {textField("case_is_en", CASE_IS_MAX, { multiline: true })}
+            {textField("case_is_id", CASE_IS_MAX, { multiline: true })}
+          </Pair>
+          <Pair>
+            {(["case_did_en", "case_did_id"] as const).map((field) => (
+              <Field
+                key={field}
+                field={field}
+                label={fieldLabels[field]}
+                errors={errors}
+                as="group"
+                aside={t.lines(filledLines(values[field]), CASE_DID_LINES_MAX)}
+              >
+                <LinesInput
+                  id={field}
+                  language={field.endsWith("_en") ? "EN" : "ID"}
+                  lines={values[field]}
+                  onChange={(next) => set(field, next)}
+                  onBlur={() => touch(field)}
+                  invalid={Boolean(errors[field])}
+                  describedBy={errors[field] ? `${field}-error` : undefined}
+                />
+              </Field>
+            ))}
+          </Pair>
+          <Field
+            field="tags"
+            label={fieldLabels.tags}
+            errors={errors}
+            help={t.help.tags}
+            aside={t.tagsCount(values.tags.length, TAGS_MAX)}
+          >
+            <StackInput
+              id="tags"
+              tags={values.tags}
+              onChange={(next) => set("tags", next)}
+              onBlur={() => touch("tags")}
+              onError={setTagError}
+              invalid={Boolean(errors.tags)}
+              describedBy={describedBy("tags", errors, true)}
+            />
+          </Field>
+          <Pair>
+            {textField("status_en", STATUS_MAX, { help: t.help.status_en })}
+            {textField("status_id", STATUS_MAX)}
+          </Pair>
+        </FormSection>
+
+        <FormSection id="button" title={t.sections.button.title} help={t.sections.button.help}>
+          <CaseActionField
+            id="case_action"
+            legend={fieldLabels.case_action}
+            value={values.case_action}
+            onChange={(value) => {
+              set("case_action", value);
+              // The live URL error depends on this choice; drop a stale server one.
+              setServerErrors((current) => {
+                if (!current.live_url) return current;
+                const next = { ...current };
+                delete next.live_url;
+                return next;
+              });
+            }}
           />
+          <Field
+            field="live_url"
+            label={fieldLabels.live_url}
+            errors={errors}
+            help={t.help.live_url}
+            aside={values.case_action === "site" ? undefined : t.optional}
+          >
+            <input
+              type="url"
+              inputMode="url"
+              autoComplete="url"
+              placeholder="https://"
+              {...text("live_url", true)}
+            />
+          </Field>
+        </FormSection>
+
+        <FormSection id="visual" title={t.sections.visual.title} help={t.sections.visual.help}>
+          <VisualField
+            values={values}
+            errors={errors}
+            savedPublicId={savedPublicId}
+            onVisualType={(value) => set("visual_type", value)}
+            onThumbnail={(image) => {
+              set("thumbnail", image);
+              touch("thumbnail");
+            }}
+            onText={(field, value) => set(field, value)}
+            onBlur={touch}
+            onBusyChange={setUploading}
+          />
+        </FormSection>
+
+        <FormSection id="publishing" title={t.sections.publishing.title}>
           <Toggle
             id="published"
             label={fieldLabels.published}
@@ -516,32 +476,52 @@ export function ProjectForm(props: ProjectFormProps) {
             checked={values.published}
             onChange={(checked) => {
               set("published", checked);
-              setTouched((current) => ({ ...current, thumbnail: true }));
+              touch("thumbnail");
             }}
           />
-        </div>
+          {props.mode === "edit" && (
+            <div className="mt-2 flex flex-col items-stretch justify-between gap-4 border-t border-border pt-6 md:flex-row md:items-center">
+              <div>
+                <p id="danger-heading" className="font-medium">
+                  {t.danger.heading}
+                </p>
+                <p className="text-small text-text-muted">{t.danger.help}</p>
+              </div>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => setDialog("delete")}
+                disabled={saving}
+              >
+                {t.danger.button}
+              </Button>
+            </div>
+          )}
+        </FormSection>
 
-        {/* Sticky on phones so Save is always reachable (App Flow S-12). */}
-        <div className="sticky bottom-0 -mx-4 flex flex-wrap gap-3 border-t border-border bg-bg px-4 py-3 md:static md:mx-0 md:border-0 md:bg-transparent md:p-0">
-          <Button type="submit" loading={saving} disabled={uploading}>
-            {saving ? t.saving : t.save}
-          </Button>
-          <Button variant="secondary" onClick={onCancel} disabled={saving}>
+        {/* Sticky so Save is always reachable (App Flow S-12, admin.html .savebar). */}
+        <div className="sticky bottom-0 z-10 -mx-4 mt-2 flex items-center justify-end gap-2.5 border-t border-border bg-bg px-4 py-3.5 md:mx-0 md:px-0">
+          <p className="mr-auto hidden text-small text-text-muted md:block">{t.saveNote}</p>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onCancel}
+            disabled={saving}
+            className="flex-1 md:flex-none"
+          >
             {t.cancel}
+          </Button>
+          <Button
+            type="submit"
+            size="sm"
+            loading={saving}
+            disabled={uploading}
+            className="flex-1 md:flex-none"
+          >
+            {saving ? t.saving : t.save}
           </Button>
         </div>
       </form>
-
-      {props.mode === "edit" && (
-        <section aria-labelledby="danger-heading" className="mt-12 border-t border-border pt-8">
-          <h2 id="danger-heading" className="sr-only">
-            {t.danger.heading}
-          </h2>
-          <Button variant="danger" onClick={() => setDialog("delete")} disabled={saving}>
-            {t.danger.button}
-          </Button>
-        </section>
-      )}
 
       <ConfirmDialog
         open={dialog === "discard"}

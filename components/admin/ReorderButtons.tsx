@@ -19,7 +19,7 @@ type ReorderButtonsProps = {
 const strings = adminStrings.projects;
 
 const buttonClass =
-  "grid size-11 cursor-pointer place-items-center rounded-button border border-border bg-surface text-text transition-colors hover:border-text-muted disabled:cursor-not-allowed disabled:opacity-40";
+  "grid size-11 cursor-pointer place-items-center rounded-button border border-text-muted text-text-muted transition-colors hover:enabled:bg-text/8 hover:enabled:text-text disabled:cursor-not-allowed disabled:opacity-35 md:size-9";
 
 /**
  * ↑/↓ on S-11 (DECISIONS T-18b): API-08 swaps the project with its neighbour, then the list is
@@ -74,7 +74,7 @@ export function ReorderButtons({ projectId, title, position, total, layout }: Re
   const busy = pending !== null || refreshing;
 
   return (
-    <div className="flex gap-1.5">
+    <div className={layout === "card" ? "flex flex-col gap-1.5" : "flex gap-1.5"}>
       {(["up", "down"] as const).map((direction) => (
         <button
           key={direction}
