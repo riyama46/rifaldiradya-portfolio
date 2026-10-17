@@ -4,7 +4,7 @@ import { Container } from "@/components/ui/Container";
 import type { Dictionary } from "@/i18n";
 import { richText } from "@/i18n/rich";
 
-// App Flow S-01 section 4: 1:2 grid from 1024px; key sentences use <mark> from the dictionary.
+// App Flow S-01 section 4: 1:2 grid from 1024px; key sentences use <strong> from the dictionary.
 export function About({ dict }: { dict: Dictionary }) {
   return (
     <section
@@ -19,10 +19,8 @@ export function About({ dict }: { dict: Dictionary }) {
           title={dict.about.title}
           titleId="about-title"
         />
-        <div className="reveal mark-on-view flex max-w-[62ch] flex-col gap-5 lg:pt-4">
-          <p className="font-display text-lead font-semibold text-pretty">
-            {richText(dict.about.lead)}
-          </p>
+        <div className="reveal flex max-w-[62ch] flex-col gap-5 lg:pt-4">
+          <p className="text-lead font-semibold text-pretty">{richText(dict.about.lead)}</p>
           <p className="text-text-muted">{richText(dict.about.body)}</p>
           <AboutFacts dict={dict} />
         </div>

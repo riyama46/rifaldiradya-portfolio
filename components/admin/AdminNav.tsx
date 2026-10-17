@@ -23,7 +23,7 @@ const links = [
 export function AdminNav() {
   const pathname = usePathname();
   return (
-    <nav aria-label={adminStrings.nav.label} className="border-b border-border bg-surface-raised">
+    <nav aria-label={adminStrings.nav.label} className="border-b border-border bg-surface">
       <Container className="flex gap-6">
         {links.map(({ href, label, match }) => {
           const active = match(pathname);

@@ -8,8 +8,12 @@
   "language": {
     "label": "Language"
   },
+  "theme": {
+    "toDark": "Switch to dark mode",
+    "toLight": "Switch to light mode"
+  },
   "hero": {
-    "title": "Landing Pages That Launch in <hl>Days</hl>, <dim>Not Weeks</dim>",
+    "title": "Landing Pages That Launch in <em>Days</em>, Not Weeks",
     "subtitle": "I'm Rifaldi, a web developer who turns a brief into a live site, fast. Need something bigger, like a dashboard or web app? I build those too. Based in Indonesia, working with clients worldwide.",
     "ctaPrimary": "See the Work",
     "ctaSecondary": "Email Me About Your Project",
@@ -87,8 +91,8 @@
   },
   "about": {
     "title": "Who you'll work with",
-    "lead": "I'm Rifaldi, a web developer who <mark>builds websites professionally as a full-time job</mark>, and takes on freelance landing pages for founders and small businesses.",
-    "body": "My approach is simple: take your brief, turn it into <strong>a fast, clean page</strong>, and <mark>get it live in days, not weeks</mark>. You get one person from first message to launch, so nothing gets lost between a designer, a developer, and a project manager."
+    "lead": "I'm Rifaldi, a web developer who <strong>builds websites professionally as a full-time job</strong>, and takes on freelance landing pages for founders and small businesses.",
+    "body": "My approach is simple: take your brief, turn it into <strong>a fast, clean page</strong>, and <strong>get it live in days, not weeks</strong>. You get one person from first message to launch, so nothing gets lost between a designer, a developer, and a project manager."
   },
   "facts": {
     "basedLabel": "Based in",
@@ -102,7 +106,7 @@
     "stackLabel": "Stack"
   },
   "cta": {
-    "title": "Have a page to <hl>launch</hl>?",
+    "title": "Have a page to <em>launch</em>?",
     "sub": "Send a short brief: what the page is for and when you need it. I'll reply with the next steps.",
     "button": "Email me about your project",
     "or": "or copy"

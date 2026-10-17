@@ -19,7 +19,7 @@ type ReorderButtonsProps = {
 const strings = adminStrings.projects;
 
 const buttonClass =
-  "grid size-11 cursor-pointer place-items-center rounded-button border border-border bg-surface-raised text-text transition-colors hover:border-text-muted disabled:cursor-not-allowed disabled:opacity-40";
+  "grid size-11 cursor-pointer place-items-center rounded-button border border-border bg-surface text-text transition-colors hover:border-text-muted disabled:cursor-not-allowed disabled:opacity-40";
 
 /**
  * ↑/↓ on S-11 (DECISIONS T-18b): API-08 swaps the project with its neighbour, then the list is

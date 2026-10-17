@@ -77,7 +77,7 @@ export function LanguageSuggestBanner({ lang, path, labels }: LanguageSuggestBan
     <div
       role="region"
       aria-label={labels.text}
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-accent-soft pb-[env(safe-area-inset-bottom)] md:absolute md:top-full md:bottom-auto md:border-t-0 md:border-b md:pb-0"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-accent/12 pb-[env(safe-area-inset-bottom)] md:absolute md:top-full md:bottom-auto md:border-t-0 md:border-b md:pb-0"
     >
       <div className="mx-auto flex h-12 w-full max-w-[1200px] items-center gap-3 px-4 text-small lg:px-8">
         {/* Very narrow screens show only the button; the region label still carries the sentence. */}

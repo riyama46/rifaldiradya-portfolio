@@ -3,6 +3,7 @@ export const adminStrings = {
   appName: "Portfolio Admin",
   viewSite: "View site",
   logout: "Log out",
+  theme: { toDark: "Switch to dark mode", toLight: "Switch to light mode" },
   loadError: "Couldn't load this page. Check the database connection and try again.",
   retry: "Try again",
   signIn: {

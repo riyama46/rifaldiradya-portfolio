@@ -20,12 +20,12 @@ export function BylineBadge({ avatar }: { avatar: PublicAvatar | null }) {
           height={72}
           alt=""
           decoding="async"
-          className={`${circle} bg-accent-soft object-cover`}
+          className={`${circle} bg-accent/12 object-cover`}
         />
       ) : (
         <div
           aria-hidden="true"
-          className={`${circle} grid place-items-center bg-accent-soft font-display text-[1.375rem] font-semibold lg:text-2xl`}
+          className={`${circle} grid place-items-center bg-accent/12 text-[1.375rem] font-semibold lg:text-2xl`}
         >
           {siteConfig.initials}
         </div>

@@ -1,17 +1,11 @@
-import { IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
+import { Archivo } from "next/font/google";
 
-export const spaceGrotesk = Space_Grotesk({
-  weight: "600",
-  subsets: ["latin"],
+// Delta SDD section 2: Archivo only, one variable file per style (400/500/600 + italic 500/600).
+export const archivo = Archivo({
+  subsets: ["latin", "latin-ext"],
+  style: ["normal", "italic"],
   display: "swap",
-  variable: "--font-space-grotesk",
+  variable: "--font-archivo",
 });
 
-export const plexSans = IBM_Plex_Sans({
-  weight: ["400", "500"],
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-plex-sans",
-});
-
-export const fontVariables = `${spaceGrotesk.variable} ${plexSans.variable}`;
+export const fontVariables = archivo.variable;

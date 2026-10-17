@@ -29,15 +29,15 @@ export type ButtonProps = ButtonAsButton | ButtonAsLink;
 const base =
   "group inline-flex items-center justify-center gap-2 rounded-button border font-sans font-medium leading-none " +
   "cursor-pointer select-none transition-[background-color,border-color,color,text-decoration-color,transform] duration-200 ease-out " +
-  "motion-safe:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100";
+  "motion-safe:active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100";
 
 const variants: Record<Variant, string> = {
   primary: "border-transparent bg-accent text-on-accent hover:bg-accent-hover",
-  // Admin only (PRD: --color-danger is for admin errors and destructive actions).
-  danger: "border-transparent bg-danger text-on-accent hover:bg-danger/90",
-  secondary: "border-border bg-surface-raised text-text hover:border-text-muted",
+  // Admin only (Delta SDD section 8: --color-danger is for admin errors and destructive actions).
+  danger: "border-danger/45 bg-transparent text-danger hover:bg-danger/10",
+  secondary: "border-text-muted bg-transparent text-text hover:bg-text/8",
   ghost:
-    "border-transparent bg-transparent text-text underline decoration-border decoration-2 underline-offset-[5px] hover:decoration-accent",
+    "border-transparent bg-transparent text-text underline decoration-text-muted decoration-1 underline-offset-[5px] hover:text-accent hover:decoration-accent",
 };
 
 const heights: Record<Size, string> = {

@@ -11,7 +11,7 @@ const EMAIL_TEXT_ID = "contact-email";
 // App Flow S-01 section 5 / G2: centered, generous space so nothing competes with the ask.
 export function FooterCta({ dict }: { dict: Dictionary }) {
   return (
-    <Container className="hl-on-view flex flex-col items-center py-28 text-center lg:py-44">
+    <Container className="flex flex-col items-center py-28 text-center lg:py-44">
       <p className="mb-5 flex justify-center gap-3 text-eyebrow font-medium text-text-muted uppercase">
         <b className="font-medium text-text">04</b>
         <span>{dict.label.contact}</span>

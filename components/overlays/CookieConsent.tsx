@@ -97,7 +97,7 @@ export function CookieConsent({ lang, dict }: { lang: Locale; dict: Dictionary }
     <section
       ref={section}
       aria-labelledby={titleId}
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface-raised px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-card-hover md:inset-x-auto md:right-6 md:bottom-4 md:w-[420px] md:rounded-card md:border md:p-4"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-lg md:inset-x-auto md:right-6 md:bottom-4 md:w-[420px] md:rounded-card md:border md:p-4"
     >
       <h2 id={titleId} className="sr-only">
         {dict.consent.label}

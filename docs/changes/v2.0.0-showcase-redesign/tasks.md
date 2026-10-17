@@ -20,7 +20,7 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
 
 ## Fase A — Persiapan
 
-- [ ] **T-23 Simpan change & rapikan rujukan.**
+- [x] **T-23 Simpan change & rapikan rujukan.**
   - Commit `docs/design/v2/screens-option-b/`.
   - Pindahkan `docs/design/homepage-mockup.html` ke `docs/design/archive/`.
   - Simpan `docs/changes/v2.0.0-showcase-redesign/CHANGE.md` + `tasks.md` (status `approved`) dan `docs/changes/v2.1.0-pointer-layer/CHANGE.md` (status tetap `proposed`).
@@ -32,7 +32,7 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
 
 ## Fase B — Fondasi (gate: halaman v1 masih tampil utuh di staging)
 
-- [ ] **T-24 Token tema + Archivo + toggle tema.**
+- [x] **T-24 Token tema + Archivo + toggle tema.**
   - `styles/globals.css` dua lapis (Delta SDD §8), Archivo via `next/font`, `ThemeScript` inline (D-23), `ThemeToggle` (O-04, publik + admin).
   - Skin ulang `ui/*` (Button, Field, Toggle, Toast) dengan focus ring v2.
   - Hapus token/font v1 dan `<hl>`/`<dim>`/`<mark>` di `richText` (ganti `<em>`/`<s>`; kamus v1 yang memakai tag lama disesuaikan sementara).

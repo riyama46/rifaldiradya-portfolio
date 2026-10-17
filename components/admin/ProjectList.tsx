@@ -125,10 +125,7 @@ export function ProjectList({ projects, now }: { projects: Project[]; now: Date 
 
       <ul className="grid gap-3 md:hidden">
         {projects.map((project, index) => (
-          <li
-            key={project.id}
-            className="rounded-card border border-border bg-surface-raised p-4 shadow-card"
-          >
+          <li key={project.id} className="rounded-card border border-border bg-surface p-4">
             <div className="flex items-start gap-3">
               <AdminThumbnail url={project.thumbnailUrl} />
               <div className="min-w-0">

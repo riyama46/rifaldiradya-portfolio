@@ -14,39 +14,38 @@ describe("richText", () => {
     expect(richText("Just text")).toEqual(["Just text"]);
   });
 
-  it("renders <hl> and <dim> as styled spans", () => {
-    const nodes = richText("Launch in <hl>Days</hl>, <dim>Not Weeks</dim>");
-    expect(nodes[0]).toBe("Launch in ");
+  it("renders <em> as the accent word", () => {
+    const nodes = richText("for <em>thousands.</em>");
+    expect(nodes[0]).toBe("for ");
 
-    const hl = asElement(nodes[1]);
-    expect(hl.type).toBe("span");
-    expect(hl.props.className).toBe("hl");
-    expect(hl.props.children).toBe("Days");
-
-    expect(nodes[2]).toBe(", ");
-
-    const dim = asElement(nodes[3]);
-    expect(dim.type).toBe("span");
-    expect(dim.props.className).toBe("dim");
-    expect(dim.props.children).toBe("Not Weeks");
+    const em = asElement(nodes[1]);
+    expect(em.type).toBe("em");
+    expect(em.props.className).toBe("ac");
+    expect(em.props.children).toBe("thousands.");
   });
 
-  it("renders <mark> and <strong> as native elements", () => {
-    const nodes = richText("a <mark>key</mark> and <strong>bold</strong> end");
-    expect(asElement(nodes[1]).type).toBe("mark");
+  it("renders <s> and <strong> as native elements", () => {
+    const nodes = richText("instead of <s>five passwords.</s> and <strong>bold</strong> end");
+    expect(asElement(nodes[1]).type).toBe("s");
     expect(asElement(nodes[3]).type).toBe("strong");
     expect(nodes[4]).toBe(" end");
   });
 
   it("gives every element a unique key", () => {
-    const keys = richText("<mark>a</mark> <mark>b</mark> <hl>c</hl>")
+    const keys = richText("<em>a</em> <s>b</s> <strong>c</strong>")
       .filter(isValidElement)
       .map((node) => node.key);
     expect(new Set(keys).size).toBe(3);
   });
 
+  it("leaves the v1 markers literal (no longer allowed)", () => {
+    for (const text of ["<hl>Days</hl>", "<dim>Not Weeks</dim>", "<mark>key</mark>"]) {
+      expect(richText(text)).toEqual([text]);
+    }
+  });
+
   it("leaves unknown or unbalanced tags as literal text", () => {
     expect(richText("<script>alert(1)</script>")).toEqual(["<script>alert(1)</script>"]);
-    expect(richText("<hl>open only")).toEqual(["<hl>open only"]);
+    expect(richText("<em>open only")).toEqual(["<em>open only"]);
   });
 });

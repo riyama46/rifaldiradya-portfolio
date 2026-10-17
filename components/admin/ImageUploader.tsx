@@ -182,7 +182,7 @@ export function ImageUploader({
             ? "aspect-square max-w-[240px] rounded-card"
             : "aspect-[16/10] max-w-[480px] rounded-card",
           value ? "border-border" : "border-dashed",
-          dragging ? "border-accent bg-accent-soft" : invalid ? "border-danger" : "border-border",
+          dragging ? "border-accent bg-accent/12" : invalid ? "border-danger" : "border-border",
         )}
       >
         {value ? (
@@ -214,7 +214,7 @@ export function ImageUploader({
         )}
 
         {busy && (
-          <div className="absolute inset-x-0 bottom-0 grid gap-2 bg-surface-raised/95 p-3 text-small">
+          <div className="absolute inset-x-0 bottom-0 grid gap-2 bg-surface/95 p-3 text-small">
             <p>
               {status.kind === "uploading" ? strings.uploading(status.percent) : strings.preparing}
             </p>

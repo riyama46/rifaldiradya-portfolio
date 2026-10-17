@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 const t = adminStrings.signIn;
 
 const inputClass =
-  "w-full rounded-button border border-border bg-surface-raised px-3.5 py-3 text-base text-text outline-none transition-colors focus-visible:border-accent";
+  "w-full rounded-button border border-text-muted bg-field px-3.5 py-3 text-base text-text transition-colors";
 
 type ApiError = { error?: { code?: string; retryAfterSeconds?: number } };
 

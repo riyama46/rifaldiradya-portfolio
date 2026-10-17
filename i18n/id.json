@@ -8,8 +8,12 @@
   "language": {
     "label": "Bahasa"
   },
+  "theme": {
+    "toDark": "Ganti ke mode gelap",
+    "toLight": "Ganti ke mode terang"
+  },
   "hero": {
-    "title": "Landing Page Siap Pakai dalam Hitungan <hl>Hari</hl>, <dim>Bukan Minggu</dim>",
+    "title": "Landing Page Siap Pakai dalam Hitungan <em>Hari</em>, Bukan Minggu",
     "subtitle": "Saya bikin landing page dari brief sampai live, cepat dan rapi. Butuh dashboard atau web app yang lebih kompleks? Saya juga bisa bantu.",
     "ctaPrimary": "Lihat Hasil Kerja",
     "ctaSecondary": "Kirim Brief via Email",
@@ -87,8 +91,8 @@
   },
   "about": {
     "title": "Siapa yang akan bekerja denganmu",
-    "lead": "Saya Rifaldi, web developer yang <mark>sehari-hari bekerja full-time membangun website</mark>, dan menerima project landing page freelance untuk founder dan bisnis kecil.",
-    "body": "Cara kerja saya sederhana: terima brief, ubah jadi <strong>halaman yang cepat dan rapi</strong>, lalu <mark>tayang dalam hitungan hari, bukan minggu</mark>. Kamu berurusan dengan satu orang dari pesan pertama sampai launch, jadi tidak ada yang hilang di antara desainer, developer, dan project manager."
+    "lead": "Saya Rifaldi, web developer yang <strong>sehari-hari bekerja full-time membangun website</strong>, dan menerima project landing page freelance untuk founder dan bisnis kecil.",
+    "body": "Cara kerja saya sederhana: terima brief, ubah jadi <strong>halaman yang cepat dan rapi</strong>, lalu <strong>tayang dalam hitungan hari, bukan minggu</strong>. Kamu berurusan dengan satu orang dari pesan pertama sampai launch, jadi tidak ada yang hilang di antara desainer, developer, dan project manager."
   },
   "facts": {
     "basedLabel": "Berbasis di",
@@ -102,7 +106,7 @@
     "stackLabel": "Stack"
   },
   "cta": {
-    "title": "Punya halaman yang mau <hl>diluncurkan</hl>?",
+    "title": "Punya halaman yang mau <em>diluncurkan</em>?",
     "sub": "Kirim brief singkat: halamannya untuk apa dan kapan dibutuhkan. Saya akan balas dengan langkah selanjutnya.",
     "button": "Kirim brief via email",
     "or": "atau salin"
