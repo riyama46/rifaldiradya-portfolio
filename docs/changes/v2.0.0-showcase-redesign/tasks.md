@@ -93,10 +93,11 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
   - ~~Hapus `ProjectCard`~~ → dipindah ke T-31: halaman Work masih memakai `ProjectGrid`/`ProjectCard` sampai baris case menggantikannya (disetujui Pal 2026-10-17).
 
   *Rujukan:* Delta APP_FLOW S-01 bab 2, D-06, D-18, D-20. *Selesai bila:* AC-2, AC-3 (sisi home); fallback daftar biasa tanpa scroll-driven.
-- [ ] **T-31 Halaman Work.**
+- [x] **T-31 Halaman Work.**
   - H1 + jumlah, `WorkFilter`, `CaseRow` (`<details>`), tombol case 3 jenis, hash open/reset filter, Contact penutup `#more`.
   - E-27/E-28/E-29.
   - Hapus `ProjectGrid`, `ProjectCard`, `gridColumnsClass` dan CSS `.reveal` (dipindah dari T-30).
+  - `case_open` (source `home_title`/`row`/`hash`) sudah dikirim di T-31 (disetujui Pal 2026-10-17); event lain tetap di T-32.
 
   *Rujukan:* Delta APP_FLOW S-02, D-05, D-24. *Selesai bila:* AC-3, AC-4, AC-5; snap dan baris nyaman di HP.
 
@@ -104,7 +105,7 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
 
 - [ ] **T-32 SEO + analytics + Privacy.**
   - Meta baru, JSON-LD (Person, ItemList dengan URL case), OG ulang (`scripts/og-images.mts`), `events.ts` v2 + atribut `data-track`.
-  - Privacy EN/ID (`rr-theme`, CV).
+  - Privacy EN/ID (`rr-theme`, CV, `sessionStorage` `rr-case-from-home` dari T-31: penanda sekali pakai agar klik judul home tidak terhitung dua kali sebagai `case_open`).
   - `site-config` LinkedIn baru + `github` kosong.
   - `check-deploy.mts` diperbarui.
 

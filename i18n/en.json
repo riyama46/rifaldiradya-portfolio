@@ -45,18 +45,25 @@
     "all": "See all work →",
     "rail": "Projects",
     "open": "Open the live site ↗",
-    "empty": "New work is on the way. Meanwhile, tell me what you need."
+    "empty": "New work is on the way. Meanwhile, here's how to reach me."
   },
-  "workPage": {
-    "title": "Work",
-    "intro": "Live landing pages I've built. Click through to see the real, working sites.",
-    "cta": "Like what you see?"
+  "wp": {
+    "label": "All work",
+    "sub": "Three projects inside the Panasonic HR system, three websites and a set of AI tools I use every day. Open a row for the details.",
+    "filter": "Filter projects",
+    "all": "All"
   },
-  "card": {
-    "live": "Live",
-    "visit": "Visit live site",
-    "visitShort": "Visit",
-    "visitAria": "Visit {title} (opens in new tab)"
+  "c": {
+    "is": "What it is",
+    "did": "What I did",
+    "stack": "Stack",
+    "status": "Status",
+    "walk": "Email to ask for a walkthrough"
+  },
+  "group": {
+    "panasonic": "Panasonic",
+    "web": "Websites",
+    "ai": "AI tools"
   },
   "about": {
     "h": "About",
@@ -92,6 +99,7 @@
   "ct": {
     "label": "Contact",
     "h": "Tell me what you're <em>building.</em>",
+    "hMore": "Have a project like <em>these?</em>",
     "pitch": "Hiring a full-time developer, or need an HR or internal system built? Send a few lines about it and I'll reply by email.",
     "role": "Email about a full-time role",
     "project": "Email about a project",

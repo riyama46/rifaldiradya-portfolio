@@ -75,7 +75,7 @@ describe("track() and data-track attributes (App Flow section 11)", () => {
       "en",
     );
     trackFromElement(
-      element({ track: "project_link_click", slug: "coffee", placement: "card" }),
+      element({ track: "project_link_click", slug: "coffee", placement: "case" }),
       "/id/work",
       "id",
     );
@@ -84,7 +84,7 @@ describe("track() and data-track attributes (App Flow section 11)", () => {
       [
         "event",
         "project_link_click",
-        { project_slug: "coffee", page: "work", placement: "card", language: "id" },
+        { project_slug: "coffee", page: "work", placement: "case", language: "id" },
       ],
     ]);
   });
@@ -95,10 +95,46 @@ describe("track() and data-track attributes (App Flow section 11)", () => {
       trackFromElement(element({ track: "contact_email_click", location: "sidebar" }), "/", "en"),
     ).toBe(false);
     expect(
-      trackFromElement(element({ track: "project_link_click", placement: "card" }), "/", "en"),
+      trackFromElement(element({ track: "project_link_click", placement: "case" }), "/", "en"),
     ).toBe(false);
     expect(trackFromElement(element({ track: "something_else" }), "/", "en")).toBe(false);
     expect(gtag).not.toHaveBeenCalled();
+  });
+
+  it("case_open: a row counts only when it opens; a home title click leaves a one-time mark", async () => {
+    const { gtag, trackFromElement, takeCaseFromHome } = await setup("consent=granted");
+    const store = new Map<string, string>();
+    vi.stubGlobal("sessionStorage", {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => store.set(key, value),
+      removeItem: (key: string) => store.delete(key),
+    });
+    const summary = (open: boolean) =>
+      ({
+        dataset: { track: "case_open", source: "row", slug: "sso" },
+        closest: () => ({ open }),
+      }) as unknown as HTMLElement;
+
+    expect(trackFromElement(summary(false), "/work", "en")).toBe(true);
+    expect(trackFromElement(summary(true), "/work", "en")).toBe(false);
+    trackFromElement(
+      element({ track: "case_open", source: "home_title", slug: "hr-system" }),
+      "/",
+      "en",
+    );
+    expect(gtag.mock.calls).toEqual([
+      ["event", "case_open", { project_slug: "sso", source: "row", language: "en" }],
+      ["event", "case_open", { project_slug: "hr-system", source: "home_title", language: "en" }],
+    ]);
+
+    expect(takeCaseFromHome("other")).toBe(false);
+    trackFromElement(
+      element({ track: "case_open", source: "home_title", slug: "hr-system" }),
+      "/",
+      "en",
+    );
+    expect(takeCaseFromHome("hr-system")).toBe(true);
+    expect(takeCaseFromHome("hr-system")).toBe(false);
   });
 
   it("does nothing when no Measurement ID is configured", async () => {

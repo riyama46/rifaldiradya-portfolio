@@ -130,9 +130,11 @@ test("events: email and project clicks are tracked after consent", async ({ page
       if ((event.target as Element).closest("a[target=_blank]")) event.preventDefault();
     }),
   );
-  await page.locator("article a[data-placement=card]:not([aria-hidden])").first().click();
+  const siteCase = page.locator("#cases details:has(a[data-placement=case])").first();
+  await siteCase.locator("summary").click();
+  await siteCase.locator("a[data-placement=case]").click();
   const projectClick = (await events(page)).find(([name]) => name === "project_link_click");
-  expect(projectClick?.[1]).toMatchObject({ page: "work", placement: "card", language: "en" });
+  expect(projectClick?.[1]).toMatchObject({ page: "work", placement: "case", language: "en" });
 });
 
 test.describe("phones", () => {

@@ -1100,17 +1100,305 @@
   }
 }
 
+/* ---------- Work page (Delta APP_FLOW S-02, option-b.html .workpage/.filters/.row/.cols) ---------- */
+@layer components {
+  .workpage {
+    justify-content: flex-start;
+    padding-top: 140px;
+    scroll-snap-align: none;
+  }
+
+  .wp-title {
+    font-size: clamp(96px, 15vw, 232px);
+    line-height: 0.88;
+    letter-spacing: -0.05em;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Lint "numbering" defended: the published project count next to the H1 (S-02 step 1). */
+  .wp-title sup {
+    position: relative;
+    top: -2.6em;
+    margin-left: 0.35em;
+    font-size: 0.14em;
+    letter-spacing: 0;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+  }
+
+  .wp-sub {
+    margin-top: 32px;
+    max-width: 46ch;
+    color: var(--color-text-muted);
+    font-size: clamp(18px, 1.5vw, 22px);
+    line-height: 1.5;
+  }
+
+  .filters {
+    margin-top: 48px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .filters button {
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ink) 8%, transparent);
+    color: var(--color-text-muted);
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color 200ms var(--ease),
+      color 200ms var(--ease);
+  }
+
+  .filters button:hover {
+    color: var(--color-text);
+  }
+
+  .filters button[aria-pressed="true"] {
+    background: var(--color-text);
+    color: var(--color-bg);
+  }
+
+  .filters .fc {
+    margin-left: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rows[data-filter="panasonic"] .row:not([data-group="panasonic"]),
+  .rows[data-filter="web"] .row:not([data-group="web"]),
+  .rows[data-filter="ai"] .row:not([data-group="ai"]) {
+    display: none;
+  }
+
+  /* Lint "hairline" defended: rules between the rows of a real list (option-b.html). The top rule
+     sits on the list and each row draws its bottom one, so a filtered list still closes. */
+  .rows {
+    margin-top: 40px;
+    border-top: 1px solid var(--faint); /* taste-skill-ignore: rows of a real list */
+  }
+
+  .row {
+    border-bottom: 1px solid var(--faint); /* taste-skill-ignore */
+  }
+
+  /* The hash target and the row JS scrolls to: clear of the sticky bar. */
+  .case {
+    scroll-margin-top: 88px;
+  }
+
+  .row-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto 150px 28px;
+    align-items: center;
+    gap: 24px;
+    padding: clamp(24px, 2.6vw, 40px) 0;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .row-head::-webkit-details-marker {
+    display: none;
+  }
+
+  .row-t {
+    grid-area: 1 / 1;
+    font-size: clamp(36px, 5vw, 80px);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    font-weight: 500;
+    text-wrap: balance;
+    transition:
+      transform 400ms var(--ease),
+      color 200ms var(--ease);
+  }
+
+  .row-m {
+    grid-area: 1 / 2;
+    color: var(--color-text-muted);
+    font-size: 15px;
+    text-align: right;
+  }
+
+  .row-y {
+    grid-area: 1 / 3;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pm {
+    grid-area: 1 / 4;
+    position: relative;
+    justify-self: end;
+    width: 20px;
+    height: 20px;
+  }
+
+  .pm::before,
+  .pm::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1.5px;
+    margin-top: -0.75px;
+    background: currentColor;
+    transition: transform 300ms var(--ease);
+  }
+
+  .pm::after {
+    transform: rotate(90deg);
+  }
+
+  .case[open] .pm::after {
+    transform: rotate(0deg);
+  }
+
+  .row-head:hover .row-t,
+  .row-head:focus-visible .row-t,
+  .case[open] .row-t {
+    transform: translateX(14px);
+    color: var(--color-accent);
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 24px;
+    padding: 4px 0 48px;
+  }
+
+  .cols .ch-label {
+    margin-bottom: 10px;
+  }
+
+  .cols .val,
+  .cols li {
+    font-size: 17px;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+
+  .cols li {
+    color: var(--color-text-muted);
+  }
+
+  .cols ul {
+    padding-left: 1.1em;
+    list-style: disc;
+  }
+
+  .cols li + li {
+    margin-top: 6px;
+  }
+
+  .cols .val + .ch-label {
+    margin-top: 20px;
+  }
+
+  .case-act {
+    margin-top: 20px;
+  }
+
+  .work-empty {
+    margin-top: 48px;
+    max-width: 46ch;
+    font-size: clamp(18px, 1.5vw, 22px);
+    line-height: 1.5;
+  }
+
+  .work-empty .line-link {
+    margin-top: 16px;
+    font-size: 17px;
+  }
+
+  @media (max-width: 767px) {
+    .workpage {
+      padding-top: 104px;
+    }
+
+    .wp-title {
+      font-size: 30vw;
+    }
+
+    .row-head {
+      grid-template-columns: minmax(0, 1fr) 20px;
+      gap: 4px 12px;
+      padding: 24px 0;
+    }
+
+    .row-t {
+      font-size: 9vw;
+    }
+
+    .row-m {
+      grid-area: 2 / 1;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .row-y {
+      display: none;
+    }
+
+    .pm {
+      grid-area: 1 / 2;
+    }
+
+    .row-head:hover .row-t,
+    .row-head:focus-visible .row-t,
+    .case[open] .row-t {
+      transform: none;
+    }
+
+    .cols {
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding: 0 0 32px;
+    }
+  }
+}
+
+/* S-02 without JS the filter could not work, so it is not shown and every row stays (E-07). */
+html:not([data-theme]) .filters {
+  display: none;
+}
+
+/* A case row opens smoothly where the browser can animate <details> (D-24); elsewhere at once. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (interpolate-size: allow-keywords) {
+    .case {
+      interpolate-size: allow-keywords;
+    }
+
+    .case::details-content {
+      block-size: 0;
+      overflow: clip;
+      transition:
+        block-size 450ms var(--ease),
+        content-visibility 450ms var(--ease) allow-discrete;
+    }
+
+    .case[open]::details-content {
+      block-size: auto;
+    }
+  }
+}
+
 /* O-04 without JS: the inline theme script never ran, so the toggle would do nothing (E-07).
    Unlayered so it beats the toggle's display utility. */
 html:not([data-theme]) .theme-toggle {
   display: none;
-}
-
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
 }
 
 @keyframes grow-x {
@@ -1378,6 +1666,11 @@ html:has(.consent-banner) {
       animation-name: ch-focus-in;
     }
 
+    /* The Work page is a long list, not one screen: it never blurs (option-b.html). */
+    .workpage > .ch-inner {
+      animation: none;
+    }
+
     /* About is taller than one phone screen: it stays in focus there. */
     @media (max-width: 767px) {
       #about > .ch-inner {
@@ -1530,17 +1823,6 @@ html:has(.consent-banner) {
       .is-pinned .rail {
         display: none;
       }
-    }
-
-    /* v1 project grid on the Work page until T-31. */
-    .reveal {
-      animation: rise linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 70%;
-    }
-
-    .reveal-late {
-      animation-range: entry 15% entry 85%;
     }
   }
 }

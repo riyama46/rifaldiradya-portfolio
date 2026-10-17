@@ -45,18 +45,25 @@
     "all": "Lihat semua karya →",
     "rail": "Proyek",
     "open": "Buka situsnya ↗",
-    "empty": "Karya baru sedang disiapkan. Sementara itu, ceritakan kebutuhanmu."
+    "empty": "Karya baru sedang disiapkan. Sementara itu, ini cara menghubungi saya."
   },
-  "workPage": {
-    "title": "Hasil Kerja",
-    "intro": "Landing page yang sudah live. Klik dan lihat situs aslinya.",
-    "cta": "Suka dengan hasilnya?"
+  "wp": {
+    "label": "Semua karya",
+    "sub": "Tiga proyek di sistem HR Panasonic, tiga website, dan alat AI yang saya pakai setiap hari. Buka satu baris untuk melihat detailnya.",
+    "filter": "Saring proyek",
+    "all": "Semua"
   },
-  "card": {
-    "live": "Live",
-    "visit": "Lihat situs",
-    "visitShort": "Lihat",
-    "visitAria": "Lihat {title} (buka di tab baru)"
+  "c": {
+    "is": "Apa ini",
+    "did": "Yang saya kerjakan",
+    "stack": "Stack",
+    "status": "Status",
+    "walk": "Email untuk minta walkthrough"
+  },
+  "group": {
+    "panasonic": "Panasonic",
+    "web": "Website",
+    "ai": "Alat AI"
   },
   "about": {
     "h": "Tentang",
@@ -92,6 +99,7 @@
   "ct": {
     "label": "Kontak",
     "h": "Ada posisi atau <em>proyek?</em>",
+    "hMore": "Punya proyek seperti <em>ini?</em>",
     "pitch": "Sedang mencari developer full-time, atau perlu sistem HR dan aplikasi internal dibangun? Ceritakan singkat kebutuhannya, saya balas lewat email.",
     "role": "Email soal posisi full-time",
     "project": "Email soal proyek",
