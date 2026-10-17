@@ -6,7 +6,7 @@ type Language = "en" | "id";
 
 export type AnalyticsEvents = {
   contact_email_click: {
-    location: "navbar" | "hero" | "footer" | "work_page";
+    location: "bar" | "hero" | "footer" | "work_page";
     method: "mailto" | "copy";
     language: Language;
   };
@@ -31,7 +31,7 @@ export function track<Name extends keyof AnalyticsEvents>(
   window.gtag("event", name, params);
 }
 
-const LOCATIONS = ["navbar", "hero", "footer", "work_page"] as const;
+const LOCATIONS = ["bar", "hero", "footer", "work_page"] as const;
 const PLACEMENTS = ["hero_panel", "card"] as const;
 const includes = <T extends string>(list: readonly T[], value: string | undefined): value is T =>
   list.includes(value as T);

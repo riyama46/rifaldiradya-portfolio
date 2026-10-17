@@ -74,7 +74,7 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
 
 ## Fase D — Situs publik (gate: semua AC CHANGE.md lolos di staging)
 
-- [ ] **T-28 Shell publik.**
+- [x] **T-28 Shell publik.**
   - `SiteBar` (desktop + mobile sesuai mockup), `ScrollProgress`, `ChapterDepth` (titik + cahaya CSS per `data-zone`), footer v2, skip link.
   - Restyle O-02/O-03 dan S-04.
   - Hapus `Navbar`, `FooterCta`.

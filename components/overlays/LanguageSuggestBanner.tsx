@@ -52,8 +52,8 @@ function CloseIcon() {
  * O-02 (App Flow): offered to browsers that list Indonesian, on English pages, until a choice is
  * stored in lang_pref. Decided in the browser after hydration (the server render and the first
  * client render show nothing), so it never blocks rendering and never shows without JS (E-07).
- * It is an overlay, so nothing shifts (no CLS): 48 px right under the sticky navbar from 768 px, and
- * a bar at the bottom of the screen on phones, where the hero starts only 24 px below the navbar.
+ * It is an overlay, so nothing shifts (no CLS): 48 px right under the bar row from 768 px, and a
+ * bar at the bottom of the screen on phones, where the hero fills the first screen.
  */
 export function LanguageSuggestBanner({ lang, path, labels }: LanguageSuggestBannerProps) {
   const [dismissed, setDismissed] = useState(false);
@@ -77,9 +77,9 @@ export function LanguageSuggestBanner({ lang, path, labels }: LanguageSuggestBan
     <div
       role="region"
       aria-label={labels.text}
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-accent/12 pb-[env(safe-area-inset-bottom)] md:absolute md:top-full md:bottom-auto md:border-t-0 md:border-b md:pb-0"
+      className="pointer-events-auto fixed inset-x-0 bottom-0 z-40 bg-[color-mix(in_srgb,var(--color-accent)_14%,var(--color-bg))] pb-[env(safe-area-inset-bottom)] md:absolute md:top-13 md:bottom-auto md:pb-0"
     >
-      <div className="mx-auto flex h-12 w-full max-w-[1200px] items-center gap-3 px-4 text-small lg:px-8">
+      <div className="flex h-12 w-full items-center gap-3 px-[var(--gutter)] text-small">
         {/* Very narrow screens show only the button; the region label still carries the sentence. */}
         <p className="mr-auto truncate max-[419px]:sr-only">{labels.text}</p>
         <Button

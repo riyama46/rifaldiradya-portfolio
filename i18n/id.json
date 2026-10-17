@@ -1,8 +1,9 @@
 {
   "nav": {
-    "work": "Hasil Kerja",
-    "email": "Email saya",
-    "skip": "Langsung ke konten",
+    "work": "Karya",
+    "about": "Tentang",
+    "email": "Kirim email",
+    "skip": "Lewati ke konten",
     "label": "Utama"
   },
   "language": {
@@ -131,7 +132,8 @@
   "footer": {
     "privacy": "Privasi",
     "cookies": "Pengaturan cookie",
-    "linkedinAria": "LinkedIn (buka di tab baru)"
+    "top": "Kembali ke atas ↑",
+    "home": "Kembali ke beranda ↑"
   },
   "privacy": {
     "title": "Privasi",

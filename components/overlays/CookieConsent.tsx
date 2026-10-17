@@ -97,7 +97,7 @@ export function CookieConsent({ lang, dict }: { lang: Locale; dict: Dictionary }
     <section
       ref={section}
       aria-labelledby={titleId}
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-lg md:inset-x-auto md:right-6 md:bottom-4 md:w-[420px] md:rounded-card md:border md:p-4"
+      className="fixed inset-x-0 bottom-0 z-50 bg-surface px-[var(--gutter)] pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgb(0_0_0/0.16)] md:inset-x-auto md:right-[var(--gutter)] md:bottom-4 md:w-[420px] md:rounded-card md:p-4 md:shadow-[0_12px_32px_rgb(0_0_0/0.24)]"
     >
       <h2 id={titleId} className="sr-only">
         {dict.consent.label}
@@ -106,7 +106,7 @@ export function CookieConsent({ lang, dict }: { lang: Locale; dict: Dictionary }
         {dict.consent.body}{" "}
         <Link
           href={localePath("/privacy", lang)}
-          className="font-medium underline decoration-accent decoration-2 underline-offset-4"
+          className="font-medium underline decoration-text-muted decoration-1 underline-offset-4 hover:text-accent hover:decoration-accent"
         >
           {dict.footer.privacy}
         </Link>
