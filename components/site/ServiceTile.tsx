@@ -26,9 +26,7 @@ export function ServiceTile({
     <div
       className={cn(
         "rounded-card p-6 lg:p-8",
-        isPrimary
-          ? "border-[1.5px] border-accent bg-surface-raised shadow-card"
-          : "border border-border",
+        isPrimary ? "border-[1.5px] border-accent bg-surface" : "border border-border",
         className,
       )}
     >

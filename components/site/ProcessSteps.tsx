@@ -26,7 +26,7 @@ export function ProcessSteps({ dict }: { dict: Dictionary }) {
           ) : (
             <span
               aria-hidden="true"
-              className="relative size-3 rounded-full border-2 border-accent bg-surface-raised"
+              className="relative size-3 rounded-full border-2 border-accent bg-surface"
             />
           )}
           <span className="text-small font-medium">{step.title}</span>

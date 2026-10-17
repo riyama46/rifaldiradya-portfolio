@@ -17,7 +17,7 @@ export default function AdminError({
       <Container className="py-10">
         <div
           role="alert"
-          className="rounded-card border border-l-4 border-border border-l-danger bg-surface-raised p-6"
+          className="rounded-card border border-l-4 border-border border-l-danger bg-surface p-6"
         >
           <p>{adminStrings.loadError}</p>
           <Button variant="secondary" size="sm" className="mt-4" onClick={() => retry()}>

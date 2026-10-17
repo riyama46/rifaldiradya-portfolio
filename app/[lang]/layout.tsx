@@ -1,4 +1,5 @@
 import { CspMeta } from "@/components/site/CspMeta";
+import { ThemeScript } from "@/components/site/ThemeScript";
 import { Analytics } from "@/components/overlays/Analytics";
 import { CookieConsent } from "@/components/overlays/CookieConsent";
 import { Footer } from "@/components/site/Footer";
@@ -22,9 +23,10 @@ export default async function PublicLayout({ children, params }: LayoutProps<"/[
   const dict = getDictionary(lang);
 
   return (
-    <html lang={lang} className={fontVariables}>
+    <html lang={lang} className={fontVariables} suppressHydrationWarning>
       <head>
         <CspMeta />
+        <ThemeScript />
       </head>
       <body>
         <SkipLink label={dict.nav.skip} />

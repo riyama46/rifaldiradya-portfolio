@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LanguageSuggestBanner } from "@/components/overlays/LanguageSuggestBanner";
 import { LanguageToggle } from "@/components/overlays/LanguageToggle";
+import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { localePath, type Dictionary, type Locale } from "@/i18n";
@@ -38,10 +39,10 @@ export function SiteHeader({ lang, dict, path }: SiteHeaderProps) {
 
   return (
     <header className="site-header sticky top-0 z-50">
-      <Container className="site-header-inner flex h-16 items-center gap-2">
+      <Container className="site-header-inner flex h-16 items-center gap-0.5 sm:gap-2">
         <Link
           href={localePath("/", lang)}
-          className="mr-auto rounded-sm font-display text-[1.0625rem] font-semibold whitespace-nowrap"
+          className="mr-auto rounded-sm text-[1.0625rem] font-semibold whitespace-nowrap"
         >
           <span className="max-md:hidden">{siteConfig.name}</span>
           <span className="md:hidden">{siteConfig.shortName}</span>
@@ -51,19 +52,20 @@ export function SiteHeader({ lang, dict, path }: SiteHeaderProps) {
           <Link
             href={localePath("/work", lang)}
             aria-current={path === "/work" ? "page" : undefined}
-            className="inline-flex min-h-11 items-center rounded-sm px-2 text-[0.9375rem] font-medium hover:text-accent aria-[current=page]:text-accent"
+            className="inline-flex min-h-11 items-center rounded-sm px-1 text-[0.9375rem] sm:px-2 font-medium hover:text-accent aria-[current=page]:text-accent"
           >
             {dict.nav.work}
           </Link>
         </nav>
 
         <LanguageToggle lang={lang} path={path} label={dict.language.label} />
+        <ThemeToggle labels={dict.theme} className="max-sm:w-9" />
 
         <Button
           href={mailto}
           size="icon"
           aria-label={dict.nav.email}
-          className="md:hidden"
+          className="shrink-0 md:hidden"
           data-track="contact_email_click"
           data-location="navbar"
         >

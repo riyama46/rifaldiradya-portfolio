@@ -40,7 +40,7 @@ export default async function PrivacyPage({ params }: PageProps<"/[lang]/privacy
           <article className="max-w-[65ch]">
             <h1 className="text-display">{privacy.title}</h1>
             <p className="mt-3 text-small text-text-muted">{privacy.updated}</p>
-            <p className="mt-6 text-lead font-display font-semibold text-pretty">{privacy.intro}</p>
+            <p className="mt-6 text-lead font-semibold text-pretty">{privacy.intro}</p>
 
             <Section title={privacy.collectTitle}>
               <p>{privacy.collectBody}</p>
@@ -77,7 +77,7 @@ export default async function PrivacyPage({ params }: PageProps<"/[lang]/privacy
               <p>{privacy.changeBody}</p>
               <CookieSettingsButton
                 label={dict.footer.cookies}
-                className="mt-4 inline-flex min-h-11 cursor-pointer items-center rounded-button border border-border bg-surface-raised px-3.5 font-medium text-text hover:border-text-muted"
+                className="mt-4 inline-flex min-h-11 cursor-pointer items-center rounded-button border border-border bg-surface px-3.5 font-medium text-text hover:border-text-muted"
               />
             </Section>
 

@@ -77,7 +77,7 @@ export function HeroProofPanel({ slides, labels }: HeroProofPanelProps) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={current.ariaLabel}
-          className="relative block overflow-hidden rounded-card border border-border bg-surface-raised shadow-card transition-[transform,box-shadow] duration-240 ease-out hover:shadow-card-hover motion-safe:hover:-translate-y-0.5"
+          className="relative block overflow-hidden rounded-card border border-border bg-surface transition-[transform,box-shadow] duration-240 ease-out motion-safe:hover:-translate-y-0.5"
         >
           <div
             aria-hidden="true"
@@ -88,7 +88,7 @@ export function HeroProofPanel({ slides, labels }: HeroProofPanelProps) {
             <i className="size-2.5 rounded-full bg-border" />
             <span
               key={`url-${active}`}
-              className="fade-in ml-2.5 min-w-0 flex-1 truncate rounded-md border border-border bg-surface-raised px-2.5 py-0.5 text-[0.8125rem] text-text-muted"
+              className="fade-in ml-2.5 min-w-0 flex-1 truncate rounded-md border border-border bg-surface px-2.5 py-0.5 text-[0.8125rem] text-text-muted"
             >
               {current.liveHost}
             </span>

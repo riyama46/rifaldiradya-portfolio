@@ -1,21 +1,78 @@
 @import "tailwindcss";
 
-/* Design tokens: single source for PRD section 8. Components use these, never raw values. */
+/*
+ * Design tokens v2 (Delta PRD section 8, Delta SDD section 8). Two layers:
+ * 1. theme tokens per theme on :root; values copied from docs/design/v2/option-b.html (public) and
+ *    admin.html (--panel, --field, --ok, --danger);
+ * 2. the Tailwind mapping in @theme below. Components use the mapped utilities, never raw values.
+ * Rules: --calm is glow colour only, --faint is decorative lines only; neither is ever text.
+ */
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b0b0b;
+  --ink: #f1f1ef;
+  --soft: rgba(241, 241, 239, 0.62);
+  --faint: rgba(241, 241, 239, 0.16);
+  --accent: #7b93ff;
+  --accent-ink: #0b0b0b;
+  --calm: #d2bf9f;
+  --k: 1;
+  --avatar-ring: rgba(243, 239, 233, 0.2);
+  --dot: rgba(255, 255, 255, 0.085);
+  --panel: #121212;
+  --field: #0e0e0e;
+  --ok: #3fbf6f;
+  --danger: #ff6b6b;
+}
+
+/* Without JS there is no data-theme (E-07): follow the device setting, dark when it has none. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+    --bg: #f6f6f3;
+    --ink: #111111;
+    --soft: rgba(17, 17, 17, 0.64);
+    --faint: rgba(17, 17, 17, 0.14);
+    --accent: #2f4fe0;
+    --accent-ink: #ffffff;
+    --calm: #8a7152;
+    --k: 0.6;
+    --avatar-ring: rgba(17, 17, 17, 0.14);
+    --dot: rgba(17, 17, 17, 0.1);
+    --panel: #ffffff;
+    --field: #ffffff;
+    --ok: #1a7f45;
+    --danger: #c62828;
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f6f6f3;
+  --ink: #111111;
+  --soft: rgba(17, 17, 17, 0.64);
+  --faint: rgba(17, 17, 17, 0.14);
+  --accent: #2f4fe0;
+  --accent-ink: #ffffff;
+  --calm: #8a7152;
+  --k: 0.6;
+  --avatar-ring: rgba(17, 17, 17, 0.14);
+  --dot: rgba(17, 17, 17, 0.1);
+  --panel: #ffffff;
+  --field: #ffffff;
+  --ok: #1a7f45;
+  --danger: #c62828;
+}
+
+:root {
+  --gutter: clamp(20px, 2.8vw, 40px);
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --win: 100svh;
+}
+
 @theme {
   --color-*: initial;
-  --color-bg: oklch(98.5% 0.008 85);
-  --color-surface: oklch(96% 0.012 85);
-  --color-surface-raised: oklch(100% 0 0);
-  --color-border: oklch(88% 0.015 80);
-  --color-text: oklch(22% 0.02 60);
-  --color-text-muted: oklch(45% 0.02 60);
-  --color-accent: oklch(52% 0.15 50);
-  --color-accent-hover: oklch(47% 0.14 48);
-  --color-accent-soft: oklch(93% 0.05 75);
-  --color-on-accent: oklch(100% 0 0);
-  /* L51 instead of PRD's L55: 14px "Live" text needs 4.5:1 on bg and surface (see docs/decisions/DECISIONS.md). */
-  --color-success: oklch(51% 0.13 150);
-  --color-danger: oklch(55% 0.18 28);
 
   --breakpoint-xl: 75rem;
 
@@ -43,27 +100,28 @@
   --text-eyebrow--line-height: 1.4;
   --text-eyebrow--letter-spacing: 0.08em;
 
-  --radius-card: 12px;
-  --radius-button: 10px;
-
-  --shadow-card:
-    0 1px 2px oklch(40% 0.04 60 / 0.06), 0 4px 12px oklch(40% 0.04 60 / 0.06),
-    0 12px 32px oklch(40% 0.04 60 / 0.05);
-  --shadow-card-hover:
-    0 2px 4px oklch(40% 0.04 60 / 0.06), 0 8px 20px oklch(40% 0.04 60 / 0.08),
-    0 20px 48px oklch(40% 0.04 60 / 0.07);
+  --radius-card: 6px;
+  /* Public buttons are 3px (option-b.html); .admin-shell overrides it to 6px (admin.html). */
+  --radius-button: 3px;
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-pulse: cubic-bezier(0.2, 0.6, 0.35, 1);
 }
 
 @theme inline {
-  --font-sans: var(--font-plex-sans), system-ui, sans-serif;
-  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
-}
+  --color-bg: var(--bg);
+  --color-surface: var(--panel);
+  --color-field: var(--field);
+  --color-text: var(--ink);
+  --color-text-muted: var(--soft);
+  --color-border: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-hover: color-mix(in srgb, var(--accent) 86%, var(--ink));
+  --color-on-accent: var(--accent-ink);
+  /* Admin only (status text and destructive actions). */
+  --color-success: var(--ok);
+  --color-danger: var(--danger);
 
-:root {
-  --slide-ms: 6000ms;
+  --font-sans: var(--font-archivo), "Helvetica Neue", Arial, sans-serif;
 }
 
 @layer base {
@@ -83,8 +141,14 @@
     font-family: var(--font-sans);
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
+    caret-color: var(--color-accent);
+    accent-color: var(--color-accent);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* O-04: theme change fades over 300ms; reduced motion switches instantly (rule below). */
+    transition:
+      background-color 300ms var(--ease),
+      color 300ms var(--ease);
   }
 
   @media (min-width: 64rem) {
@@ -96,9 +160,16 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-display);
     font-weight: 600;
     text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    text-underline-offset: 0.2em;
   }
 
   :focus-visible {
@@ -107,18 +178,8 @@
   }
 
   ::selection {
-    background-color: var(--color-accent-soft);
-    color: var(--color-text);
-  }
-
-  mark {
-    color: inherit;
-    padding-inline: 0.1em;
-    margin-inline: -0.1em;
-    background: linear-gradient(to top, var(--color-accent-soft) 0 42%, transparent 42%) no-repeat
-      left bottom / 100% 100%;
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -133,30 +194,15 @@
 }
 
 @layer components {
-  /* Highlighter behind a keyword; rendered by richText() for <hl>. */
-  .hl {
-    position: relative;
-    z-index: 0;
-    white-space: nowrap;
+  /* Accent word in a heading: rendered by richText() for <em> (one per heading). */
+  em.ac {
+    font-style: italic;
+    font-weight: 600;
+    color: var(--color-accent);
   }
 
-  .hl::before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    inset: 0.42em -0.1em 0.04em -0.08em;
-    border-radius: 3px;
-    background: var(--color-accent-soft);
-    transform: skew(-10deg) rotate(-1.2deg);
-    transform-origin: left center;
-  }
-
-  .hl-on-load .hl::before {
-    animation: hl-draw 700ms var(--ease-out) 250ms both;
-  }
-
-  .dim {
-    color: var(--color-text-muted);
+  .admin-shell {
+    --radius-button: 6px;
   }
 
   /* Sticky navbar. Its box never changes height (no layout shift); on scroll the background
@@ -172,7 +218,6 @@
     inset: 0;
     z-index: -1;
     background: color-mix(in oklab, var(--color-bg) 92%, transparent);
-    backdrop-filter: blur(8px);
     border-bottom: 1px solid transparent;
     transform-origin: top;
   }
@@ -211,7 +256,8 @@
     mask-image: radial-gradient(ellipse 90% 75% at 70% 35%, #000 20%, transparent 75%);
   }
 
-  /* HeroProofPanel (App Flow S-01): stacked back card, crossfading slides, CSS-timed progress. */
+  /* HeroProofPanel (App Flow S-01): stacked back card, crossfading slides, CSS-timed progress.
+     Removed with the panel in T-29. */
   .proof-stack::before {
     content: "";
     position: absolute;
@@ -245,7 +291,7 @@
   .proof-fill {
     transform: scaleX(0);
     transform-origin: left center;
-    animation: proof-fill var(--slide-ms) linear forwards;
+    animation: proof-fill 6000ms linear forwards;
   }
 
   .hero-proof:hover .proof-fill,
@@ -263,37 +309,12 @@
   .fade-in {
     animation: fade-in 200ms var(--ease-out);
   }
-
-  /* Pulsing ring for StatusDot; transform/opacity only so it stays on the compositor. */
-  .status-dot::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: var(--color-success);
-    animation: pulse-ring 2.2s var(--ease-pulse) infinite;
-  }
 }
 
-@keyframes hl-draw {
-  from {
-    transform: skew(-10deg) rotate(-1.2deg) scaleX(0);
-  }
-  to {
-    transform: skew(-10deg) rotate(-1.2deg) scaleX(1);
-  }
-}
-
-@keyframes pulse-ring {
-  0% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-  70%,
-  100% {
-    transform: scale(2.8);
-    opacity: 0;
-  }
+/* O-04 without JS: the inline theme script never ran, so the toggle would do nothing (E-07).
+   Unlayered so it beats the toggle's display utility. */
+html:not([data-theme]) .theme-toggle {
+  display: none;
 }
 
 @keyframes rise {
@@ -306,12 +327,6 @@
 @keyframes draw-x {
   from {
     transform: scaleX(0);
-  }
-}
-
-@keyframes mark-draw {
-  from {
-    background-size: 0% 100%;
   }
 }
 
@@ -399,18 +414,6 @@
       animation: draw-x linear both;
       animation-timeline: view();
       animation-range: entry 10% cover 35%;
-    }
-
-    .hl-on-view .hl::before {
-      animation: hl-draw linear both;
-      animation-timeline: view();
-      animation-range: entry 20% cover 50%;
-    }
-
-    .mark-on-view mark {
-      animation: mark-draw linear both;
-      animation-timeline: view();
-      animation-range: entry 60% cover 45%;
     }
   }
 }

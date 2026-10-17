@@ -10,7 +10,7 @@ export function StatusDot({ size = "sm", className }: StatusDotProps) {
     <span
       aria-hidden="true"
       className={cn(
-        "status-dot relative inline-block shrink-0 rounded-full bg-success",
+        "relative inline-block shrink-0 rounded-full bg-success",
         size === "sm" ? "size-2" : "size-3",
         className,
       )}

@@ -1,7 +1,7 @@
 import { analyticsEnabled } from "./config";
 import { getConsent } from "./consent";
 
-// The four GA4 events of App Flow section 11 (page_view is sent by gtag itself), typed strictly.
+// The GA4 events of App Flow section 11 (page_view is sent by gtag itself), typed strictly.
 type Language = "en" | "id";
 
 export type AnalyticsEvents = {
@@ -17,6 +17,8 @@ export type AnalyticsEvents = {
     language: Language;
   };
   language_switch: { from: Language; to: Language; source: "toggle" | "banner" };
+  /** O-04 theme toggle (Delta APP_FLOW section 11). */
+  theme_switch: { to: "dark" | "light" };
 };
 
 /** No-op without an ID, without consent, or before gtag exists. GA4 sends with a beacon. */

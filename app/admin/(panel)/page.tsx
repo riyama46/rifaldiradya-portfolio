@@ -41,7 +41,7 @@ export default async function AdminProjectsPage({ searchParams }: PageProps<"/ad
           <div className="mt-6 grid gap-2 text-small text-text-muted">
             <p>{strings.featuredInHero(featured.count, featured.limit)}</p>
             {featured.overLimit && (
-              <p className="rounded-button border-l-4 border-l-accent bg-accent-soft px-3 py-2 font-medium text-text">
+              <p className="rounded-button border-l-4 border-l-accent bg-accent/12 px-3 py-2 font-medium text-text">
                 {strings.featuredOverLimit}
               </p>
             )}

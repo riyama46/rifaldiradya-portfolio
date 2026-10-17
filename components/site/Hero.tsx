@@ -26,7 +26,7 @@ export function Hero({ dict, proofPanel, avatar }: HeroProps) {
       >
         <div>
           <BylineBadge avatar={avatar} />
-          <h1 className="hl-on-load max-w-[14ch] text-display">{richText(dict.hero.title)}</h1>
+          <h1 className="max-w-[14ch] text-display">{richText(dict.hero.title)}</h1>
           <p className="mt-4 max-w-[58ch] text-text-muted lg:mt-6 lg:text-body-lg">
             {dict.hero.subtitle}
           </p>

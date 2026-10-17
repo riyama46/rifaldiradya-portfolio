@@ -19,7 +19,7 @@ export function ProjectCard({ project, dict, sizes, priority }: ProjectCardProps
   const visitLabel = interpolate(dict.card.visitAria, { title: project.title });
 
   return (
-    <article className="group/card flex h-full flex-col overflow-hidden rounded-card border border-border bg-surface-raised shadow-card transition-[transform,box-shadow] duration-240 ease-out hover:shadow-card-hover motion-safe:hover:-translate-y-[3px]">
+    <article className="group/card flex h-full flex-col overflow-hidden rounded-card border border-border bg-surface transition-[transform,box-shadow] duration-240 ease-out motion-safe:hover:-translate-y-[3px]">
       <a
         href={project.liveUrl}
         data-track="project_link_click"

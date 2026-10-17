@@ -1,5 +1,6 @@
 import { AdminNav } from "@/components/admin/AdminNav";
 import { LogoutButton } from "@/components/admin/LogoutButton";
+import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { adminStrings } from "@/components/admin/strings";
 import { ArrowIcon } from "@/components/ui/ArrowIcon";
 import { Container } from "@/components/ui/Container";
@@ -12,9 +13,9 @@ export default async function AdminPanelLayout({ children }: LayoutProps<"/admin
 
   return (
     <>
-      <header className="border-b border-border bg-surface-raised">
+      <header className="border-b border-border bg-bg">
         <Container className="flex h-16 items-center gap-3">
-          <p className="mr-auto font-display font-semibold">{adminStrings.appName}</p>
+          <p className="mr-auto font-semibold">{adminStrings.appName}</p>
           <a
             href="/"
             target="_blank"
@@ -24,6 +25,7 @@ export default async function AdminPanelLayout({ children }: LayoutProps<"/admin
             {adminStrings.viewSite}
             <ArrowIcon />
           </a>
+          <ThemeToggle labels={adminStrings.theme} />
           <LogoutButton />
         </Container>
       </header>

@@ -37,7 +37,7 @@ import {
 const t = adminStrings.form;
 
 const inputClass =
-  "w-full rounded-button border bg-surface-raised px-3.5 py-3 text-base text-text outline-none transition-colors focus-visible:border-accent";
+  "w-full rounded-button border bg-field px-3.5 py-3 text-base text-text transition-colors";
 
 type ProjectFormProps =
   | { mode: "create"; initial: FormValues }
@@ -291,7 +291,7 @@ export function ProjectForm(props: ProjectFormProps) {
     onChange: (event: { target: { value: string } }) => set(field, event.target.value),
     onBlur: blur(field),
     "aria-invalid": errors[field] ? true : undefined,
-    className: cn(inputClass, errors[field] ? "border-danger" : "border-border"),
+    className: cn(inputClass, errors[field] ? "border-danger" : "border-text-muted"),
   });
 
   const errorList = (Object.entries(errors) as [ProjectField, string][]).sort(
@@ -304,7 +304,7 @@ export function ProjectForm(props: ProjectFormProps) {
         {sessionExpired && (
           <p
             role="alert"
-            className="rounded-button border-l-4 border-l-accent bg-accent-soft px-4 py-3"
+            className="rounded-button border-l-4 border-l-accent bg-accent/12 px-4 py-3"
           >
             {t.sessionExpired}{" "}
             <a
@@ -321,7 +321,7 @@ export function ProjectForm(props: ProjectFormProps) {
         {summary && errorList.length > 0 && (
           <div
             role="alert"
-            className="rounded-card border border-l-4 border-border border-l-danger bg-surface-raised p-4"
+            className="rounded-card border border-l-4 border-border border-l-danger bg-surface p-4"
           >
             <p className="font-medium">{t.errorSummary}</p>
             <ul className="mt-2 grid gap-1 text-small">
@@ -406,14 +406,14 @@ export function ProjectForm(props: ProjectFormProps) {
         <Field field="tags" errors={errors} help={t.help.tags}>
           <div
             className={cn(
-              "flex flex-wrap items-center gap-2 rounded-button border bg-surface-raised px-2 py-2 focus-within:border-accent",
-              errors.tags ? "border-danger" : "border-border",
+              "flex flex-wrap items-center gap-2 rounded-button border bg-field px-2 py-2 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent",
+              errors.tags ? "border-danger" : "border-text-muted",
             )}
           >
             {values.tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center gap-1 rounded-full bg-accent-soft py-1 pr-1 pl-3 text-small"
+                className="inline-flex items-center gap-1 rounded-full bg-accent/12 py-1 pr-1 pl-3 text-small"
               >
                 {tag}
                 <button

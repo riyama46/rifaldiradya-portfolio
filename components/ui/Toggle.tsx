@@ -25,15 +25,15 @@ export function Toggle({ id, label, description, checked, onChange, disabled }: 
         disabled={disabled}
         onClick={() => onChange(!checked)}
         className={cn(
-          "relative mt-0.5 inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full border transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50",
-          checked ? "border-accent bg-accent" : "border-border bg-surface",
+          "relative mt-0.5 inline-flex h-6 w-10 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-50",
+          checked ? "bg-accent" : "bg-text-muted",
         )}
       >
         <span
           aria-hidden="true"
           className={cn(
-            "inline-block size-5 rounded-full bg-surface-raised shadow-card transition-transform duration-200",
-            checked ? "translate-x-6" : "translate-x-1",
+            "inline-block size-[18px] rounded-full bg-bg transition-transform duration-200 ease-out",
+            checked ? "translate-x-[19px]" : "translate-x-[3px]",
           )}
         />
       </button>

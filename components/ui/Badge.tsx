@@ -8,8 +8,8 @@ type BadgeProps = {
 };
 
 const variants = {
-  soft: "bg-accent-soft text-text",
-  plain: "border border-border bg-surface text-text-muted",
+  soft: "bg-accent/12 text-text",
+  plain: "bg-text/8 text-text-muted",
 };
 
 export function Badge({ variant = "soft", className, children }: BadgeProps) {

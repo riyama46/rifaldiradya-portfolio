@@ -1,4 +1,5 @@
 import { CspMeta } from "@/components/site/CspMeta";
+import { ThemeScript } from "@/components/site/ThemeScript";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Analytics } from "@/components/overlays/Analytics";
@@ -26,9 +27,10 @@ export default async function GlobalNotFound() {
   const dict = getDictionary(lang);
 
   return (
-    <html lang={lang} className={fontVariables}>
+    <html lang={lang} className={fontVariables} suppressHydrationWarning>
       <head>
         <CspMeta />
+        <ThemeScript />
       </head>
       <body>
         <SkipLink label={dict.nav.skip} />

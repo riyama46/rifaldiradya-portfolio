@@ -4,7 +4,7 @@ app: rifaldiradya.com
 tier: full
 bump: major
 base_version: 1.0.1
-status: approved
+status: in-progress
 date: 2026-10-17
 ---
 
