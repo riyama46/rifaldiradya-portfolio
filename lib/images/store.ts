@@ -125,25 +125,45 @@ export async function getProfilePhoto(): Promise<Image | null> {
  * unless something else uses it.
  */
 export async function setProfilePhoto(id: string | null): Promise<void> {
-  const previous = await getProfilePhotoId();
-  await getDb()
-    .insert(siteSettings)
-    .values({ key: PROFILE_PHOTO_KEY, value: id })
-    .onDuplicateKeyUpdate({ set: { value: id, updatedAt: new Date() } });
-  if (previous && previous !== id) {
-    await deleteImageIfUnused(previous).catch((error: Error) =>
-      console.error("[images] old profile photo cleanup failed:", error.message),
-    );
-  }
+  await saveProfileSettings({ photoId: id });
 }
 
 /** Shows or hides the availability line in the hero (S-14, D-16). Stored as '1' / '0'. */
 export async function setAvailability(on: boolean): Promise<void> {
-  const value = on ? "1" : "0";
-  await getDb()
-    .insert(siteSettings)
-    .values({ key: AVAILABILITY_KEY, value })
-    .onDuplicateKeyUpdate({ set: { value, updatedAt: new Date() } });
+  await saveProfileSettings({ availability: on });
+}
+
+/**
+ * One S-14 save (API-09): the photo and the availability switch are written in one transaction,
+ * so a failed save changes neither. A field left undefined stays as it is. The replaced photo is
+ * deleted only after the commit, unless something else uses it.
+ */
+export async function saveProfileSettings(settings: {
+  photoId?: string | null;
+  availability?: boolean;
+}): Promise<void> {
+  const { photoId, availability } = settings;
+  const previous = photoId === undefined ? null : await getProfilePhotoId();
+  const rows: { key: string; value: string | null }[] = [];
+  if (availability !== undefined)
+    rows.push({ key: AVAILABILITY_KEY, value: availability ? "1" : "0" });
+  if (photoId !== undefined) rows.push({ key: PROFILE_PHOTO_KEY, value: photoId });
+  if (rows.length === 0) return;
+
+  await getDb().transaction(async (tx) => {
+    for (const row of rows) {
+      await tx
+        .insert(siteSettings)
+        .values(row)
+        .onDuplicateKeyUpdate({ set: { value: row.value, updatedAt: new Date() } });
+    }
+  });
+
+  if (previous && previous !== photoId) {
+    await deleteImageIfUnused(previous).catch((error: Error) =>
+      console.error("[images] old profile photo cleanup failed:", error.message),
+    );
+  }
 }
 
 /** The availability switch; on until it has been saved once (Delta APP_FLOW section 9). */

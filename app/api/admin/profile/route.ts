@@ -6,8 +6,7 @@ import {
   getAvailability,
   getImage,
   getProfilePhoto,
-  setAvailability,
-  setProfilePhoto,
+  saveProfileSettings,
 } from "@/lib/images/store";
 import { revalidatePublicPages } from "@/lib/revalidate";
 
@@ -54,9 +53,9 @@ export async function PUT(request: Request) {
       if (id && (!image || image.width !== image.height)) {
         return invalid({ photo: "This photo is no longer available. Upload it again." });
       }
-      await setProfilePhoto(id);
     }
-    if (availability !== undefined) await setAvailability(availability);
+    // Both fields in one transaction: a failed save changes neither.
+    await saveProfileSettings({ photoId: id, availability });
 
     const [photo, availabilityOn] = await Promise.all([getProfilePhoto(), getAvailability()]);
     const revalidated = revalidatePublicPages();
