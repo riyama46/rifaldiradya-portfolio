@@ -156,6 +156,34 @@ export function removeLine(current: string[], index: number) {
   return next.length > 0 ? next : [""];
 }
 
+/**
+ * Pasting several lines into one "What I did" field: an <input> would drop the line breaks and
+ * join them, so each pasted line becomes its own line, starting at the cursor. Blank pasted lines
+ * are skipped. More than 8 lines are kept and flagged by validation instead of being cut off.
+ * Returns null for a single-line paste (the input handles it).
+ */
+export function pasteLines(
+  current: string[],
+  index: number,
+  text: string,
+  selectionStart: number,
+  selectionEnd: number,
+): { lines: string[]; focus: number } | null {
+  const pasted = text.split(/\r\n|\r|\n/).filter((line) => line.trim() !== "");
+  if (pasted.length < 2) return null;
+
+  const line = current[index] ?? "";
+  const before = line.slice(0, selectionStart);
+  const after = line.slice(selectionEnd);
+  const inserted = pasted.map((part, position) =>
+    [position === 0 ? before : "", part, position === pasted.length - 1 ? after : ""].join(""),
+  );
+  return {
+    lines: [...current.slice(0, index), ...inserted, ...current.slice(index + 1)],
+    focus: index + inserted.length - 1,
+  };
+}
+
 /** Lines that will be saved (blank ones are dropped), for the "n lines, max 8" counter. */
 export const filledLines = (current: string[]) =>
   current.filter((line) => line.trim() !== "").length;

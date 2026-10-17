@@ -7,6 +7,7 @@ import {
   filledLines,
   firstErrorField,
   isDirty,
+  pasteLines,
   removeLine,
   toPayload,
   validate,
@@ -145,6 +146,30 @@ describe("What I did lines (LinesInput)", () => {
 
   it("counts only the lines that will be saved", () => {
     expect(filledLines(["a", " ", "", "b"])).toBe(2);
+  });
+
+  it("splits a multi-line paste into one line each, at the cursor", () => {
+    // Empty field (the usual copy from the content sheet), Windows line breaks, a blank line.
+    expect(pasteLines([""], 0, "One.\r\nTwo.\r\n\r\nThree.", 0, 0)).toEqual({
+      lines: ["One.", "Two.", "Three."],
+      focus: 2,
+    });
+    // Into the middle of an existing line: text before the cursor starts the first pasted line,
+    // text after it ends the last one; the lines around stay.
+    expect(pasteLines(["keep", "abXYcd", "tail"], 1, "1\n2", 2, 4)).toEqual({
+      lines: ["keep", "ab1", "2cd", "tail"],
+      focus: 2,
+    });
+  });
+
+  it("leaves a single-line paste to the input", () => {
+    expect(pasteLines([""], 0, "Just one line.", 0, 0)).toBeNull();
+    expect(pasteLines([""], 0, "Just one line.\n\n", 0, 0)).toBeNull();
+  });
+
+  it("keeps lines beyond 8 so validation can flag them", () => {
+    const nine = Array.from({ length: 9 }, (_, i) => `L${i}`).join("\n");
+    expect(pasteLines([""], 0, nine, 0, 0)?.lines).toHaveLength(9);
   });
 });
 

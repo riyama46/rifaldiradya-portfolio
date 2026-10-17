@@ -86,7 +86,19 @@ test("UF-07 + UF-08 + UF-09 v2: walkthrough case with a number card, edit, delet
   await page.getByRole("button", { name: "Add a line (EN)" }).click();
   await page.getByRole("button", { name: "Remove line 3 (EN)" }).click();
   await expect(page.getByRole("textbox", { name: "Line 3 (EN)" })).toHaveCount(0);
-  await page.getByRole("textbox", { name: "Line 1 (ID)" }).fill("Menulis baris pertama.");
+  // Pasting two lines (as copied from a content sheet) fills one line each instead of joining them.
+  await page.getByRole("textbox", { name: "Line 1 (ID)" }).evaluate((input, text) => {
+    const data = new DataTransfer();
+    data.setData("text/plain", text);
+    input.dispatchEvent(
+      new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }),
+    );
+  }, "Menulis baris pertama.\r\nLalu baris kedua.");
+  await expect(page.getByRole("textbox", { name: "Line 1 (ID)" })).toHaveValue(
+    "Menulis baris pertama.",
+  );
+  await expect(page.getByRole("textbox", { name: "Line 2 (ID)" })).toHaveValue("Lalu baris kedua.");
+  await expect(page.getByRole("textbox", { name: "Line 2 (ID)" })).toBeFocused();
   await page.getByLabel("Stack").fill("C#, SQL Server");
   await page.getByLabel("Stack").press("Enter");
   await page.getByRole("button", { name: "Remove SQL Server" }).click();
