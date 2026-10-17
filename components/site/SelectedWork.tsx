@@ -72,6 +72,9 @@ export function SelectedWork({ lang, dict, projects }: SelectedWorkProps) {
                       <a
                         className="wt-a"
                         href={localePath(`/work#case-${project.slug}`, lang)}
+                        data-track="case_open"
+                        data-source="home_title"
+                        data-slug={project.slug}
                         data-cursor="read"
                       >
                         {/* The arrow sits in the text so it follows the last word when the title wraps. */}

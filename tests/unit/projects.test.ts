@@ -3,7 +3,7 @@ import type { Project } from "@/lib/db/schema";
 import { mediaLoader } from "@/lib/images/loader";
 import {
   compareProjects,
-  gridColumnsClass,
+  groupCounts,
   screenshotOf,
   selectSelectedWork,
   selectedWorkRanges,
@@ -230,14 +230,17 @@ describe("selectedWorkRanges (pinned steps, option-b.html)", () => {
   });
 });
 
-describe("gridColumnsClass", () => {
-  it.each([
-    [1, "md:grid-cols-2"],
-    [2, "md:grid-cols-2"],
-    [3, "md:grid-cols-2 xl:grid-cols-3"],
-    [6, "md:grid-cols-2 xl:grid-cols-3"],
-  ])("%i cards -> %s", (count, expected) => {
-    expect(gridColumnsClass(count)).toBe(expected);
+describe("groupCounts", () => {
+  it("counts each group in the fixed order and drops empty groups", () => {
+    const projects = [{ group: "web" }, { group: "panasonic" }, { group: "web" }] as const;
+    expect(groupCounts(projects)).toEqual([
+      { group: "panasonic", count: 1 },
+      { group: "web", count: 2 },
+    ]);
+  });
+
+  it("returns nothing for no projects", () => {
+    expect(groupCounts([])).toEqual([]);
   });
 });
 

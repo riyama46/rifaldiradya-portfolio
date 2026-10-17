@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n";
 import type { Project } from "@/lib/db/schema";
-import type { CaseAction, ProjectGroup } from "./validation";
+import { PROJECT_GROUPS, type CaseAction, type ProjectGroup } from "./validation";
 
 export type ScreenshotVisual = {
   type: "screenshot";
@@ -135,7 +135,15 @@ export function selectedWorkRanges(n: number): { r0: string; r1: string }[] {
   }));
 }
 
-/** Grid goes to 3 columns at >=1200px only with 3+ cards (App Flow S-02, E-04). */
-export function gridColumnsClass(count: number): string {
-  return count >= 3 ? "md:grid-cols-2 xl:grid-cols-3" : "md:grid-cols-2";
+/**
+ * Filter buttons of the Work page (Delta APP_FLOW S-02 step 2): one per group that has projects,
+ * in the fixed order Panasonic, Websites, AI tools. An empty group gets no button.
+ */
+export function groupCounts(
+  projects: readonly Pick<PublicProject, "group">[],
+): { group: ProjectGroup; count: number }[] {
+  return PROJECT_GROUPS.map((group) => ({
+    group,
+    count: projects.filter((project) => project.group === group).length,
+  })).filter(({ count }) => count > 0);
 }
