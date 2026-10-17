@@ -64,13 +64,10 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
   - E2E UF-07/UF-08 versi v2;
   - form nyaman di 375 px;
   - semua kontrol berfungsi (yang di mockup masih tampilan saja: ↑/↓, + Add a line, hapus chip/baris, upload, Delete).
-- [ ] **T-27 Konten staging (Pal, paralel mulai setelah T-26).**
-  - Isi 7 proyek dari teks `T` di mockup.
-  - Atur `show_on_home` + urutan (D-18).
-  - Unggah screenshot SwiftPay/Bloom dan foto ≥ 640.
+- [x] **T-27 Konten (Pal).** Dipersempit oleh D-29 (2026-10-18): konten final tidak diisi di staging karena database devstaging dan produksi terpisah. Proyek uji staging pindah ke T-33; 7 proyek, `show_on_home` + urutan, screenshot SwiftPay/Bloom dan foto ≥ 640 pindah ke langkah setelah deploy di T-33.
   - [x] Siapkan PDF CV web tanpa nomor HP (dibersihkan metadata generator): `public/cv/rifaldi-radya-pratama-cv.pdf`, disusun ulang dari "Career - CV Software Engineer - v1.0" (Drive), satu halaman A4.
 
-  *Selesai bila:* semua proyek published tanpa error validasi; PDF siap di-commit.
+  *Selesai bila:* PDF siap di-commit.
 
 ## Fase D — Situs publik (gate: semua AC CHANGE.md lolos di staging)
 
@@ -114,11 +111,14 @@ Penomoran melanjutkan SDD §12 (T-01..T-22 = v1).
 ## Fase F — QA & rilis
 
 - [ ] **T-33 QA v2.0.0 + rilis.**
+  - Sebelum QA: Pal mengisi 2–3 proyek uji di admin devstaging (tiap jenis tombol case dan visual); periksa juga tampilan proyek v1 hasil migrasi `0004` di devstaging, karena itulah yang tampil di produksi sampai konten diisi (D-29).
   - Jalankan semua Acceptance checks (AC-1..AC-15) dan QA manual (Delta SDD §11): Safari iOS nyata, Firefox, reduced motion, mode terang di semua bab, snap Work di HP, kontras soft, focus ring baris case, Lighthouse mobile ≥ 90 di 4 halaman dalam kedua tema.
   - Backup database produksi.
   - `version` 2.0.0, CHANGELOG `[2.0.0]`.
   - PR `staging` → `main`, tag `v2.0.0` + GitHub Release, `check-deploy --production`.
-  - Merge CHANGE.md ke `docs/specs/` (header `version: 2.0.0`, `last_change`), salin D-01..D-28 ke DECISIONS, arsipkan change ke `docs/changes/archive/`, kosongkan "Active change".
+  - Merge CHANGE.md ke `docs/specs/` (header `version: 2.0.0`, `last_change`), salin D-01..D-29 ke DECISIONS, arsipkan change ke `docs/changes/archive/`, kosongkan "Active change".
+
+  - Setelah deploy (D-29): Pal mengisi 7 proyek di admin produksi (teks `T` di mockup), atur `show_on_home` + urutan (D-18), unggah screenshot SwiftPay/Bloom dan foto ≥ 640; lalu verifikasi AC-2 dan Lighthouse di produksi.
 
   *Selesai bila:* semua kotak tercentang dan Pal menyetujui.
 
