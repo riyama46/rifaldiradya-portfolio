@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { inputBorder, inputClass } from "@/components/admin/FormField";
-import { addLine, canAddLine, removeLine } from "@/components/admin/project-form-model";
+import { addLine, canAddLine, pasteLines, removeLine } from "@/components/admin/project-form-model";
 import { adminStrings } from "@/components/admin/strings";
 import { cn } from "@/lib/cn";
 
@@ -21,8 +21,9 @@ type LinesInputProps = {
 
 /**
  * "What I did" (S-12 field 8): one input per line, + Add a line (up to 8), × removes a line. The
- * order stays as typed; blank lines are dropped when saving. Focus follows the change: a new line
- * gets focus, a removed one hands it to its neighbour.
+ * order stays as typed; blank lines are dropped when saving. Pasting several lines fills one line
+ * each (pasteLines). Focus follows the change: a new line gets focus, a removed one hands it to its
+ * neighbour.
  */
 export function LinesInput({
   id,
@@ -59,6 +60,20 @@ export function LinesInput({
               value={line}
               onChange={(event) => update(index, event.target.value)}
               onBlur={onBlur}
+              onPaste={(event) => {
+                const input = event.currentTarget;
+                const pasted = pasteLines(
+                  lines,
+                  index,
+                  event.clipboardData.getData("text"),
+                  input.selectionStart ?? input.value.length,
+                  input.selectionEnd ?? input.value.length,
+                );
+                if (!pasted) return;
+                event.preventDefault();
+                focusLine.current = pasted.focus;
+                onChange(pasted.lines);
+              }}
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
                   event.preventDefault();
