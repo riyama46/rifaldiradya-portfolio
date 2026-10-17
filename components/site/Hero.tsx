@@ -12,11 +12,13 @@ type HeroProps = {
   avatar: PublicAvatar | null;
   /** Availability switch of S-14 (D-16). */
   availabilityOn: boolean;
+  /** "Scroll ↓" target: Selected work, or About when it is not rendered (E-25). */
+  scrollTarget: "#work" | "#about";
 };
 
 // Delta APP_FLOW S-01 bab 1. The H1 rises in without any opacity change (D-10): it is the LCP
 // element. No priority image here; the avatar is small with explicit dimensions.
-export function Hero({ dict, avatar, availabilityOn }: HeroProps) {
+export function Hero({ dict, avatar, availabilityOn, scrollTarget }: HeroProps) {
   return (
     <section id="top" data-zone="top" aria-labelledby="hero-h" className="chapter ch hero">
       <ChapterDepth />
@@ -76,7 +78,7 @@ export function Hero({ dict, avatar, availabilityOn }: HeroProps) {
             <MailtoLink dict={dict} kind="general" location="hero" variant="primary">
               {dict.cta}
             </MailtoLink>
-            <a href="#work" className="ch-label hero-scroll">
+            <a href={scrollTarget} className="ch-label hero-scroll">
               {dict.hero.scroll}
             </a>
           </div>

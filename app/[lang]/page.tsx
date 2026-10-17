@@ -5,19 +5,12 @@ import { Footer } from "@/components/site/Footer";
 import { Hero } from "@/components/site/Hero";
 import { HighlightChapter } from "@/components/site/HighlightChapter";
 import { JsonLd } from "@/components/site/JsonLd";
-import { ProjectGrid } from "@/components/site/ProjectGrid";
 import { SelectedWork } from "@/components/site/SelectedWork";
 import { SiteBar } from "@/components/site/SiteBar";
-import { ArrowIcon } from "@/components/ui/ArrowIcon";
-import { Button } from "@/components/ui/Button";
-import { getDictionary, interpolate, localePath } from "@/i18n";
+import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/i18n/server";
 import { getSiteSettings } from "@/lib/images/store";
-import {
-  HOMEPAGE_GRID_LIMIT,
-  selectHomepageProjects,
-  toPublicProject,
-} from "@/lib/projects/public";
+import { selectSelectedWork, toPublicProject } from "@/lib/projects/public";
 import { getPublishedProjects } from "@/lib/projects/queries";
 import { homeJsonLd } from "@/lib/seo/jsonld";
 import { buildMetadata, siteOrigin } from "@/lib/seo/metadata";
@@ -32,7 +25,8 @@ export async function generateMetadata({ params }: PageProps<"/[lang]">): Promis
 }
 
 // Delta APP_FLOW S-01: Hero → Selected work → About → Highlight → Contact → footer.
-// Selected work is still the v1 grid until T-30.
+// E-25: without show_on_home projects the Selected work chapter is not rendered and the hero
+// "Scroll ↓" points at About instead.
 export default async function HomePage({ params }: PageProps<"/[lang]">) {
   const lang = await resolveLocale(params);
   const dict = getDictionary(lang);
@@ -41,32 +35,20 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
     getPublishedProjects(),
     getSiteSettings(),
   ]);
-  const { grid, total } = selectHomepageProjects(
-    projects.map((project) => toPublicProject(project, lang)),
-  );
-
-  const viewAllLabel =
-    total > HOMEPAGE_GRID_LIMIT
-      ? interpolate(dict.work.viewAllCount, { n: total })
-      : dict.work.viewAll;
+  const selected = selectSelectedWork(projects.map((project) => toPublicProject(project, lang)));
 
   return (
     <>
       <JsonLd data={homeJsonLd(lang, siteOrigin())} />
       <SiteBar lang={lang} dict={dict} path="/" />
       <main id="content" tabIndex={-1}>
-        <Hero dict={dict} avatar={avatar} availabilityOn={availabilityOn} />
-        <SelectedWork dict={dict}>
-          {grid.length > 0 ? (
-            <>
-              <ProjectGrid projects={grid} dict={dict} />
-              <Button href={localePath("/work", lang)} variant="ghost" className="mt-8">
-                {viewAllLabel}
-                <ArrowIcon direction="right" />
-              </Button>
-            </>
-          ) : undefined}
-        </SelectedWork>
+        <Hero
+          dict={dict}
+          avatar={avatar}
+          availabilityOn={availabilityOn}
+          scrollTarget={selected.length > 0 ? "#work" : "#about"}
+        />
+        {selected.length > 0 && <SelectedWork lang={lang} dict={dict} projects={selected} />}
         <AboutChapter dict={dict} />
         <HighlightChapter dict={dict} />
         <ContactChapter dict={dict} />

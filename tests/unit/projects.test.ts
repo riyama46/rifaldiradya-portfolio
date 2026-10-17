@@ -5,8 +5,8 @@ import {
   compareProjects,
   gridColumnsClass,
   screenshotOf,
-  selectHomepageProjects,
   selectSelectedWork,
+  selectedWorkRanges,
   toPublicProject,
 } from "@/lib/projects/public";
 
@@ -201,15 +201,32 @@ describe("selectSelectedWork (D-18)", () => {
   });
 });
 
-describe("selectHomepageProjects (v1 homepage grid until T-30)", () => {
-  it("grid: the first 6 published, plus the total", () => {
-    const { grid, total } = selectHomepageProjects(Array.from({ length: 8 }, (_, id) => ({ id })));
-    expect(grid).toHaveLength(6);
-    expect(total).toBe(8);
+describe("selectedWorkRanges (pinned steps, option-b.html)", () => {
+  it("5 steps match the mockup ranges", () => {
+    expect(selectedWorkRanges(5)).toEqual([
+      { r0: "-12.5%", r1: "12.5%" },
+      { r0: "12.5%", r1: "37.5%" },
+      { r0: "37.5%", r1: "62.5%" },
+      { r0: "62.5%", r1: "87.5%" },
+      { r0: "87.5%", r1: "112.5%" },
+    ]);
   });
 
-  it("handles no projects (E-01)", () => {
-    expect(selectHomepageProjects([])).toEqual({ grid: [], total: 0 });
+  it("2 and 3 steps centre on 0/100 and 0/50/100", () => {
+    expect(selectedWorkRanges(2)).toEqual([
+      { r0: "-50%", r1: "50%" },
+      { r0: "50%", r1: "150%" },
+    ]);
+    expect(selectedWorkRanges(3).map((r) => r.r0)).toEqual(["-25%", "25%", "75%"]);
+  });
+
+  it("4 steps round to a clean percentage", () => {
+    expect(selectedWorkRanges(4)[1]).toEqual({ r0: "16.667%", r1: "50%" });
+  });
+
+  it("one project (or none) is not pinned", () => {
+    expect(selectedWorkRanges(1)).toEqual([]);
+    expect(selectedWorkRanges(0)).toEqual([]);
   });
 });
 
