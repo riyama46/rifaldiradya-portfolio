@@ -9,7 +9,7 @@ date: 2026-10-17
 approved: 2026-10-18
 ---
 
-# Change v2.1.0 — Lapisan pointer, preview admin, dan tema gelap default
+# Change v2.1.0 — Lapisan pointer, preview admin, tema gelap default, dan perapian visual
 
 > **Status: disetujui Pal 18 Okt 2026.** Bagian pointer sengaja ditunda dari v2.0.0 (D-27 di `docs/decisions/DECISIONS.md`; change v2.0.0 diarsipkan di `docs/changes/archive/2026-10-18-v2.0.0-showcase-redesign/`). Tema gelap default ditambahkan atas permintaan Pal saat persetujuan.
 >
@@ -28,6 +28,11 @@ Lapisan pointer adalah bagian desain yang diminta eksplisit (D-09) dan menunjukk
 
 Tema: arah "Opsi B" dirancang gelap lebih dulu (PRD §8, "Mode gelap (default)"), tetapi D-23 mengikuti setelan perangkat, sehingga pengunjung yang perangkatnya disetel terang (sebagian besar HP dan laptop kantor) tidak pernah melihat tampilan utama kecuali menekan toggle. Kesan pertama recruiter dan klien sebaiknya sama di semua perangkat.
 
+Masukan Pal setelah rilis (18 Okt 2026), ikut change ini:
+- Titik latar terlihat terputus di batas tiap bab, karena tiap bab punya lapisan titik sendiri dengan mask pudar 18 % di atas dan bawah (sama dengan mockup). Hanya di Selected work (dipin) titiknya terasa menyambung.
+- Favicon dan ikon aplikasi masih desain v1 ("RR" dengan sapuan stabilo amber), padahal amber sudah tidak ada di palet v2 (aksen cobalt).
+- Perubahan dari admin baru tampak setelah ±1 menit, kadang lebih lama: `revalidatePath` hanya membersihkan cache Next, sedangkan CDN Hostinger menyimpan HTML sesuai `s-maxage=300` dan boleh menyajikan salinan basi sampai ±1 tahun (`stale-while-revalidate`); teramati `Age: 589` pada respons HIT. Ini juga penyebab laporan "proyek AI tidak muncul di /work".
+
 Lane MINOR: hanya menambah dan mengubah satu perilaku default, tanpa perubahan struktur, URL, atau data.
 
 ## Scope
@@ -40,10 +45,14 @@ Lane MINOR: hanya menambah dan mengubah satu perilaku default, tanpa perubahan s
 - Tilt screenshot di Selected work (`perspective` + `rotateX/Y` maks. sekitar 6°, transisi 500 ms).
 - Admin S-12/S-13: panel preview di ≥ 1024 px, "Preview on the homepage" (meta, judul, deskripsi) dan "Preview next to the cursor" (screenshot atau kartu angka), diperbarui saat mengetik, EN dengan tombol ganti ke ID.
 - Tema gelap jadi default untuk semua pengunjung yang belum memilih, di publik dan admin, dengan dan tanpa JS. Terang tetap tersedia lewat toggle (tersimpan di `rr-theme`) dan `?theme=light`.
+- Titik latar menjadi satu bidang yang menyambung di seluruh halaman, dengan parallax pelan; cahaya per bab tetap.
+- Favicon, `icon.png`, dan `apple-icon.png` baru dalam gaya v2.
+- Cache HTML publik lebih pendek supaya perubahan admin tampak dalam ±1–2 menit dan salinan basi tidak bertahan lama.
 
 **Out**
 
-- Perubahan copy, data, API, atau URL; perubahan tampilan di HP dan tablet selain tema default.
+- Perubahan copy, data, API, atau URL; perubahan tampilan di HP dan tablet selain tema default, titik latar, dan ikon.
+- Purge cache CDN Hostinger lewat API (tidak ada API resmi yang dipakai proyek ini).
 - Library animasi atau dependency baru.
 
 ## Decisions
@@ -54,6 +63,9 @@ Lane MINOR: hanya menambah dan mengubah satu perilaku default, tanpa perubahan s
 - **D-34 — Reduced motion.** Dengan `prefers-reduced-motion: reduce`: titik dan cincin tetap (sebagai penanda), tetapi tanpa lag (langsung di posisi), tanpa tilt, cahaya tanpa transisi; preview tetap tampil tanpa animasi masuk. · Alasan: tetap informatif tanpa gerak.
 - **D-35 — Aksesibilitas tidak bergantung pada lapisan ini.** Label "Read"/"Visit" dan preview bersifat `aria-hidden`; arti tautan tetap dari teksnya. Kursor bawaan kembali muncul saat fokus keyboard dipakai (`:focus-visible` di mana pun → lapisan disembunyikan sampai mouse bergerak lagi).
 - **D-36 — Tema gelap default, tidak mengikuti setelan perangkat.** Urutan sebelum paint: `?theme=` → `rr-theme` → `dark`. Tanpa JS (E-07) dan saat `localStorage` diblokir (E-31) tema juga gelap. Berlaku untuk publik dan admin (satu `ThemeScript`). Menggantikan bagian `prefers-color-scheme` dari D-23; key, toggle, dan `?theme=` tetap. · Alasan: Opsi B dirancang gelap lebih dulu; kesan pertama sama di semua perangkat; pilihan terang tetap ada dan diingat. Kontras kedua tema sudah lolos WCAG AA dan PageSpeed (SDD §12). · Ditolak: mengikuti setelan perangkat (D-23 lama), karena mayoritas pengunjung tidak pernah melihat tampilan utama.
+- **D-37 — Satu bidang titik untuk seluruh halaman.** Titik dipindah dari `.depth` tiap bab ke satu lapisan `position: fixed` di belakang semua konten (`aria-hidden`, `pointer-events: none`), tanpa mask per bab. Parallax CSS: lapisan sedikit lebih tinggi dari layar bergeser `translateY` pelan dengan `animation-timeline: scroll(root)` di dalam `@supports`; tanpa dukungan atau dengan reduced motion → diam. Hanya `transform`. Lapisan `.depth` tiap bab tinggal cahaya (dan drift cahaya yang sudah ada); animasi titik `work-drift` di Selected work dihapus. · Alasan: masukan Pal, titik terputus terbaca sebagai bug; satu lapisan juga lebih ringan daripada 5–7 lapisan. · Ditolak: mempertahankan mask per bab seperti mockup.
+- **D-38 — Ikon v2.** Monogram "RR" dengan font Archivo di atas warna latar gelap v2 (`--bg` gelap) dengan aksen cobalt (`--accent`), dibuat ulang oleh `scripts/icons.mts` dari token yang sama; ukuran sama dengan v1 (ico 16/32/48, 512, 180). Builder menyiapkan 2 varian (mis. "RR" putih dengan garis bawah cobalt, dan "RR" cobalt) sebagai PNG untuk dipilih Pal sebelum PR. Menggantikan keputusan ikon 2026-09-30 ("B · highlighter"). · Alasan: amber sudah keluar dari palet v2.
+- **D-39 — Cache HTML publik.** `export const revalidate = 60` di `/[lang]` dan `/[lang]/work` (sitemap dan robots tetap 300) dan `expireTime: 120` di `next.config.ts`, sehingga header menjadi `s-maxage=60, stale-while-revalidate=60`. Revalidasi on-demand saat admin menyimpan tetap. · Alasan: CDN tidak ikut dibersihkan `revalidatePath`; batas atas salinan basi turun dari tak terbatas praktis ke ±2 menit. Beban tambahan: paling banyak 1 render ulang per halaman per menit saat ada pengunjung, query ringan. · Ditolak: `revalidate = 0`/dinamis (kehilangan cache CDN dan ketahanan saat DB bermasalah).
 
 ## Delta: PRD
 
@@ -101,17 +113,20 @@ Tidak ada file DESIGN_SPEC (konvensi v1/v2). Perubahan visual tercatat di Delta 
 
 - **§4** `components/site/PointerLayer.tsx` (client, dynamic import) dan `components/admin/ProjectPreview.tsx` (client). Data preview dirender server sebagai markup tersembunyi di dalam `.peek`, bukan diambil lewat fetch.
 - **§8 Motion** Aturan D-32..D-35; satu-satunya `requestAnimationFrame` di situs.
+- **§8 Motion** Lapisan titik tetap (D-37) dengan `animation-timeline: scroll(root)`.
 
 ### MODIFIED
 
 - **§8 Token tema.** Hapus `@media (prefers-color-scheme: light) :root:not([data-theme])`; `:root` tanpa `data-theme` memakai token gelap. `lib/theme.ts` `resolveTheme(query, stored)` tanpa argumen setelan perangkat. Previously: fallback tanpa JS mengikuti perangkat (E-07). Why: D-36.
+- **§3/§5 Render & cache.** Tabel render: `revalidate = 300` menjadi `60` untuk `/[lang]` dan `/[lang]/work`, plus `expireTime: 120` (D-39). Previously: 300 tanpa `expireTime` (SWR ±1 tahun dari default Next). Why: D-39.
+- **§4** `scripts/icons.mts` memakai token v2; file ikon di `app/` diganti (D-38).
 - **§11 Testing.** E2E "tema tanpa flash" ditambah kasus perangkat `colorScheme: light` tanpa pilihan → gelap; unit `resolveTheme` disesuaikan.
 - **§13 AGENTS.md.** Aturan JS klien: tambah "`PointerLayer` (khusus mouse, dimuat terpisah)". Previously: lapisan pointer dilarang sampai v2.1.0.
 
 ## Impact checklist
 
 - [ ] Screens: S-01, S-02 (atribut + lapisan), S-12/S-13 (panel preview); semua layar publik dan admin (tema default). Route tidak berubah.
-- [ ] Komponen: 2 komponen baru; `lib/theme.ts`, `styles/globals.css` (fallback tema) diubah; tidak ada yang dihapus.
+- [ ] Komponen: 2 komponen baru; `lib/theme.ts`, `styles/globals.css` (fallback tema, lapisan titik), `next.config.ts`, `revalidate` dua halaman, `scripts/icons.mts` + ikon `app/` diubah; tidak ada yang dihapus.
 - [ ] URL/SEO: tidak berubah.
 - [ ] Copy: label kursor `cur.read`/`cur.visit` (key baru) dan label panel preview admin.
 - [ ] Data/API: tidak ada.
@@ -128,6 +143,9 @@ Tidak ada file DESIGN_SPEC (konvensi v1/v2). Perubahan visual tercatat di Delta 
 - **AC-7.** Given form admin di ≥ 1024 px, When judul atau angka diketik, Then panel preview berubah langsung tanpa menyimpan.
 - **AC-8.** Given perangkat disetel terang dan belum ada `rr-theme`, When membuka `/`, `/work`, atau `/admin/login`, Then frame pertama sudah gelap (tanpa flash); setelah toggle ke terang dan reload, tetap terang; `?theme=light` tetap terang.
 - **AC-9.** Given JavaScript mati dan perangkat disetel terang, When membuka `/`, Then tema gelap dan semua konten tetap terbaca.
+- **AC-10.** Given scroll pelan melewati batas bab di `/` dan `/work` (1280 dan 375 px, kedua tema), Then pola titik menyambung tanpa celah atau pudar di batas bab; dengan reduced motion titik diam; tidak ada CLS dan Performance tetap ≥ 90.
+- **AC-11.** Tab browser, hasil Google, dan ikon layar utama memakai ikon v2 pilihan Pal; tidak ada amber.
+- **AC-12.** Given proyek disimpan di admin produksi, When `/work` dibuka ulang setelah 2 menit, Then perubahan tampak; header `Cache-Control` HTML publik = `s-maxage=60, stale-while-revalidate=60`.
 
 ## Already implemented
 
