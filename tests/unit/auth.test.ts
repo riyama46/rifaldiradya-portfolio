@@ -94,17 +94,14 @@ describe("verifyCredentials", () => {
 
   beforeAll(async () => {
     admin = {
-      email: "Rifaldi@RifaldiRadya.com",
+      email: "Admin@Example.com",
       passwordHash: await hashPassword("correct horse battery"),
     };
   });
 
   it("accepts the right email (any case) and password", async () => {
     await expect(
-      verifyCredentials(
-        { email: " admin@example.com ", password: "correct horse battery" },
-        admin,
-      ),
+      verifyCredentials({ email: " admin@example.com ", password: "correct horse battery" }, admin),
     ).resolves.toBe(true);
   });
 
