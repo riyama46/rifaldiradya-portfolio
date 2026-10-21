@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { guardAdminWrite } from "@/lib/auth/guard";
 import { apiError, readJsonBody } from "@/lib/http/api";
+import { MissingImageError } from "@/lib/images/store";
 import { missingImage, showOnHomeFull } from "@/lib/projects/errors";
 import {
   createProject,
@@ -32,6 +33,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ project: toProjectJson(project), revalidated }, { status: 201 });
   } catch (error) {
     if (error instanceof ShowOnHomeLimitError) return showOnHomeFull();
+    if (error instanceof MissingImageError) return missingImage();
     console.error("[projects] create failed:", (error as Error).message);
     return apiError(500, "SERVER_ERROR", "Couldn't save. Your changes are still here — try again.");
   }

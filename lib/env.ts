@@ -79,6 +79,9 @@ function cached<T>(load: () => T): () => T {
   return () => (value ??= load());
 }
 
+/** True while `next build` prerenders pages, when the database may be unreachable (E-02). */
+export const isBuildPhase = () => process.env.NEXT_PHASE === "phase-production-build";
+
 export const siteEnv = cached(() => parseSiteEnv(process.env));
 export const databaseEnv = cached(() => parseDatabaseEnv(process.env));
 export const adminEnv = cached(() => parseAdminEnv(process.env));

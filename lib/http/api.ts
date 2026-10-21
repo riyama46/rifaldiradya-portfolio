@@ -36,11 +36,22 @@ export const MAX_JSON_BYTES = 32 * 1024;
 /** Parsed JSON body, or undefined when it is missing, too large, or not valid JSON. */
 export async function readJsonBody(request: Request): Promise<unknown> {
   const declared = Number(request.headers.get("content-length") ?? 0);
-  if (declared > MAX_JSON_BYTES) return undefined;
-  const text = await request.text().catch(() => "");
-  if (!text || new TextEncoder().encode(text).length > MAX_JSON_BYTES) return undefined;
+  if (declared > MAX_JSON_BYTES || !request.body) return undefined;
+  // Counted while reading: a chunked body has no Content-Length, so the header alone can't stop it.
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
   try {
-    return JSON.parse(text) as unknown;
+    for (let part = await reader.read(); !part.done; part = await reader.read()) {
+      size += part.value.byteLength;
+      if (size > MAX_JSON_BYTES) {
+        await reader.cancel();
+        return undefined;
+      }
+      chunks.push(part.value);
+    }
+    const text = Buffer.concat(chunks).toString("utf8");
+    return text ? (JSON.parse(text) as unknown) : undefined;
   } catch {
     return undefined;
   }

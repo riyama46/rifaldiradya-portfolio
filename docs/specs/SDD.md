@@ -2,9 +2,9 @@
 doc: SDD
 app: rifaldiradya.com
 tier: full
-version: 2.0.0
+version: 2.0.1
 status: current
-last_updated: 2026-10-18
+last_updated: 2026-10-22
 last_change: changes/archive/2026-10-18-v2.0.0-showcase-redesign
 ---
 
@@ -102,7 +102,7 @@ Seed tidak ada; project pertama diisi lewat admin.
 - **Avatar (S-14)**: persegi, minimal 640 × 640, varian 320 dan 640 (v1: 160/320). Avatar 320 lama tetap disajikan dengan srcset hanya berisi lebar yang benar-benar ada (E-32).
 - **Delivery**: `/media/<id>.<ext>` (terbesar) dan `/media/<id>-<lebar>.<ext>`; loader `next/image` memilih lebar tersimpan terkecil yang cukup. Gambar tidak pernah berubah (thumbnail baru = id baru), jadi `Cache-Control: public, max-age=31536000, immutable`.
 - **Project hanya memilih `public_id`**: API-03/04 mengambil url, lebar, dan tinggi dari tabel `images`, bukan dari request.
-- **Hapus**: thumbnail lama dihapus setelah project tersimpan dengan gambar baru; API-05 (T-17) menghapus gambar project. Upload yang tidak pernah tersimpan dihapus lewat API-07 (Remove/Replace/Cancel) atau otomatis setelah 24 jam (dibersihkan saat upload berikutnya). Gagal hapus tidak membatalkan operasi utama, hanya dicatat di log. Salinan di cache CDN bisa bertahan, tapi tidak lagi ditautkan dari mana pun.
+- **Hapus**: thumbnail lama dihapus setelah project tersimpan dengan gambar baru; API-05 (T-17) menghapus gambar project. Hapus dan simpan saling mengunci baris gambar (`for update` / `for share`), jadi gambar yang sedang dipilih oleh save project/profil tidak bisa terhapus di tengah jalan; kalau sudah terhapus duluan, save menjawab "image no longer available". Upload yang tidak pernah tersimpan dihapus lewat API-07 (Remove/Replace/Cancel) atau otomatis setelah 24 jam (dibersihkan saat upload berikutnya). Gagal hapus tidak membatalkan operasi utama, hanya dicatat di log. Salinan di cache CDN bisa bertahan, tapi tidak lagi ditautkan dari mana pun.
 
 ## 4. Struktur repo & konvensi kode
 
@@ -251,8 +251,9 @@ Satu admin, sesi disimpan di database, dan semua pemeriksaan dilakukan di server
 | CSRF | Cookie `sameSite=lax` + cek header `Origin` = `SITE_URL` di semua request tulis (`403 FORBIDDEN_ORIGIN`) |
 | XSS | React escaping; tidak ada `dangerouslySetInnerHTML` kecuali JSON-LD yang dibentuk dari objek (di-`JSON.stringify` + escape `<`) dan skrip tema inline yang dibentuk dari kode sendiri; input admin disimpan sebagai teks biasa; mailto dibangun dengan `encodeURIComponent` untuk subject/body (judul proyek di subject walkthrough ikut di-encode) |
 | Upload berbahaya | Client: tipe JPG/PNG/WebP, maks 5 MB, lebar ≥ 1200 px, digambar ulang lewat canvas. Server: format + dimensi dari magic bytes (hanya WebP/JPEG; SVG/HTML/PNG ditolak), set lebar dan rasio 16:10 wajib cocok, maks 1 MB per varian; nama file dan MIME dari client diabaikan; disajikan dengan `Content-Type` dari DB + `X-Content-Type-Options: nosniff` |
-| URL berbahaya | `live_url` divalidasi `https:` di server dan hanya dirender bila `https:`; dirender dengan `rel="noopener noreferrer"` |
-| Brute force | Rate limit login + bcrypt cost 12 |
+| URL berbahaya | `live_url` divalidasi `https:` di server dan hanya dirender (termasuk JSON-LD) bila `https:` dan tombol case = `site`; dirender dengan `rel="noopener noreferrer"` |
+| Brute force | Rate limit login + bcrypt cost 12. Percobaan dicatat sebagai gagal *sebelum* cek password, jadi request paralel ikut terhitung; percobaan yang ditolak 429 tidak dihitung (DECISIONS 2026-10-22) |
+| Body request besar | Body JSON API admin, termasuk login, maks 32 KB (`readJsonBody`, dihitung saat dibaca, jadi body chunked tanpa `Content-Length` ikut terpotong); lebih besar diperlakukan seperti body rusak (`400`/`422`) |
 | Kebocoran secret | Semua secret di env Hostinger; `.env*` di `.gitignore`; `.env.example` tanpa nilai; tidak ada secret dengan prefix `NEXT_PUBLIC_` |
 | Clickjacking & header | `lib/security-headers.ts` lewat `next.config.ts` `headers()` di semua respons: `Content-Security-Policy` (default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com, + 'unsafe-eval' hanya di dev; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: + host GA; font-src 'self'; connect-src 'self' + host GA; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (kamera, mikrofon, lokasi, pembayaran, USB, topics dimatikan), `Cross-Origin-Opener-Policy: same-origin`, `Strict-Transport-Security: max-age=31536000` (produksi) |
 | Dependency rentan | Aktifkan scan kerentanan otomatis Hostinger + Dependabot di GitHub; ikuti security release Next.js |
@@ -489,7 +490,7 @@ v1: 22 task dalam 4 fase (T-01..T-22). v2.0.0: 11 task (T-23..T-33), di bawah. S
 
 - [x] **T-32** Meta v2, JSON-LD (Person, ItemList dengan URL case), OG ulang, `events.ts` v2 + `data-track`, Privacy EN/ID (`rr-theme`, CV, `rr-case-from-home`), `site-config` LinkedIn baru + GitHub kosong, `check-deploy.mts` diperbarui.
 - [x] **T-33** QA v2.0.0 (di atas) + rilis: perbaikan QA (#59, #60), backup DB produksi, `version` 2.0.0, CHANGELOG `[2.0.0]`, CHANGE digabung ke `docs/specs/` dan diarsipkan, D-01..D-30 ke DECISIONS, PR `staging` → `main`, tag `v2.0.0` + GitHub Release, `check-deploy --production`.
-- [ ] **Pasca-rilis (D-29):** Pal mengisi 7 proyek di admin produksi, `show_on_home` + urutan, foto ≥ 640; lalu verifikasi AC-2 dan PageSpeed di produksi.
+- [x] **Pasca-rilis (D-29):** Pal mengisi 7 proyek di admin produksi, `show_on_home` + urutan, foto ≥ 640; lalu verifikasi AC-2 dan PageSpeed di produksi. Produksi 18 Okt 2026: AC-2 lolos di `/` dan `/id` (HR System, Single Sign-On, rifaldiradya.com, SwiftPay, Bloom Studio; penghitung 01–05 / 05; AI tidak di home sesuai D-18); `/work` dan `/id/work` 7 baris, filter 7/3/3/1. PageSpeed mobile kedua tema: `/` 98–99, `/work` 97–99, `/id` 97–98, `/id/work` 96–99; Accessibility, Best Practices, SEO 100; CLS ≤ 0,001; LCP lab 1,7–3,1 s (bervariasi antar-run, belum ada data CrUX). Foto profil 640 × 640.
 
 ## 13. Aturan kerja dengan coding AI
 

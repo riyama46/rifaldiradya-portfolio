@@ -1,8 +1,7 @@
 import { asc, desc, eq, max } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { projects, type Project } from "@/lib/db/schema";
-
-const isBuildPhase = () => process.env.NEXT_PHASE === "phase-production-build";
+import { isBuildPhase } from "@/lib/env";
 
 /**
  * Published projects in standard order (sort_order asc, created_at desc). Drafts never leave here.

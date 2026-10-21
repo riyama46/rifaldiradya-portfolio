@@ -431,4 +431,23 @@ describe("readJsonBody", () => {
       readJsonBody(post(JSON.stringify({ a: "x".repeat(MAX_JSON_BYTES) }))),
     ).resolves.toBeUndefined();
   });
+
+  it("stops reading a chunked body (no Content-Length) once it is too large", async () => {
+    const chunk = new TextEncoder().encode("x".repeat(1024));
+    let pulled = 0;
+    // Never ends: reading it whole would hang the test.
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        pulled++;
+        controller.enqueue(chunk);
+      },
+    });
+    const request = new Request("https://rifaldiradya.com/api/admin/login", {
+      method: "POST",
+      body,
+      duplex: "half",
+    } as RequestInit);
+    await expect(readJsonBody(request)).resolves.toBeUndefined();
+    expect(pulled).toBeLessThan(MAX_JSON_BYTES / 1024 + 5);
+  });
 });
