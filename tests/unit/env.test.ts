@@ -17,7 +17,7 @@ const valid = {
   DATABASE_NAME: "portfolio",
   DATABASE_USER: "portfolio",
   DATABASE_PASSWORD: "secret-db-password",
-  ADMIN_EMAIL: "rifaldi@rifaldiradya.com",
+  ADMIN_EMAIL: "admin@example.com",
   ADMIN_PASSWORD_HASH: BCRYPT,
   RATE_LIMIT_SALT: "x".repeat(32),
   NEXT_PUBLIC_GA_MEASUREMENT_ID: "G-ABC123",
@@ -68,7 +68,7 @@ describe("database env", () => {
 
 describe("admin env", () => {
   it("accepts a bcrypt hash and a long salt", () => {
-    expect(parseAdminEnv(valid).ADMIN_EMAIL).toBe("rifaldi@rifaldiradya.com");
+    expect(parseAdminEnv(valid).ADMIN_EMAIL).toBe("admin@example.com");
   });
 
   it("rejects a plain-text password", () => {
