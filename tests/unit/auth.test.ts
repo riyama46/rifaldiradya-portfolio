@@ -102,7 +102,7 @@ describe("verifyCredentials", () => {
   it("accepts the right email (any case) and password", async () => {
     await expect(
       verifyCredentials(
-        { email: " rifaldi@rifaldiradya.com ", password: "correct horse battery" },
+        { email: " admin@example.com ", password: "correct horse battery" },
         admin,
       ),
     ).resolves.toBe(true);
@@ -110,7 +110,7 @@ describe("verifyCredentials", () => {
 
   it("rejects a wrong password", async () => {
     await expect(
-      verifyCredentials({ email: "rifaldi@rifaldiradya.com", password: "wrong" }, admin),
+      verifyCredentials({ email: "admin@example.com", password: "wrong" }, admin),
     ).resolves.toBe(false);
   });
 
@@ -122,7 +122,7 @@ describe("verifyCredentials", () => {
 });
 
 describe("admin env password hash", () => {
-  const base = { ADMIN_EMAIL: "rifaldi@rifaldiradya.com", RATE_LIMIT_SALT: "s".repeat(32) };
+  const base = { ADMIN_EMAIL: "admin@example.com", RATE_LIMIT_SALT: "s".repeat(32) };
 
   it("accepts the base64 form printed by npm run hash-password", async () => {
     const hash = await hashPassword("correct horse battery");

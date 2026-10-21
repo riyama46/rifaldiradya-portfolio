@@ -323,7 +323,7 @@ Meta tidak menyebut availability (D-26).
 | Hosting | Hostinger **Business Web Hosting** → fitur Node.js Web Apps (paket Business termasuk yang didukung; runtime Node 18/20/22/24) | Final, perlu cek di hPanel |
 | Deploy | Push ke GitHub → Hostinger GitHub integration build otomatis (install → build → start) setiap push ke branch `main` | Final |
 | Domain | rifaldiradya.com (sudah dimiliki); project demo di `staging0.` dan `staging1.rifaldiradya.com` | Final |
-| Email | hello@rifaldiradya.com (public), rifaldi@rifaldiradya.com (primer) | Final |
+| Email | hello@rifaldiradya.com | Final |
 | Penyimpanan gambar | Bukan filesystem server, supaya aman dari redeploy. Dikunci: MySQL Hostinger, dikompres di browser admin (16:10, WebP, 4 lebar) | Final (29 Sep 2026, tanpa vendor pihak ketiga) |
 | Database | Database terkelola kecil untuk data project + akun admin (kandidat dibandingkan di SDD: MySQL bawaan Hostinger vs Postgres terkelola seperti Supabase/Neon) | Diputuskan di SDD |
 | Analytics | Google Analytics 4 + Consent Mode v2 | Final |
