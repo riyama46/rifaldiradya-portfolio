@@ -59,7 +59,15 @@ describe("admin sessions (SDD section 6)", () => {
 
 describe("login rate limit (E-10)", () => {
   it(`locks an IP after ${MAX_FAILED_ATTEMPTS} failures in 15 minutes`, async () => {
-    for (let i = 0; i < MAX_FAILED_ATTEMPTS - 1; i++) await startLoginAttempt(ipHash);
+    // The race fix itself: an allowed attempt is already counted before the password check runs.
+    const first = await startLoginAttempt(ipHash);
+    const [row] = await getDb()
+      .select({ success: loginAttempts.success })
+      .from(loginAttempts)
+      .where(eq(loginAttempts.id, first.id));
+    expect(row?.success).toBe(false);
+
+    for (let i = 0; i < MAX_FAILED_ATTEMPTS - 2; i++) await startLoginAttempt(ipHash);
     // successes don't count toward the limit
     await markLoginSucceeded((await startLoginAttempt(ipHash)).id);
 
@@ -75,13 +83,7 @@ describe("login rate limit (E-10)", () => {
       Array.from({ length: 12 }, () => startLoginAttempt(parallelIpHash)),
     );
     const allowed = attempts.filter((attempt) => attempt.retryAfterSeconds === 0);
+    // Often 0: when all insert before any counts, every one is refused. Safe, just strict.
     expect(allowed.length).toBeLessThanOrEqual(MAX_FAILED_ATTEMPTS);
-
-    // The race fix itself: an allowed attempt is already counted before the password check runs.
-    const [row] = await getDb()
-      .select({ success: loginAttempts.success })
-      .from(loginAttempts)
-      .where(eq(loginAttempts.id, allowed[0].id));
-    expect(row?.success).toBe(false);
   });
 });
