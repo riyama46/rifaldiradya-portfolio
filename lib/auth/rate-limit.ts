@@ -35,21 +35,44 @@ async function failuresSince(since: Date, ipHash?: string): Promise<Date[]> {
   return rows.map((row) => row.createdAt);
 }
 
-/** 0 when a login may be attempted, otherwise the seconds to wait. */
-export async function checkRateLimit(ipHash: string, now = new Date()): Promise<number> {
+/**
+ * 0 when a login may be attempted, otherwise the seconds to wait. `pending` = failure rows of
+ * attempts still in progress that are already counted (see startLoginAttempt).
+ */
+export async function checkRateLimit(
+  ipHash: string,
+  now = new Date(),
+  pending = 0,
+): Promise<number> {
   const since = new Date(now.getTime() - WINDOW_MS);
   const [fromIp, fromAnywhere] = await Promise.all([
     failuresSince(since, ipHash),
     failuresSince(since),
   ]);
   return Math.max(
-    retryAfterSeconds(fromIp, MAX_FAILED_ATTEMPTS, now),
-    retryAfterSeconds(fromAnywhere, GLOBAL_MAX_FAILED_ATTEMPTS, now),
+    retryAfterSeconds(fromIp, MAX_FAILED_ATTEMPTS + pending, now),
+    retryAfterSeconds(fromAnywhere, GLOBAL_MAX_FAILED_ATTEMPTS + pending, now),
   );
 }
 
-export async function recordLoginAttempt(ipHash: string, success: boolean): Promise<void> {
-  await getDb().insert(loginAttempts).values({ ipHash, success });
+/**
+ * Records the attempt as a failure *before* the slow password check, so parallel requests count
+ * each other and can't all slip under the limit (DECISIONS 2026-10-22). A blocked attempt is not a
+ * guess: its row is removed again, so hammering a locked form doesn't extend the lock.
+ */
+export async function startLoginAttempt(
+  ipHash: string,
+  now = new Date(),
+): Promise<{ id: number; retryAfterSeconds: number }> {
+  const db = getDb();
+  const [{ id }] = await db.insert(loginAttempts).values({ ipHash, success: false }).$returningId();
+  const retryAfterSeconds = await checkRateLimit(ipHash, now, 1);
+  if (retryAfterSeconds > 0) await db.delete(loginAttempts).where(eq(loginAttempts.id, id));
+  return { id, retryAfterSeconds };
+}
+
+export async function markLoginSucceeded(id: number): Promise<void> {
+  await getDb().update(loginAttempts).set({ success: true }).where(eq(loginAttempts.id, id));
 }
 
 export async function deleteOldLoginAttempts(now = new Date()): Promise<void> {

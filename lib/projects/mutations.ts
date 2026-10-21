@@ -1,8 +1,8 @@
 import { asc, desc, eq, gt, like, or, sql } from "drizzle-orm";
-import { getDb } from "@/lib/db/client";
+import { getDb, type Transaction } from "@/lib/db/client";
 import { projects, type Project } from "@/lib/db/schema";
 import { mediaUrl } from "@/lib/images/rules";
-import { deleteImageIfUnused, getImage } from "@/lib/images/store";
+import { deleteImageIfUnused, getImage, lockImageForUse } from "@/lib/images/store";
 import { getProjectById } from "./queries";
 import { slugify, uniqueSlug } from "./slug";
 import { messages, SHOW_ON_HOME_MAX, type ProjectInput, type ProjectInputRaw } from "./validation";
@@ -114,8 +114,6 @@ export class ShowOnHomeLimitError extends Error {
   }
 }
 
-type Transaction = Parameters<Parameters<ReturnType<typeof getDb>["transaction"]>[0]>[0];
-
 /**
  * E-26: at most 5 projects with show_on_home, drafts included. Runs inside the save transaction
  * with the rows locked, so two saves at once can't both take the 5th place. A project that is
@@ -164,6 +162,7 @@ export async function createProject(input: ProjectInput): Promise<Project> {
     const slug = await freeSlug(input.title_en);
     try {
       const id = await getDb().transaction(async (tx) => {
+        if (input.thumbnail) await lockImageForUse(tx, input.thumbnail.public_id);
         await assertShowOnHomeRoom(tx, input);
         await tx
           .update(projects)
@@ -209,6 +208,7 @@ export async function updateProject(
   input: ProjectInput,
 ): Promise<Project | null> {
   await getDb().transaction(async (tx) => {
+    if (input.thumbnail) await lockImageForUse(tx, input.thumbnail.public_id);
     await assertShowOnHomeRoom(tx, input, existing.id);
     await tx.update(projects).set(toColumns(input)).where(eq(projects.id, existing.id));
   });

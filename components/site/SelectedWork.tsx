@@ -55,7 +55,7 @@ export function SelectedWork({ lang, dict, projects }: SelectedWorkProps) {
         <div className="work-list">
           {projects.map((project, index) => {
             const shot = screenshotOf(project);
-            const site = project.caseAction === "site" ? project.liveUrl : null;
+            const site = project.liveUrl;
             const label = [project.meta, project.side].filter(Boolean).join(" · ");
             return (
               <article key={project.id} className="proj" style={step(index)}>

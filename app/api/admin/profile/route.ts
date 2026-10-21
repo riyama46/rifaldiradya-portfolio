@@ -6,6 +6,7 @@ import {
   getAvailability,
   getImage,
   getProfilePhoto,
+  MissingImageError,
   saveProfileSettings,
 } from "@/lib/images/store";
 import { revalidatePublicPages } from "@/lib/revalidate";
@@ -65,6 +66,9 @@ export async function PUT(request: Request) {
       revalidated,
     });
   } catch (error) {
+    if (error instanceof MissingImageError) {
+      return invalid({ photo: "This photo is no longer available. Upload it again." });
+    }
     console.error("[profile] save failed:", (error as Error).message);
     return apiError(500, "SERVER_ERROR", "Couldn't save. Try again.");
   }

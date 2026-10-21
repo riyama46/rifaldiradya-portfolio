@@ -29,7 +29,10 @@ export type PublicProject = {
   stack: string[];
   status: string | null;
   caseAction: CaseAction;
-  /** Only an https URL ever reaches a page (SDD section 6). */
+  /**
+   * Only when the case button opens the site, and only https (SDD section 6): a stored URL the page
+   * doesn't show must not reach the JSON-LD either.
+   */
   liveUrl: string | null;
   visual: ScreenshotVisual | NumberVisual | null;
   showOnHome: boolean;
@@ -94,7 +97,7 @@ export function toPublicProject(project: Project, lang: Locale): PublicProject {
     stack: project.tags.slice(0, STACK_LIMIT),
     status: (id ? project.statusId : project.statusEn) || null,
     caseAction,
-    liveUrl,
+    liveUrl: caseAction === "site" ? liveUrl : null,
     visual: visualOf(project, lang),
     showOnHome: project.showOnHome,
   };
@@ -103,14 +106,6 @@ export function toPublicProject(project: Project, lang: Locale): PublicProject {
 /** The screenshot of a project, or null (number cards appear only from v2.1.0, D-11). */
 export const screenshotOf = (project: Pick<PublicProject, "visual">) =>
   project.visual?.type === "screenshot" ? project.visual : null;
-
-/** Standard order (App Flow section 9): sort_order asc, then newest first. */
-export function compareProjects(
-  a: Pick<Project, "sortOrder" | "createdAt">,
-  b: Pick<Project, "sortOrder" | "createdAt">,
-): number {
-  return a.sortOrder - b.sortOrder || b.createdAt.getTime() - a.createdAt.getTime();
-}
 
 /**
  * Selected work (Delta SDD section 5): from the published list in standard order, the projects

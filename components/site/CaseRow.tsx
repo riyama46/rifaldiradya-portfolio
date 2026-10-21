@@ -14,7 +14,7 @@ type CaseRowProps = {
 export function CaseRow({ dict, project }: CaseRowProps) {
   const { c } = dict;
   const intro = project.caseIs ?? project.summary;
-  const site = project.caseAction === "site" ? project.liveUrl : null;
+  const site = project.liveUrl;
   const walkthrough = project.caseAction === "walkthrough";
   const hasDetails = project.stack.length > 0 || project.status !== null || site || walkthrough;
 

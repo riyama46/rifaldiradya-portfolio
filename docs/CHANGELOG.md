@@ -4,6 +4,19 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versi
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-10-22
+
+### Fixed
+
+- Rate limit login (E-10) tidak lagi bisa dilewati dengan banyak request serentak.
+- Body JSON API admin, termasuk login, dibatasi 32 KB juga untuk request chunked tanpa `Content-Length`.
+- URL live yang tidak ditampilkan di halaman (tombol case bukan "site") tidak lagi ikut di JSON-LD halaman Work.
+- Gambar yang dihapus di satu tab tidak lagi bisa tersimpan di project/profil yang disimpan di tab lain.
+
+### Changed
+
+- Bersih-bersih kode: helper yang hanya dipakai test dihapus, cek fase build di satu tempat.
+
 ## [2.0.0] - 2026-10-18
 
 Arah situs berubah: showcase software engineer full-stack .NET untuk recruiter dan klien proyek, dengan situs sebagai funnel ke email. Detail: `docs/changes/archive/2026-10-18-v2.0.0-showcase-redesign/CHANGE.md`, keputusan D-01..D-30 di `docs/decisions/DECISIONS.md`.
