@@ -49,8 +49,8 @@ describe("siteConfig", () => {
     expect(siteConfig.social.linkedin).toBe("https://www.linkedin.com/in/rifaldiradya");
   });
 
-  it("keeps GitHub empty until there is a public repo worth showing (D-19)", () => {
-    expect(siteConfig.social.github).toBe("");
+  it("links the public GitHub profile (D-19)", () => {
+    expect(siteConfig.social.github).toBe("https://github.com/riyama46");
   });
 
   it("serves the CV from public/cv", () => {
