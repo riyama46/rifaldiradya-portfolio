@@ -20,6 +20,6 @@ export const siteConfig = {
   social: {
     linkedin: "https://www.linkedin.com/in/rifaldiradya",
     /** Empty = not rendered anywhere (D-19). */
-    github: "",
+    github: "https://github.com/riyama46",
   },
 } as const;

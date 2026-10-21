@@ -4,6 +4,16 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versi
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-10-22
+
+### Added
+
+- Tautan GitHub (profil publik) di Contact dan JSON-LD `sameAs` (D-19 terpenuhi: repo sudah publik).
+
+### Changed
+
+- README ditulis ulang untuk repo publik; email admin di spec dikoreksi ke hello@rifaldiradya.com.
+
 ## [2.0.1] - 2026-10-22
 
 ### Fixed

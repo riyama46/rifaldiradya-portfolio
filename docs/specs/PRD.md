@@ -4,7 +4,7 @@ app: rifaldiradya.com
 tier: full
 version: 2.0.0
 status: current
-last_updated: 2026-10-18
+last_updated: 2026-10-22
 last_change: changes/archive/2026-10-18-v2.0.0-showcase-redesign
 ---
 
@@ -219,7 +219,6 @@ Semua item di bawah sengaja ditunda. Trigger = kondisi yang membuat item layak d
 | Lapisan pointer + preview admin | Dipisah agar v2.0.0 bisa live lebih cepat (D-27) | v2.0.0 live; sudah direncanakan di `docs/changes/v2.1.0-pointer-layer/CHANGE.md` |
 | Halaman case study per URL | Baris case di halaman Work sudah cukup | Ada proyek dengan cerita yang tidak muat di satu baris |
 | Form kontak dengan penyimpanan data | Email sudah cukup; form menambah data pribadi + spam handling | Volume inquiry naik atau butuh brief terstruktur |
-| Link GitHub | Profil publik belum punya repo yang layak (D-19) | Profil GitHub punya repo publik yang layak |
 | Screenshot HRMS diblur | Layar internal | Pal mendapat izin dan ingin mengganti kartu angka |
 | Link profil Upwork/Fiverr | Belum diputuskan | Profil aktif dan ingin ditautkan |
 | Testimoni | Belum ada testimoni tertulis | Ada testimoni tertulis yang boleh dipakai |
