@@ -321,7 +321,7 @@ Semua variabel divalidasi oleh `lib/env.ts` (Zod) dalam 4 kelompok: site, databa
 | `DATABASE_HOST` | `127.0.0.1` | ya | tidak | Jangan `localhost` |
 | `DATABASE_PORT` | `3306` | ya | tidak | — |
 | `DATABASE_NAME` / `DATABASE_USER` / `DATABASE_PASSWORD` | dari hPanel → Databases | ya | tidak | User khusus app, hanya akses ke 1 database |
-| `ADMIN_EMAIL` | `rifaldi@rifaldiradya.com` | ya | tidak | Email login admin |
+| `ADMIN_EMAIL` | `hello@rifaldiradya.com` | ya | tidak | Email login admin |
 | `ADMIN_PASSWORD_HASH` | hash bcrypt cost 12, **di-encode base64** (tanpa `$`) | ya (admin) | tidak | Dibuat dengan `npm run hash-password` di terminal sendiri (input tersembunyi). Base64 karena `$` pada hash mentah dianggap referensi variabel di file `.env` (dotenv-expand) dan bisa merusak hash; hash mentah `$2b$…` tetap diterima |
 | `RATE_LIMIT_SALT` | string acak 32+ karakter | ya | tidak | Untuk hash IP |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | `G-XXXXXXXXXX` | tidak | ya | Kosong → komponen analytics & banner consent tidak dirender (berguna di dev) |

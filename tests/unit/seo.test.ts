@@ -98,7 +98,7 @@ describe("indexing only on the production domain", () => {
 describe("JSON-LD", () => {
   const origin = "https://rifaldiradya.com";
 
-  it("homepage: Person (with LinkedIn) + WebSite in the page language", () => {
+  it("homepage: Person (with LinkedIn and GitHub) + WebSite in the page language", () => {
     const data = homeJsonLd("id", origin) as { "@graph": Record<string, unknown>[] };
     const [person, website] = data["@graph"];
     expect(person).toMatchObject({
@@ -109,7 +109,7 @@ describe("JSON-LD", () => {
       worksFor: { "@type": "Organization", name: "PT Panasonic Manufacturing Indonesia" },
       knowsAbout: ["C#", "ASP.NET", "SQL Server", "Microsoft Azure", "Next.js", "TypeScript"],
       // GitHub is empty, so only LinkedIn (D-19, AC-13).
-      sameAs: ["https://www.linkedin.com/in/rifaldiradya"],
+      sameAs: ["https://www.linkedin.com/in/rifaldiradya", "https://github.com/riyama46"],
     });
     expect(website).toMatchObject({ "@type": "WebSite", inLanguage: "id-ID" });
   });
