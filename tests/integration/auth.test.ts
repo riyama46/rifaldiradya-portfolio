@@ -1,7 +1,12 @@
 import { eq } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
 import { sha256 } from "@/lib/auth/crypto";
-import { checkRateLimit, MAX_FAILED_ATTEMPTS, recordLoginAttempt } from "@/lib/auth/rate-limit";
+import {
+  checkRateLimit,
+  markLoginSucceeded,
+  MAX_FAILED_ATTEMPTS,
+  startLoginAttempt,
+} from "@/lib/auth/rate-limit";
 import {
   createSession,
   deleteExpiredSessions,
@@ -13,10 +18,12 @@ import { adminSessions, loginAttempts } from "@/lib/db/schema";
 
 const userAgent = `integration-test-${Date.now()}`;
 const ipHash = sha256(`integration-ip-${Date.now()}`);
+const parallelIpHash = sha256(`integration-ip-parallel-${Date.now()}`);
 
 afterAll(async () => {
   await getDb().delete(adminSessions).where(eq(adminSessions.userAgent, userAgent));
   await getDb().delete(loginAttempts).where(eq(loginAttempts.ipHash, ipHash));
+  await getDb().delete(loginAttempts).where(eq(loginAttempts.ipHash, parallelIpHash));
 });
 
 describe("admin sessions (SDD section 6)", () => {
@@ -52,12 +59,29 @@ describe("admin sessions (SDD section 6)", () => {
 
 describe("login rate limit (E-10)", () => {
   it(`locks an IP after ${MAX_FAILED_ATTEMPTS} failures in 15 minutes`, async () => {
-    for (let i = 0; i < MAX_FAILED_ATTEMPTS - 1; i++) await recordLoginAttempt(ipHash, false);
-    await recordLoginAttempt(ipHash, true); // successes don't count toward the limit
+    for (let i = 0; i < MAX_FAILED_ATTEMPTS - 1; i++) await startLoginAttempt(ipHash);
+    // successes don't count toward the limit
+    await markLoginSucceeded((await startLoginAttempt(ipHash)).id);
 
-    await recordLoginAttempt(ipHash, false);
+    expect((await startLoginAttempt(ipHash)).retryAfterSeconds).toBe(0);
     const wait = await checkRateLimit(ipHash);
     expect(wait).toBeGreaterThan(14 * 60);
     expect(wait).toBeLessThanOrEqual(15 * 60);
+    expect((await startLoginAttempt(ipHash)).retryAfterSeconds).toBeGreaterThan(0);
+  });
+
+  it(`lets at most ${MAX_FAILED_ATTEMPTS} of many parallel attempts through`, async () => {
+    const attempts = await Promise.all(
+      Array.from({ length: 12 }, () => startLoginAttempt(parallelIpHash)),
+    );
+    const allowed = attempts.filter((attempt) => attempt.retryAfterSeconds === 0);
+    expect(allowed.length).toBeLessThanOrEqual(MAX_FAILED_ATTEMPTS);
+
+    // The race fix itself: an allowed attempt is already counted before the password check runs.
+    const [row] = await getDb()
+      .select({ success: loginAttempts.success })
+      .from(loginAttempts)
+      .where(eq(loginAttempts.id, allowed[0].id));
+    expect(row?.success).toBe(false);
   });
 });

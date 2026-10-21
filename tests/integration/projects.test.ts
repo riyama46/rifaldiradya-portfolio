@@ -4,16 +4,16 @@ import { getDb } from "@/lib/db/client";
 import { images, projects, siteSettings } from "@/lib/db/schema";
 import { mediaUrl } from "@/lib/images/rules";
 import {
+  deleteImageIfUnused,
   deleteOrphanImages,
   getAvailability,
   getImage,
   getProfilePhoto,
   getSiteSettings,
   getVariant,
+  MissingImageError,
   saveImage,
   saveProfileSettings,
-  setAvailability,
-  setProfilePhoto,
 } from "@/lib/images/store";
 import {
   createProject,
@@ -88,8 +88,8 @@ afterAll(async () => {
     .from(projects)
     .where(like(projects.titleEn, `${run}%`));
   for (const project of left) await deleteProject((await getProjectById(project.id))!);
-  await setProfilePhoto(profilePhotoBefore);
-  if (availabilityBefore !== null) await setAvailability(availabilityBefore);
+  await saveProfileSettings({ photoId: profilePhotoBefore });
+  if (availabilityBefore !== null) await saveProfileSettings({ availability: availabilityBefore });
   for (const id of createdImages) await getDb().delete(images).where(eq(images.id, id));
 });
 
@@ -312,6 +312,29 @@ describe("image storage", () => {
     expect(await getImage(recent.id)).not.toBeNull();
     expect(await getImage(used.id)).not.toBeNull();
   });
+
+  it("never deletes an image a project uses, and never saves a project with a deleted image", async () => {
+    const withImage = (id: string, title: string) =>
+      withStoredThumbnail(
+        input(title, {
+          thumbnail: { public_id: id, url: "/x", width: 1, height: 1 },
+          thumbnail_alt_en: "a",
+          thumbnail_alt_id: "a",
+        }),
+      );
+    const used = await newImage();
+    const project = await createProject((await withImage(used.id, "keeps image"))!);
+    expect(await deleteImageIfUnused(used.id)).toBe("in_use");
+    expect(await getImage(used.id)).not.toBeNull();
+
+    // Removed in another tab after the form picked it (API-07), before the save commits.
+    const gone = await newImage();
+    const chosen = (await withImage(gone.id, "gone image"))!;
+    expect(await deleteImageIfUnused(gone.id)).toBe("deleted");
+    await expect(createProject(chosen)).rejects.toThrow(MissingImageError);
+    await expect(updateProject(project, chosen)).rejects.toThrow(MissingImageError);
+    expect((await getProjectById(project.id))?.thumbnailPublicId).toBe(used.id);
+  });
 });
 
 describe("profile photo (S-14)", () => {
@@ -323,16 +346,16 @@ describe("profile photo (S-14)", () => {
     createdImages.push(first.id, second.id);
     const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 
-    await setProfilePhoto(first.id);
+    await saveProfileSettings({ photoId: first.id });
     expect((await getProfilePhoto())?.id).toBe(first.id);
     await getDb().update(images).set({ createdAt: twoDaysAgo }).where(eq(images.id, first.id));
     await deleteOrphanImages();
     expect(await getImage(first.id)).not.toBeNull(); // in use as the profile photo
 
-    await setProfilePhoto(second.id);
+    await saveProfileSettings({ photoId: second.id });
     expect(await getImage(first.id)).toBeNull();
 
-    await setProfilePhoto(null);
+    await saveProfileSettings({ photoId: null });
     expect(await getProfilePhoto()).toBeNull();
     expect(await getImage(second.id)).toBeNull();
   });
@@ -509,17 +532,17 @@ describe("availability (S-14, D-16, API-09)", () => {
     expect(await getAvailability()).toBe(true);
     expect((await getSiteSettings()).availabilityOn).toBe(true);
 
-    await setAvailability(false);
+    await saveProfileSettings({ availability: false });
     expect(await getAvailability()).toBe(false);
     expect((await getSiteSettings()).availabilityOn).toBe(false);
 
-    await setAvailability(true);
+    await saveProfileSettings({ availability: true });
     expect((await getSiteSettings()).availabilityOn).toBe(true);
   });
 
-  it("saves photo and availability together: a failed save changes neither", async () => {
-    await setAvailability(true);
-    // The photo id is written after the switch and is too long for the column, so the save fails.
+  it("a save with a missing photo changes neither field", async () => {
+    await saveProfileSettings({ availability: true });
+    // The photo doesn't exist (and is too long for the column), so the save fails.
     await expect(
       saveProfileSettings({ availability: false, photoId: "X".repeat(300) }),
     ).rejects.toThrow();

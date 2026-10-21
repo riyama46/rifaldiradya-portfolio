@@ -19,6 +19,7 @@ function createDatabase() {
 }
 
 type Database = ReturnType<typeof createDatabase>;
+export type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
 
 // Reuse one pool across hot reloads in development.
 const globalForDb = globalThis as unknown as { portfolioDb?: Database };

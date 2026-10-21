@@ -3,7 +3,6 @@ import type { Project } from "@/lib/db/schema";
 import { getDictionary } from "@/i18n";
 import { mediaLoader } from "@/lib/images/loader";
 import {
-  compareProjects,
   groupCounts,
   screenshotOf,
   selectSelectedWork,
@@ -149,6 +148,16 @@ describe("toPublicProject (v2 DTO)", () => {
     expect(dto).toMatchObject({ caseAction: "walkthrough", liveUrl: null });
   });
 
+  it("hides a stored URL the case button doesn't open (also kept out of JSON-LD)", () => {
+    for (const caseAction of ["walkthrough", "none"] as const) {
+      const dto = toPublicProject(
+        project({ caseAction, liveUrl: "https://intranet.example" }),
+        "en",
+      );
+      expect(dto.liveUrl).toBeNull();
+    }
+  });
+
   it("E-28: site without a usable URL becomes no button, with a server warning", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     for (const liveUrl of [null, "", "http://insecure.example.com", "not a url"]) {
@@ -177,15 +186,6 @@ describe("toPublicProject (v2 DTO)", () => {
     for (const key of ["published", "sortOrder", "thumbnailPublicId", "createdAt", "featured"]) {
       expect(dto).not.toHaveProperty(key);
     }
-  });
-});
-
-describe("compareProjects", () => {
-  it("orders by sort_order, then newest first", () => {
-    const older = { sortOrder: 10, createdAt: new Date("2026-01-01") };
-    const newer = { sortOrder: 10, createdAt: new Date("2026-06-01") };
-    const first = { sortOrder: 1, createdAt: new Date("2025-01-01") };
-    expect([older, newer, first].sort(compareProjects)).toEqual([first, newer, older]);
   });
 });
 

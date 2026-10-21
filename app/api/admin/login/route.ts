@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { hashIp } from "@/lib/auth/crypto";
 import { verifyCredentials } from "@/lib/auth/password";
-import { checkRateLimit, deleteOldLoginAttempts, recordLoginAttempt } from "@/lib/auth/rate-limit";
+import {
+  checkRateLimit,
+  deleteOldLoginAttempts,
+  markLoginSucceeded,
+  startLoginAttempt,
+} from "@/lib/auth/rate-limit";
 import {
   createSession,
   deleteExpiredSessions,
@@ -10,7 +15,7 @@ import {
   sessionCookieOptions,
 } from "@/lib/auth/session";
 import { adminEnv, siteEnv } from "@/lib/env";
-import { apiError, clientIp, isSameOrigin } from "@/lib/http/api";
+import { apiError, clientIp, isSameOrigin, readJsonBody } from "@/lib/http/api";
 
 const bodySchema = z.object({
   email: z.string().trim().min(1).max(254),
@@ -31,7 +36,7 @@ export async function POST(request: Request) {
     return apiError(503, "ADMIN_NOT_CONFIGURED", "Admin login is not configured on the server.");
   }
 
-  const parsed = bodySchema.safeParse(await request.json().catch(() => null));
+  const parsed = bodySchema.safeParse(await readJsonBody(request));
   if (!parsed.success) {
     return apiError(400, "VALIDATION_FAILED", "Enter your email and password.");
   }
@@ -39,16 +44,17 @@ export async function POST(request: Request) {
   try {
     const ipHash = hashIp(clientIp(request), admin.RATE_LIMIT_SALT);
 
-    const waitBefore = await checkRateLimit(ipHash);
-    if (waitBefore > 0) {
-      return apiError(429, "RATE_LIMITED", "Too many attempts.", { retryAfterSeconds: waitBefore });
+    const attempt = await startLoginAttempt(ipHash);
+    if (attempt.retryAfterSeconds > 0) {
+      return apiError(429, "RATE_LIMITED", "Too many attempts.", {
+        retryAfterSeconds: attempt.retryAfterSeconds,
+      });
     }
 
     const valid = await verifyCredentials(parsed.data, {
       email: admin.ADMIN_EMAIL,
       passwordHash: admin.ADMIN_PASSWORD_HASH,
     });
-    await recordLoginAttempt(ipHash, valid);
 
     if (!valid) {
       // The 5th failure in the window already locks the form (App Flow E-10).
@@ -58,6 +64,7 @@ export async function POST(request: Request) {
         : apiError(401, "INVALID_CREDENTIALS", "Email or password is incorrect.");
     }
 
+    await markLoginSucceeded(attempt.id);
     await Promise.all([deleteExpiredSessions(), deleteOldLoginAttempts()]);
     const token = await createSession(request.headers.get("user-agent"));
 

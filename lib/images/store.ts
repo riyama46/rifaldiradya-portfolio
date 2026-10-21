@@ -1,5 +1,6 @@
 import { and, eq, inArray, isNull, lt } from "drizzle-orm";
-import { getDb } from "@/lib/db/client";
+import { getDb, type Transaction } from "@/lib/db/client";
+import { isBuildPhase } from "@/lib/env";
 import { images, imageVariants, projects, siteSettings, type Image } from "@/lib/db/schema";
 import { AVATAR_WIDTHS, mediaUrl, pickVariantWidth, type ImageFormat } from "./rules";
 import type { Variant } from "./upload";
@@ -67,28 +68,56 @@ export async function getVariant(id: string, requestedWidth: number | null) {
   return variant ? { format: image.format, width, bytes: variant.bytes } : null;
 }
 
-/** Used by a project thumbnail or as the profile photo. */
-export async function isImageInUse(id: string): Promise<boolean> {
-  const db = getDb();
-  const [project] = await db
-    .select({ id: projects.id })
-    .from(projects)
-    .where(eq(projects.thumbnailPublicId, id))
-    .limit(1);
-  if (project) return true;
-  return (await getProfilePhotoId()) === id;
+/** Thrown inside a save transaction when the chosen image was deleted meanwhile. */
+export class MissingImageError extends Error {
+  constructor() {
+    super("image no longer exists");
+    this.name = "MissingImageError";
+  }
 }
 
-/** Deletes an image (variants cascade). Returns false when it did not exist. */
-export async function deleteImage(id: string): Promise<boolean> {
-  const [result] = await getDb().delete(images).where(eq(images.id, id));
-  return result.affectedRows > 0;
+/**
+ * Inside a save that will point at this image: share-locks its row until the commit, so
+ * deleteImageIfUnused can't remove it in between, and throws MissingImageError when it's gone.
+ */
+export async function lockImageForUse(tx: Transaction, id: string): Promise<void> {
+  const [image] = await tx
+    .select({ id: images.id })
+    .from(images)
+    .where(eq(images.id, id))
+    .for("share");
+  if (!image) throw new MissingImageError();
 }
 
-/** After a thumbnail is replaced or its project deleted: remove the old image unless still used. */
-export async function deleteImageIfUnused(id: string | null): Promise<void> {
-  if (!id || (await isImageInUse(id))) return;
-  await deleteImage(id);
+/**
+ * Deletes an image (variants cascade) unless a project thumbnail or the profile photo uses it.
+ * The row lock makes this wait for, and then respect, a save that is about to use the image.
+ */
+export async function deleteImageIfUnused(
+  id: string | null,
+): Promise<"deleted" | "in_use" | "not_found"> {
+  if (!id) return "not_found";
+  return getDb().transaction(async (tx) => {
+    const [image] = await tx
+      .select({ id: images.id })
+      .from(images)
+      .where(eq(images.id, id))
+      .for("update");
+    if (!image) return "not_found";
+    const [project] = await tx
+      .select({ id: projects.id })
+      .from(projects)
+      .where(eq(projects.thumbnailPublicId, id))
+      .limit(1);
+    const [photo] = await tx
+      .select({ key: siteSettings.key })
+      .from(siteSettings)
+      .where(and(eq(siteSettings.key, PROFILE_PHOTO_KEY), eq(siteSettings.value, id)))
+      .limit(1);
+    if (project || photo) return "in_use";
+    await tx.delete(images).where(eq(images.id, id));
+    return "deleted";
+  });
 }
 
 /** Uploads older than ORPHAN_AFTER_MS that no project references. Returns how many were removed. */
@@ -99,10 +128,11 @@ export async function deleteOrphanImages(now = new Date()): Promise<number> {
     .from(images)
     .leftJoin(projects, eq(projects.thumbnailPublicId, images.id))
     .where(and(isNull(projects.id), lt(images.createdAt, cutoff)));
-  const profilePhoto = await getProfilePhotoId();
-  const orphans = candidates.filter(({ id }) => id !== profilePhoto);
-  for (const { id } of orphans) await deleteImage(id);
-  return orphans.length;
+  let removed = 0;
+  for (const { id } of candidates) {
+    if ((await deleteImageIfUnused(id)) === "deleted") removed++;
+  }
+  return removed;
 }
 
 async function getProfilePhotoId(): Promise<string | null> {
@@ -118,19 +148,6 @@ async function getProfilePhotoId(): Promise<string | null> {
 export async function getProfilePhoto(): Promise<Image | null> {
   const id = await getProfilePhotoId();
   return id ? getImage(id) : null;
-}
-
-/**
- * Sets (or with null, clears) the profile photo. The previous photo is deleted once replaced,
- * unless something else uses it.
- */
-export async function setProfilePhoto(id: string | null): Promise<void> {
-  await saveProfileSettings({ photoId: id });
-}
-
-/** Shows or hides the availability line in the hero (S-14, D-16). Stored as '1' / '0'. */
-export async function setAvailability(on: boolean): Promise<void> {
-  await saveProfileSettings({ availability: on });
 }
 
 /**
@@ -151,6 +168,7 @@ export async function saveProfileSettings(settings: {
   if (rows.length === 0) return;
 
   await getDb().transaction(async (tx) => {
+    if (photoId) await lockImageForUse(tx, photoId);
     for (const row of rows) {
       await tx
         .insert(siteSettings)
@@ -192,8 +210,6 @@ export function avatarSources(image: Pick<Image, "id" | "format" | "width">): Pu
 }
 
 export type SiteSettings = { avatar: PublicAvatar | null; availabilityOn: boolean };
-
-const isBuildPhase = () => process.env.NEXT_PHASE === "phase-production-build";
 
 /**
  * For the public pages (static, revalidated by API-09): the hero photo (null = initials) and the
