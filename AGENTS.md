@@ -2,8 +2,8 @@
 
 ## Specs (source of truth)
 
-- Current: docs/specs/ (cek `version` dan `status: current` di header tiap file). Live: v2.0.0 (tag git di `main`).
-- Active change: docs/changes/v2.1.0-pointer-layer/CHANGE.md (status `approved`, belum mulai build)
+- Current: docs/specs/ (cek `version` dan `status: current` di header tiap file). Live: v2.0.2 (tag git di `main`).
+- Active change: docs/changes/v2.1.0-pointer-layer/CHANGE.md (status `in-progress`)
   → Implement ONLY what the active change describes. Where it conflicts with docs/specs, the change wins.
 - docs/changes/archive/ is history only — never use it as requirements.
 - Versions: PATCH = fix/tidy (builder directly) · MINOR = something new · MAJOR = direction/structure change. MINOR/MAJOR are planned as a CHANGE.md first (docs/changes/vX.Y.Z-name/CHANGE.md).
