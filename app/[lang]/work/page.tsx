@@ -14,7 +14,7 @@ import { getPublishedProjects } from "@/lib/projects/queries";
 import { workJsonLd } from "@/lib/seo/jsonld";
 import { buildMetadata, siteOrigin } from "@/lib/seo/metadata";
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 const LIST_ID = "cases";
 

@@ -4,6 +4,9 @@ import { securityHeaders } from "./lib/security-headers";
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  // D-39: caps stale-while-revalidate at expireTime - revalidate (60s on /[lang] and /[lang]/work);
+  // revalidatePath does not purge the Hostinger CDN, so a stale copy may not outlive ~2 minutes.
+  expireTime: 120,
   images: {
     // Thumbnails are stored at these widths in MySQL and served from /media (lib/images/loader.ts).
     loader: "custom",
