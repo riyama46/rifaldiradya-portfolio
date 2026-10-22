@@ -78,7 +78,7 @@ check(
 );
 check("JSON-LD in the HTML", html.includes('<script type="application/ld+json">'));
 
-// v2 content (Delta SDD section 10): new meta, LinkedIn, no GitHub while it is empty (AC-13)
+// v2 content (Delta SDD section 10): new meta, LinkedIn, and GitHub since the repo is public (v2.0.2, D-19)
 const title = /<title>([^<]+)<\/title>/.exec(html)?.[1]?.replaceAll("&amp;", "&");
 check(
   "v2 title on /",
@@ -93,7 +93,10 @@ check(
   "LinkedIn links to /in/rifaldiradya (page + JSON-LD)",
   (html.match(/https:\/\/www\.linkedin\.com\/in\/rifaldiradya/g) ?? []).length >= 2,
 );
-check("No GitHub link while it is empty (D-19)", !html.includes("github.com"));
+check(
+  "GitHub links to github.com/riyama46 (page + JSON-LD, D-19)",
+  (html.match(/https:\/\/github\.com\/riyama46/g) ?? []).length >= 2,
+);
 check("Download CV link on /", html.includes('href="/cv/rifaldi-radya-pratama-cv.pdf"'));
 
 // robots.txt and sitemap

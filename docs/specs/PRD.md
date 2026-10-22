@@ -2,10 +2,10 @@
 doc: PRD
 app: rifaldiradya.com
 tier: full
-version: 2.0.0
+version: 2.1.0
 status: current
 last_updated: 2026-10-22
-last_change: changes/archive/2026-10-18-v2.0.0-showcase-redesign
+last_change: changes/archive/2026-10-22-v2.1.0-pointer-layer
 ---
 
 # PRD — rifaldiradya.com Portfolio v2
@@ -45,7 +45,6 @@ rifaldiradya.com adalah portfolio bilingual (EN default, ID sekunder) yang menam
 - Form kontak dan penyimpanan data pengunjung.
 - Halaman case study per proyek.
 - Blog, testimoni.
-- Lapisan pointer dan preview admin (v2.1.0, `docs/changes/v2.1.0-pointer-layer/CHANGE.md`).
 - Multi-user admin atau sistem role.
 
 **Success metrics**
@@ -216,7 +215,6 @@ Semua item di bawah sengaja ditunda. Trigger = kondisi yang membuat item layak d
 
 | Item | Kenapa ditunda | Trigger untuk dikerjakan |
 | --- | --- | --- |
-| Lapisan pointer + preview admin | Dipisah agar v2.0.0 bisa live lebih cepat (D-27) | v2.0.0 live; sudah direncanakan di `docs/changes/v2.1.0-pointer-layer/CHANGE.md` |
 | Halaman case study per URL | Baris case di halaman Work sudah cukup | Ada proyek dengan cerita yang tidak muat di satu baris |
 | Form kontak dengan penyimpanan data | Email sudah cukup; form menambah data pribadi + spam handling | Volume inquiry naik atau butuh brief terstruktur |
 | Screenshot HRMS diblur | Layar internal | Pal mendapat izin dan ingin mengganti kartu angka |
@@ -227,7 +225,7 @@ Semua item di bawah sengaja ditunda. Trigger = kondisi yang membuat item layak d
 
 ## 8. Arah UI/UX & visual identity
 
-Arah **"Opsi B"** (D-02): hitam/putih hangat dengan banyak ruang, satu adegan per layar, aksen cobalt hanya di satu kata miring per judul, tombol primer, garis/hover aksen, dan cahaya bab. Mode gelap (default) dan terang dengan toggle, tanpa flash saat load (D-23). Rujukan nilai: blok `:root` di `option-b.html`, dipindah apa adanya ke lapisan token (SDD §8):
+Arah **"Opsi B"** (D-02): hitam/putih hangat dengan banyak ruang, satu adegan per layar, aksen cobalt hanya di satu kata miring per judul, tombol primer, garis/hover aksen, dan cahaya bab. Mode gelap selalu default (tidak mengikuti setelan perangkat) dan terang lewat toggle yang diingat, tanpa flash saat load (D-23, D-36). Rujukan nilai: blok `:root` di `option-b.html`, dipindah apa adanya ke lapisan token (SDD §8):
 
 | Token | Gelap (default) | Terang |
 | --- | --- | --- |
@@ -244,7 +242,9 @@ Kontras (WCAG, dihitung 17 Okt 2026): ink di bg 17,4 / 17,4; soft di bg 6,98 / 5
 
 **Tipografi:** Archivo (400, 500, 600, italic 500/600), self-host lewat `next/font`.
 
-**Motion** (D-08, D-10): parallax per bab (lapisan titik dan cahaya), fokus blur/fade per bab, statement About terisi baris per baris, "five passwords" dicoret lalu angka menghitung, progress bar, langkah Selected work dipin, hover garis aksen judul. Semua CSS scroll-driven (`view()`/`scroll()`) di dalam `@supports`, dengan fallback tumpukan statis untuk browser lama dan reduced motion. H1 punya animasi masuk naik 900 ms **tanpa fade** (`opacity` 1 sejak frame pertama, LCP = teks H1). Tidak ada listener scroll JavaScript, library animasi, atau rotasi/timer JS. Tabel motion lengkap mengikuti mockup.
+**Motion** (D-08, D-10): satu bidang titik untuk seluruh halaman dengan parallax pelan (D-37), cahaya per bab, fokus blur/fade per bab, statement About terisi baris per baris, "five passwords" dicoret lalu angka menghitung, progress bar, langkah Selected work dipin, hover garis aksen judul. Semua CSS scroll-driven (`view()`/`scroll()`) di dalam `@supports`, dengan fallback tumpukan statis untuk browser lama dan reduced motion. H1 punya animasi masuk naik 900 ms **tanpa fade** (`opacity` 1 sejak frame pertama, LCP = teks H1). Tidak ada listener scroll JavaScript, library animasi, atau rotasi/timer JS. Tabel motion lengkap mengikuti mockup.
+
+**Lapisan pointer (khusus mouse, D-31..D-35):** kursor titik + cincin yang tertinggal sedikit, membesar di atas tautan/tombol dan berlabel "Read"/"Visit" sesuai `data-cursor`; cahaya mengikuti kursor dengan warna dan kekuatan per bab; preview proyek (screenshot atau kartu angka) di samping kursor saat hover judul Selected work dan baris Work; tilt screenshot di Selected work (maks. sekitar 6°). Hanya aktif bila `(hover: hover) and (pointer: fine)` dan `pointerType === "mouse"`; tidak tampil di layar sentuh dan tidak dimuat di sana.
 
 **Komponen:** SDD §4.
 
@@ -304,7 +304,7 @@ Meta tidak menyebut availability (D-26).
 
 | Area | Requirement | Cara verifikasi |
 | --- | --- | --- |
-| Performance | Lighthouse mobile ≥ 90; LCP < 2,5 s, INP < 200 ms, CLS < 0,1; LCP = teks H1; JS klien halaman publik (di luar runtime Next.js dan GA4) hanya: toggle tema, filter + hash Work, Copy email, jam GMT+7, consent, banner bahasa, target gabungan ≤ 6 KB gzip; animasi scroll hanya CSS, tanpa listener `scroll` | PageSpeed Insights di 4 halaman publik dalam kedua tema + Performance panel DevTools |
+| Performance | Lighthouse mobile ≥ 90; LCP < 2,5 s, INP < 200 ms, CLS < 0,1; LCP = teks H1; JS klien halaman publik (di luar runtime Next.js dan GA4) hanya: toggle tema, filter + hash Work, Copy email, jam GMT+7, consent, banner bahasa, target gabungan ≤ 6 KB gzip; animasi scroll hanya CSS, tanpa listener `scroll`. Lapisan pointer (D-31..D-35): ≤ 3 KB gzip, dimuat terpisah dan hanya di perangkat mouse; tidak ada long task > 50 ms darinya saat menggerakkan mouse di halaman Work; INP tetap < 200 ms | PageSpeed Insights di 4 halaman publik dalam kedua tema + Performance panel DevTools |
 | Aksesibilitas | WCAG 2.2 AA: kontras, focus ring terlihat (`:focus-visible`), navigasi keyboard penuh, elemen native (`button`, `a`), target sentuh ≥ 44 px, `prefers-reduced-motion` dihormati, skip link ke konten | Lighthouse ≥ 95 + uji keyboard manual + axe DevTools |
 | Responsif | Layout benar di 360, 375, 768, 1024, 1440 px; tanpa horizontal scroll | Uji manual di DevTools + 1 HP Android/iOS nyata |
 | Browser | 2 versi terakhir Chrome, Safari (termasuk iOS), Firefox, Edge | Uji manual |
@@ -384,4 +384,4 @@ Pipeline deploy diuji di minggu pertama dengan halaman kosong, supaya masalah Ho
 
 **Urutan dokumen perencanaan:** PRD (dokumen ini) → App Flow Document (layar, navigasi, flow langkah demi langkah, state, edge case, kontrak data/API) → SDD (arsitektur, pilihan DB/storage final, struktur repo, aturan kerja dengan coding AI). Eksekusi kode dilakukan terpisah dengan setup vibe-coding-builder.
 
-**v2.0.0:** dirakit di `staging` (task T-23..T-33, SDD §12), dirilis lewat PR `staging` → `main`; v2.1.0 (lapisan pointer + preview admin) menyusul sebagai MINOR.
+**v2.0.0:** dirakit di `staging` (task T-23..T-33, SDD §12), dirilis lewat PR `staging` → `main`; v2.1.0 (lapisan pointer, preview admin, tema gelap default, bidang titik, ikon v2, cache HTML lebih pendek) dirilis sebagai MINOR (task T-34..T-40).
