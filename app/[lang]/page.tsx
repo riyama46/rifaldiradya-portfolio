@@ -15,8 +15,9 @@ import { getPublishedProjects } from "@/lib/projects/queries";
 import { homeJsonLd } from "@/lib/seo/jsonld";
 import { buildMetadata, siteOrigin } from "@/lib/seo/metadata";
 
-// Safety net; admin saves also revalidate on demand (T-15). SDD section 5.
-export const revalidate = 300;
+// Safety net; admin saves also revalidate on demand (T-15), but the CDN keeps its copy, so keep
+// this short (D-39). SDD section 5.
+export const revalidate = 60;
 
 export async function generateMetadata({ params }: PageProps<"/[lang]">): Promise<Metadata> {
   const lang = await resolveLocale(params);

@@ -34,6 +34,16 @@ test("security headers are on every response", async ({ request }) => {
   }
 });
 
+// D-39 / AC-12: the CDN obeys this header, so a stale copy lives at most ~2 minutes.
+test("public HTML is cached briefly", async ({ request }) => {
+  for (const path of ["/", "/id", "/work", "/id/work"]) {
+    const response = await request.get(path);
+    expect(response.headers()["cache-control"], path).toBe(
+      "s-maxage=60, stale-while-revalidate=60",
+    );
+  }
+});
+
 test("public pages and GA4 after Accept run without CSP violations", async ({ page }) => {
   await recordViolations(page);
   // A stand-in for gtag.js served from the real Google host, so the CSP allowlist is exercised.
