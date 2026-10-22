@@ -4,6 +4,24 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versi
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-10-22
+
+Lapisan pointer untuk desktop, preview di admin, tema gelap default, dan perapian visual. Detail: `docs/changes/archive/2026-10-22-v2.1.0-pointer-layer/CHANGE.md`, keputusan D-31..D-39 di `docs/decisions/DECISIONS.md`.
+
+### Added
+
+- Lapisan pointer khusus mouse: kursor titik + cincin berlabel "Read"/"Visit", cahaya yang mengikuti kursor dengan warna per bab, preview proyek (screenshot atau kartu angka) di samping kursor di Selected work dan Work, tilt screenshot. Dimuat terpisah, tidak pernah di layar sentuh; menghormati reduced motion dan fokus keyboard.
+- Panel preview di form project admin (≥ 1024 px): tampilan di homepage dan preview di samping kursor, berubah saat mengetik, EN/ID.
+
+### Changed
+
+- Tema gelap jadi default untuk semua pengunjung yang belum memilih, juga tanpa JS; terang tetap lewat toggle dan `?theme=light`.
+- Titik latar menjadi satu bidang yang menyambung di seluruh halaman dengan parallax pelan.
+- Favicon dan ikon aplikasi v2 "cobalt RR".
+- Cache HTML publik dipersingkat (`s-maxage=60, stale-while-revalidate=60`), sehingga perubahan dari admin tampak dalam ±2 menit.
+- `check-deploy.mts` mengharapkan tautan GitHub (sejak v2.0.2).
+- Spesifikasi (`docs/specs/`) dinaikkan ke 2.1.0.
+
 ## [2.0.2] - 2026-10-22
 
 ### Added

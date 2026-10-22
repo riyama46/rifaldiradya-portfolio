@@ -2,10 +2,10 @@
 doc: SDD
 app: rifaldiradya.com
 tier: full
-version: 2.0.1
+version: 2.1.0
 status: current
 last_updated: 2026-10-22
-last_change: changes/archive/2026-10-18-v2.0.0-showcase-redesign
+last_change: changes/archive/2026-10-22-v2.1.0-pointer-layer
 ---
 
 # SDD — rifaldiradya.com v2
@@ -130,13 +130,15 @@ Repo GitHub private `rifaldiradya-portfolio`, satu branch produksi `main`. Struk
 │  ├─ sitemap.ts
 │  └─ robots.ts
 ├─ components/
-│  ├─ site/                    # SiteBar, ThemeScript, ThemeToggle (client), ScrollProgress, ChapterDepth,
+│  ├─ site/                    # SiteBar, ThemeScript, ThemeToggle (client), ScrollProgress, ChapterDepth, DotField,
+│  │                           # Pointer (client, memuat PointerLayer secara dinamis), PointerLayer (client), PointerPeek,
 │  │                           # Hero, SelectedWork, AboutChapter, HighlightChapter, ContactChapter,
 │  │                           # MailtoLink, CopyEmailButton (client), CvLink, LocalClock (client),
 │  │                           # WorkFilter (client), CaseRow, EmptyState, Footer, ...
 │  ├─ overlays/                # LanguageToggle, LanguageSuggestBanner, CookieConsent
 │  ├─ admin/                   # LoginForm, ProjectList, ProjectForm (per bagian), LinesInput, StackInput,
-│  │                           # SegmentedControl, CaseActionField, VisualField, ImageUploader, ProfileForm, ConfirmDialog
+│  │                           # SegmentedControl, CaseActionField, VisualField, ImageUploader, ProfileForm, ConfirmDialog,
+│  │                           # ProjectPreview (client, panel preview S-12/S-13 ≥ 1024 px)
 │  └─ ui/                      # Button, Toggle, Toast, Container, ArrowIcon (primitif)
 ├─ i18n/
 │  ├─ en.json
@@ -152,7 +154,7 @@ Repo GitHub private `rifaldiradya-portfolio`, satu branch produksi `main`. Struk
 │  ├─ seo/ (metadata.ts, jsonld.ts)
 │  ├─ analytics/ (events.ts)
 │  ├─ mailto.ts                # mailtoHref(dict, kind, title): 4 jenis mailto, subject/body ter-encode
-│  ├─ theme.ts                 # resolveTheme (D-23), skrip inline, applyTheme
+│  ├─ theme.ts                 # resolveTheme(query, stored) (D-23, D-36), skrip inline, applyTheme
 │  ├─ revalidate.ts
 │  ├─ locale-header.ts         # nama header x-locale (dipakai proxy.ts dan global-not-found)
 │  ├─ cn.ts, fonts.ts          # helper class + next/font
@@ -160,7 +162,7 @@ Repo GitHub private `rifaldiradya-portfolio`, satu branch produksi `main`. Struk
 ├─ styles/globals.css          # tokens (CSS variables) + Tailwind + keyframes & motion
 ├─ drizzle/                    # file migrasi SQL
 ├─ public/cv/rifaldi-radya-pratama-cv.pdf   # CV web statis tanpa nomor HP (D-14)
-├─ scripts/ (hash-password.mts, migrate.mts, embed-migrations.mts, og-images.mts, icons.mts, check-deploy.mts)
+├─ scripts/ (hash-password.mts, migrate.mts, embed-migrations.mts, og-images.mts, icons.mts (ikon v2 dari token gelap, D-38), check-deploy.mts)
 ├─ instrumentation.ts          # validasi semua env saat server produksi start
 ├─ drizzle.config.ts, docker-compose.yml
 ├─ tests/ (unit/, integration/, e2e/)  # Vitest (vitest.config.ts, vitest.integration.config.ts), Playwright
@@ -213,7 +215,7 @@ Tidak ada logika yang membaca `Accept-Language`, IP, atau `lang_pref` di proxy (
 
 | Route | Mode | Detail |
 | --- | --- | --- |
-| `/[lang]`, `/[lang]/work` | Statis (ISR) | Homepage memanggil `getPublishedProjects()` dan `getSiteSettings()` (foto, availability) sekali, lalu menurunkan Selected work (`show_on_home`, maks. 5) di memori; Work memakai daftar penuh. `export const revalidate = 300` sebagai jaring pengaman + revalidasi on-demand saat admin menyimpan (API-03/04/05/08/09) |
+| `/[lang]`, `/[lang]/work` | Statis (ISR) | Homepage memanggil `getPublishedProjects()` dan `getSiteSettings()` (foto, availability) sekali, lalu menurunkan Selected work (`show_on_home`, maks. 5) di memori; Work memakai daftar penuh. `export const revalidate = 60` + `expireTime: 120` di `next.config.ts` (header `s-maxage=60, stale-while-revalidate=60`, D-39) sebagai jaring pengaman + revalidasi on-demand saat admin menyimpan (API-03/04/05/08/09). CDN Hostinger tidak ikut dibersihkan `revalidatePath`, jadi salinan basi bertahan paling lama ±2 menit |
 | `/[lang]/privacy`, not-found | Statis penuh | Tanpa data |
 | `sitemap.ts`, `robots.ts` | Statis (ISR 300 s) | `lastmod` dari `max(updated_at)` |
 | `/admin/*` | Dinamis | Selalu baca sesi dan data terbaru; tidak pernah di-cache |
@@ -290,7 +292,7 @@ Consent Mode v2 dan kewajiban banner untuk pengunjung EEA/UK mengikuti panduan r
 
 Token PRD bagian 8 menjadi satu sumber di `styles/globals.css`; komponen hanya boleh memakai token, tidak boleh nilai warna mentah. Dua lapis:
 
-1. **Token tema** di `:root, :root[data-theme="dark"]` dan `:root[data-theme="light"]` (plus `@media (prefers-color-scheme: light) :root:not([data-theme])` untuk tanpa JS, E-07), nilai persis PRD bagian 8: `--bg`, `--ink`, `--soft`, `--faint`, `--accent`, `--accent-ink`, `--calm`, `--k`, `--dot`, `--avatar-ring`, dan khusus admin `--panel`, `--field`, `--ok`, `--warn`, `--danger`.
+1. **Token tema** di `:root, :root[data-theme="dark"]` dan `:root[data-theme="light"]`; `:root` tanpa `data-theme` (tanpa JS, E-07) memakai token gelap (D-36), nilai persis PRD bagian 8: `--bg`, `--ink`, `--soft`, `--faint`, `--accent`, `--accent-ink`, `--calm`, `--k`, `--dot`, `--avatar-ring`, dan khusus admin `--panel`, `--field`, `--ok`, `--warn`, `--danger`.
 2. **Pemetaan `@theme` Tailwind:** `--color-bg: var(--bg)`, `--color-text: var(--ink)`, `--color-text-muted: var(--soft)`, `--color-border: var(--faint)`, `--color-accent: var(--accent)`, `--color-on-accent: var(--accent-ink)`, `--color-success`/`--color-danger` khusus admin; `--font-sans: var(--font-archivo)`.
 
 - Ukuran, spasi, radius, dan easing mengikuti mockup: `--gutter: clamp(20px, 2.8vw, 40px)`, `--ease: cubic-bezier(0.23, 1, 0.32, 1)`, `--win: 100svh`.
@@ -304,12 +306,13 @@ Token PRD bagian 8 menjadi satu sumber di `styles/globals.css`; komponen hanya b
 
 Semua motion mengikuti D-08 dan D-10. Keyframes dan aturan motion tinggal di `styles/globals.css` (bukan per komponen) supaya mudah diaudit.
 
-- Semua motion scroll dibungkus `@supports (animation-timeline: view())` + `@media (prefers-reduced-motion: no-preference)`: parallax lapisan per bab (`ChapterDepth`: titik + cahaya per `data-zone`), blur/fade fokus per bab, statement About terisi per baris, coret + hitung angka Highlight (`@property` integer counter), progress bar `scroll(root)`, langkah Selected work dipin (rentang per langkah dari `selectedWorkRanges()`), hover garis aksen judul.
+- Semua motion scroll dibungkus `@supports (animation-timeline: view())` + `@media (prefers-reduced-motion: no-preference)`: satu lapisan titik `position: fixed` untuk seluruh halaman (`DotField`, `aria-hidden`, sedikit lebih tinggi dari layar, `translateY` pelan dengan `animation-timeline: scroll(root)`; tanpa dukungan atau reduced motion → diam, D-37), cahaya per bab (`ChapterDepth` per `data-zone`, tanpa titik), blur/fade fokus per bab, statement About terisi per baris, coret + hitung angka Highlight (`@property` integer counter), progress bar `scroll(root)`, langkah Selected work dipin (rentang per langkah dari `selectedWorkRanges()`), hover garis aksen judul.
 - Scroll snap `y proximity` di `html`, mati saat reduced motion.
 - H1: animasi `transform: translateY` 900 ms `--ease`, **tanpa opacity** (D-10).
 - Transisi tema 300 ms pada `background-color`/`color`.
 - Tanpa dukungan (Firefox saat ini) atau reduced motion: semua bab tampil statis dalam keadaan akhir (E-30); tidak ada fallback JavaScript/IntersectionObserver.
-- **Larangan**: listener `scroll`, library animasi, rotasi/timer JS, fade-in pada H1/sub, JS pointer (v2.1.0).
+- **Lapisan pointer (O-05, D-31..D-35):** `Pointer` memuat `PointerLayer` dengan dynamic import setelah idle, hanya bila `(hover: hover) and (pointer: fine)` cocok; chunk tidak pernah diminta di layar sentuh. Satu loop `requestAnimationFrame` (satu-satunya di situs) yang berhenti saat titik, cincin, dan cahaya sudah di posisi kursor (selisih < 0,4 px) dan menyala lagi pada `pointermove`; hanya `transform` dan `opacity`. Zona cahaya lewat IntersectionObserver (`rootMargin: -45% 0 -45% 0`). Data preview dirender server di `.peek` (`PointerPeek`), bukan fetch. Reduced motion: tanpa lag, tanpa tilt, tanpa transisi. `:focus-visible` di mana pun → lapisan disembunyikan.
+- **Larangan**: listener `scroll`, library animasi, rotasi/timer JS, fade-in pada H1/sub, `requestAnimationFrame` di luar `PointerLayer`.
 
 ## 9. Environment variables & konfigurasi
 
@@ -407,7 +410,7 @@ Test otomatis fokus pada bagian yang paling mudah rusak diam-diam: validasi, rou
 | --- | --- | --- | --- |
 | Unit | Vitest | Skema Zod project v2 (setiap aturan kondisional: site ↔ live_url, screenshot ↔ thumbnail+alt, number ↔ number+caption, batas `case_did`, maks. 6 stack), batas 5 `show_on_home`, builder mailto (4 jenis × 2 bahasa, encoding), `workSub`, paste multi-baris What I did, `slugify` + bentrok, `localePath`/`altPath`, aturan `proxy.ts`, kesamaan key `en.json` vs `id.json`, `richText` (tag `<em>`/`<s>`/`<strong>`, tag lama jadi teks), urutan penentuan tema, rate-limit window, builder metadata | Setiap PR (CI) |
 | Integrasi | Vitest + MySQL Docker | Migrasi `0004` pada dump v1 (baris lama valid, default terisi, idempotent); query publik hanya `published=true` dengan urutan benar; API-03/04 aturan kondisional + E-26; API-09 availability + simpan atomik; sesi login/expired/logout | Setiap PR (CI, service MySQL) |
-| E2E | Playwright (Edge desktop 1280 + mobile 375) | UF-01 v2, UF-02, UF-04, UF-05 (event v2, request Google dicegat), UF-06, UF-07/UF-08 v2 (termasuk paste multi-baris), UF-09; filter + hash Work; tema tanpa flash (frame pertama) di kedua tema; tanpa JS (E-07); reduced motion + tanpa scroll-driven (E-30); axe di kedua tema | Setiap PR fitur + sebelum rilis |
+| E2E | Playwright (Edge desktop 1280 + mobile 375) | UF-01 v2, UF-02, UF-04, UF-05 (event v2, request Google dicegat), UF-06, UF-07/UF-08 v2 (termasuk paste multi-baris), UF-09; filter + hash Work; tema tanpa flash (frame pertama) di kedua tema, termasuk perangkat `colorScheme: light` tanpa pilihan → gelap; lapisan pointer (AC-1..AC-5, E-34, anggaran JS); panel preview admin (AC-7); tanpa JS (E-07); reduced motion + tanpa scroll-driven (E-30); axe di kedua tema | Setiap PR fitur + sebelum rilis |
 | Build | `next build` | Build sukses tanpa koneksi DB | Setiap PR (CI) |
 
 ### Checklist QA manual sebelum launch (v1)
@@ -492,6 +495,16 @@ v1: 22 task dalam 4 fase (T-01..T-22). v2.0.0: 11 task (T-23..T-33), di bawah. S
 - [x] **T-33** QA v2.0.0 (di atas) + rilis: perbaikan QA (#59, #60), backup DB produksi, `version` 2.0.0, CHANGELOG `[2.0.0]`, CHANGE digabung ke `docs/specs/` dan diarsipkan, D-01..D-30 ke DECISIONS, PR `staging` → `main`, tag `v2.0.0` + GitHub Release, `check-deploy --production`.
 - [x] **Pasca-rilis (D-29):** Pal mengisi 7 proyek di admin produksi, `show_on_home` + urutan, foto ≥ 640; lalu verifikasi AC-2 dan PageSpeed di produksi. Produksi 18 Okt 2026: AC-2 lolos di `/` dan `/id` (HR System, Single Sign-On, rifaldiradya.com, SwiftPay, Bloom Studio; penghitung 01–05 / 05; AI tidak di home sesuai D-18); `/work` dan `/id/work` 7 baris, filter 7/3/3/1. PageSpeed mobile kedua tema: `/` 98–99, `/work` 97–99, `/id` 97–98, `/id/work` 96–99; Accessibility, Best Practices, SEO 100; CLS ≤ 0,001; LCP lab 1,7–3,1 s (bervariasi antar-run, belum ada data CrUX). Foto profil 640 × 640.
 
+### v2.1.0 — Lapisan pointer, preview admin, tema gelap default (T-34..T-40)
+
+- [x] **T-34** Change v2.1.0 `in-progress`, base 2.0.2 (PR #71).
+- [x] **T-35** Tema gelap default di publik dan admin, dengan dan tanpa JS (D-36, PR #72).
+- [x] **T-36** Cache HTML publik `revalidate = 60` + `expireTime: 120` (D-39, PR #73).
+- [x] **T-37** Satu bidang titik untuk seluruh halaman (D-37, PR #75).
+- [x] **T-38** Ikon v2 "cobalt RR" (D-38, PR #76).
+- [x] **T-39** Lapisan pointer O-05 (D-31..D-35, PR #77).
+- [x] **T-40** Panel preview admin S-12/S-13 (PR #78).
+
 ## 13. Aturan kerja dengan coding AI
 
 Coding AI hanya sebaik konteks dan batas yang diberikan. Tiga dokumen ini masuk ke repo di `docs/`, dan `AGENTS.md` di root jadi pintu masuk yang dibaca AI di setiap sesi.
@@ -523,7 +536,7 @@ Kalau semuanya tidak menjawab: BERHENTI dan tanya. Jangan mengarang.
 - Tidak ada teks UI hardcode; semua dari i18n/en.json dan i18n/id.json.
 - Akses DB hanya di lib/projects, lib/images, dan lib/auth.
 - Jangan menambah layar, field, fitur, atau library di luar docs.
-- Motion scroll hanya CSS (`@supports` + fallback statis); JS klien hanya untuk komponen di PRD §10; tanpa fade-in pada H1.
+- Motion scroll hanya CSS (`@supports` + fallback statis); JS klien hanya untuk komponen di PRD §10 dan `PointerLayer` (khusus mouse, dimuat terpisah); tanpa fade-in pada H1.
 - String kamus dengan penanda (<em>, <s>, <strong>) dirender lewat richText(), jangan dangerouslySetInnerHTML.
 ```
 
