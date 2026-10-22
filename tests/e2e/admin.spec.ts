@@ -166,6 +166,43 @@ test("UF-07 + UF-08 + UF-09 v2: walkthrough case with a number card, edit, delet
   await expect(page.getByRole("link", { name: title, exact: true })).toHaveCount(0);
 });
 
+test("v2.1 AC-7: the preview panel follows the fields without saving (1024 px and up)", async ({
+  page,
+}, testInfo) => {
+  await signIn(page, "/admin/projects/new");
+  const preview = page.getByRole("complementary", { name: "Preview" });
+
+  if (testInfo.project.name === "mobile") {
+    await expect(preview).toBeHidden();
+    return;
+  }
+
+  await expect(preview).toBeVisible();
+  await page.getByLabel("Title (EN)").fill("HR System");
+  await page.getByLabel("Title (ID)").fill("Sistem HR");
+  await page.getByLabel("Meta line (EN)").fill("Panasonic · 13 companies");
+  await page.getByLabel("Short description (EN)").fill("The HR system 13 companies run on.");
+  await expect(preview).toContainText("Panasonic · 13 companies");
+  await expect(preview).toContainText("HR System");
+  await expect(preview).toContainText("The HR system 13 companies run on.");
+  await expect(preview).toContainText("Nothing shows next to the cursor");
+
+  await page.getByRole("button", { name: "Number card" }).click();
+  await page.getByLabel("Number", { exact: true }).fill("13");
+  await page.getByLabel("Caption (EN)").fill("group companies on one HR system");
+  await page.getByLabel("Caption (ID)").fill("perusahaan grup di satu sistem HR");
+  await expect(preview).toContainText("13group companies on one HR system");
+
+  await preview.getByRole("button", { name: "ID" }).click();
+  await expect(preview.getByRole("button", { name: "ID" })).toHaveAttribute("aria-pressed", "true");
+  await expect(preview).toContainText("Sistem HR");
+  await expect(preview).toContainText("perusahaan grup di satu sistem HR");
+
+  // Nothing was saved: leaving asks to discard.
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await expect(page.getByRole("dialog", { name: "Discard changes?" })).toBeVisible();
+});
+
 test("AC-8: the case button opens the site, so a live URL is required", async ({ page }) => {
   await signIn(page, "/admin/projects/new");
   await page.getByLabel("Title (EN)").fill("AC-8");
