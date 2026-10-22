@@ -1,35 +1,40 @@
-// Renders the site icons (PRD launch checklist), design "B · highlighter" chosen by Pal: white "RR"
-// on the site's dark text colour with an amber highlighter stroke, like "Days" in the hero H1.
+// Renders the site icons (D-38), design "cobalt RR" chosen by Pal: "RR" in Archivo, accent colour on
+// the dark v2 ground. Colours are read from the dark theme tokens in styles/globals.css so they never drift from the site.
 //   app/favicon.ico (16, 32, 48), app/icon.png (512), app/apple-icon.png (180).
 // Next.js serves these file conventions and adds the <link> tags itself.
 // Run after changing the design:  node scripts/icons.mts
 // Uses the installed Microsoft Edge through Playwright (PW_CHANNEL to change it) and Google Fonts.
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { chromium } from "@playwright/test";
+
+const css = readFileSync("styles/globals.css", "utf8");
+const darkStart = css.indexOf(':root[data-theme="dark"]');
+const dark = css.slice(darkStart, css.indexOf("}", darkStart));
+const token = (name: string) => {
+  const value = dark.match(new RegExp(`${name}:\\s*([^;]+);`))?.[1];
+  if (!value) throw new Error(`[icons] token ${name} not found in the dark theme block`);
+  return value.trim();
+};
+const bg = token("--bg");
+const accent = token("--accent");
 
 const html = (size: number, rounded: boolean) => `<!doctype html>
 <html><head><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600&display=block" rel="stylesheet">
 <style>
   * { margin: 0; }
   html, body { width: ${size}px; height: ${size}px; background: transparent; }
   .tile {
     position: relative; overflow: hidden;
     width: ${size}px; height: ${size}px; display: grid; place-items: center;
-    background: oklch(22% 0.02 60);
+    background: ${bg};
     border-radius: ${rounded ? "22%" : "0"};
   }
-  /* The hero highlighter (.hl::before) on a dark tile: a brighter amber so it still reads at 16 px. */
-  .stroke {
-    position: absolute; left: 19%; top: 47%; width: 64%; height: 21%;
-    border-radius: ${Math.max(1, size * 0.03)}px; background: oklch(74% 0.13 65);
-    transform: skew(-10deg) rotate(-2deg);
-  }
   .letters {
-    position: relative; color: #fff;
-    font: 600 ${Math.round(size * 0.5)}px/1 "Space Grotesk"; letter-spacing: -0.04em;
+    color: ${accent};
+    font: 600 ${Math.round(size * 0.52)}px/1 "Archivo"; letter-spacing: -0.04em;
   }
-</style></head><body><div class="tile"><div class="stroke"></div><div class="letters">RR</div></div></body></html>`;
+</style></head><body><div class="tile"><div class="letters">RR</div></div></body></html>`;
 
 /** An .ico holding PNG images (supported by every current browser). */
 function ico(images: { size: number; png: Buffer }[]): Buffer {
