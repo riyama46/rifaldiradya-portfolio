@@ -3,8 +3,8 @@ change: v2.1.0-pointer-layer
 app: rifaldiradya.com
 tier: full
 bump: minor
-base_version: 2.0.0
-status: approved
+base_version: 2.0.2
+status: in-progress
 date: 2026-10-17
 approved: 2026-10-18
 ---
@@ -15,7 +15,7 @@ approved: 2026-10-18
 >
 > Prasyarat dicek 18 Okt 2026:
 > 1. v2.0.0 sudah dirilis (tag `v2.0.0`, tag terakhir) dan sudah di-merge ke `docs/specs/`; verifikasi pasca-rilis D-29 selesai.
-> 2. `base_version` = 2.0.0.
+> 2. `base_version` = 2.0.0 saat disetujui; dinaikkan ke 2.0.2 saat build dimulai 22 Okt 2026 (v2.0.1 dan v2.0.2 adalah patch, tidak menyentuh scope change ini).
 > 3. `data-cursor` masih ada di `components/site/SelectedWork.tsx` dan `components/site/CaseRow.tsx`; token cahaya `--gx`, `--gy`, `--glow`, `--k` masih ada di `styles/globals.css`.
 > 4. Nomor keputusan digeser ke D-31..D-36 karena D-29 dan D-30 sudah dipakai di v2.0.0.
 > 5. Key `cur.read`/`cur.visit` ternyata tidak ada di `i18n/*.json` (terhapus saat v2.0.0), jadi dicatat sebagai ADDED di bawah.
