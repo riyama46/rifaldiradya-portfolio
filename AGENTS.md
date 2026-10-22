@@ -29,7 +29,7 @@
 - Tidak ada teks UI hardcode; semua dari i18n/en.json dan i18n/id.json.
 - Akses DB hanya di lib/projects, lib/images, dan lib/auth.
 - Jangan menambah layar, field, fitur, atau library di luar docs.
-- Motion scroll hanya CSS (`@supports` + fallback statis); JS klien hanya untuk komponen di PRD §10; tanpa fade-in pada H1.
+- Motion scroll hanya CSS (`@supports` + fallback statis); JS klien hanya untuk komponen di PRD §10 dan `PointerLayer` (khusus mouse, dimuat terpisah; v2.1.0 D-31..D-35); tanpa fade-in pada H1.
 - String kamus dengan penanda (<em>, <s>, <strong>) dirender lewat richText(), jangan dangerouslySetInnerHTML.
 - Folder baru dibuat saat task yang membutuhkannya dikerjakan, mengikuti struktur SDD bagian 4 (tanpa file placeholder kosong).
 

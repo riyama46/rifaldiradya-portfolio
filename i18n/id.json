@@ -47,6 +47,10 @@
     "open": "Buka situsnya ↗",
     "empty": "Karya baru sedang disiapkan. Sementara itu, ini cara menghubungi saya."
   },
+  "cur": {
+    "read": "Baca",
+    "visit": "Kunjungi"
+  },
   "wp": {
     "label": "Semua karya",
     "sub": {
