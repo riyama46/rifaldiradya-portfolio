@@ -8,6 +8,7 @@ import {
   firstErrorField,
   isDirty,
   pasteLines,
+  previewOf,
   removeLine,
   toPayload,
   validate,
@@ -192,5 +193,49 @@ describe("addTags (chip input)", () => {
 
   it("ignores empty input", () => {
     expect(addTags(["a"], " , ")).toEqual({ tags: ["a"], error: null });
+  });
+});
+
+describe("previewOf (S-12/S-13 preview panel, v2.1.0)", () => {
+  const values: FormValues = {
+    ...filled,
+    meta_en: " Panasonic · 13 companies ",
+    meta_id: "Panasonic · 13 perusahaan",
+    side_en: "2022–now",
+    side_id: "",
+    visual_type: "number",
+    card_number: "13",
+    card_caption_en: "group companies on one HR system",
+    card_caption_id: "perusahaan grup di satu sistem HR",
+  };
+
+  it("joins meta and side like the site label, per language", () => {
+    expect(previewOf(values, "en").label).toBe("Panasonic · 13 companies · 2022–now");
+    expect(previewOf(values, "id").label).toBe("Panasonic · 13 perusahaan");
+    expect(previewOf(values, "id").title).toBe("Kedai Kopi");
+  });
+
+  it("shows the number card in the chosen language", () => {
+    expect(previewOf(values, "id").visual).toEqual({
+      type: "number",
+      number: "13",
+      caption: "perusahaan grup di satu sistem HR",
+    });
+  });
+
+  it("shows no visual when the chosen one is incomplete (E-33)", () => {
+    expect(previewOf({ ...values, card_caption_id: " " }, "id").visual).toBeNull();
+    expect(
+      previewOf({ ...values, visual_type: "screenshot", thumbnail: null }, "en").visual,
+    ).toBeNull();
+  });
+
+  it("uses the uploaded screenshot when Screenshot is chosen", () => {
+    expect(previewOf({ ...values, visual_type: "screenshot", thumbnail }, "en").visual).toEqual({
+      type: "screenshot",
+      url: thumbnail.url,
+      width: 1600,
+      height: 1000,
+    });
   });
 });

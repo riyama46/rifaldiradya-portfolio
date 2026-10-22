@@ -203,3 +203,43 @@ export function addTags(tags: string[], raw: string): { tags: string[]; error: s
   }
   return { tags: next, error: null };
 }
+
+export type PreviewLanguage = "en" | "id";
+
+export type ProjectPreviewData = {
+  label: string;
+  title: string;
+  summary: string;
+  visual:
+    | { type: "number"; number: string; caption: string }
+    | { type: "screenshot"; url: string; width: number; height: number }
+    | null;
+};
+
+/**
+ * S-12/S-13 preview panel (v2.1.0): what Selected work and the cursor preview (O-05) would show for
+ * the current, unsaved values, with the same rules as the site (toPublicProject): the label is
+ * "meta · side", and an incomplete visual shows nothing (E-33).
+ */
+export function previewOf(values: FormValues, lang: PreviewLanguage): ProjectPreviewData {
+  const pick = (en: string, id: string) => (lang === "id" ? id : en).trim();
+  const number = values.card_number.trim();
+  const caption = pick(values.card_caption_en, values.card_caption_id);
+  const image = values.thumbnail;
+  const visual: ProjectPreviewData["visual"] =
+    values.visual_type === "number"
+      ? number && caption
+        ? { type: "number", number, caption }
+        : null
+      : image
+        ? { type: "screenshot", url: image.url, width: image.width, height: image.height }
+        : null;
+  return {
+    label: [pick(values.meta_en, values.meta_id), pick(values.side_en, values.side_id)]
+      .filter(Boolean)
+      .join(" · "),
+    title: pick(values.title_en, values.title_id),
+    summary: pick(values.summary_en, values.summary_id),
+    visual,
+  };
+}
