@@ -65,7 +65,7 @@ test("mailto: subject and body per kind and page language (F5)", async ({ page }
   ).toHaveAttribute("href", /subject=Posisi%20full-time%3A%20&body=Perusahaan%3A/);
 });
 
-test("Contact: email + Copy email, LinkedIn, Download CV, clock; no GitHub (D-17, D-19)", async ({
+test("Contact: email + Copy email, LinkedIn, GitHub, Download CV, clock (D-17, D-19)", async ({
   page,
 }) => {
   await page.goto("/");
@@ -77,7 +77,11 @@ test("Contact: email + Copy email, LinkedIn, Download CV, clock; no GitHub (D-17
     "href",
     "https://www.linkedin.com/in/rifaldiradya",
   );
-  await expect(page.locator("a[href*='github']")).toHaveCount(0);
+  // D-19: GitHub shows once it is set in siteConfig (v2.0.2).
+  await expect(contact(page).getByRole("link", { name: "GitHub ↗" })).toHaveAttribute(
+    "href",
+    siteConfig.social.github,
+  );
   await expect(contact(page).locator(".clock")).toHaveText(/^\d{2}:\d{2} GMT\+7$/);
 });
 

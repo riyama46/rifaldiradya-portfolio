@@ -4,25 +4,22 @@ export type Theme = "dark" | "light";
 export const THEME_STORAGE_KEY = "rr-theme";
 
 /**
- * D-23 order: `?theme=` (screenshots/QA) → saved choice → device setting → dark.
+ * D-36 order: `?theme=` (screenshots/QA) → saved choice → dark. The device setting is ignored on
+ * purpose: the dark theme is the main look, so every first visit sees it.
  * Self-contained on purpose: ThemeScript inlines its source into <head>, so it may not reference
  * anything outside its own body.
  */
-export function resolveTheme(
-  query: string | null,
-  stored: string | null,
-  prefersLight: boolean,
-): Theme {
+export function resolveTheme(query: string | null, stored: string | null): Theme {
   if (query === "dark" || query === "light") return query;
   if (stored === "dark" || stored === "light") return stored;
-  return prefersLight ? "light" : "dark";
+  return "dark";
 }
 
 /**
  * Runs before first paint. Every browser API is guarded: storage can throw in private mode or when
- * blocked (E-31), and then the device setting decides.
+ * blocked (E-31), and then the theme is dark.
  */
-export const themeScript = `(function(){var q=null,s=null,l=false;try{q=new URLSearchParams(location.search).get("theme")}catch(e){}try{s=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)})}catch(e){}try{l=matchMedia("(prefers-color-scheme: light)").matches}catch(e){}document.documentElement.dataset.theme=(${resolveTheme.toString()})(q,s,l)})()`;
+export const themeScript = `(function(){var q=null,s=null;try{q=new URLSearchParams(location.search).get("theme")}catch(e){}try{s=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)})}catch(e){}document.documentElement.dataset.theme=(${resolveTheme.toString()})(q,s)})()`;
 
 export function readTheme(): Theme {
   return document.documentElement.dataset.theme === "light" ? "light" : "dark";

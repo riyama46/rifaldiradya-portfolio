@@ -17,7 +17,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
 // Delta APP_FLOW S-01 bab 2 (option-b.html .work). With 2+ projects the stage is pinned and each
 // project is one scroll step (CSS view timeline, ranges from selectedWorkRanges); without
 // scroll-driven support or with reduced motion it is a plain stacked list (E-30). `data-cursor`
-// is read by the v2.1.0 pointer layer (D-27).
+// and `data-preview` are read by the pointer layer (O-05).
 export function SelectedWork({ lang, dict, projects }: SelectedWorkProps) {
   const total = pad(projects.length);
   const ranges = selectedWorkRanges(projects.length);
@@ -76,6 +76,7 @@ export function SelectedWork({ lang, dict, projects }: SelectedWorkProps) {
                         data-source="home_title"
                         data-slug={project.slug}
                         data-cursor="read"
+                        data-preview={project.slug}
                       >
                         {/* The arrow sits in the text so it follows the last word when the title wraps. */}
                         <span>

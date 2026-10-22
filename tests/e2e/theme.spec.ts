@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { hasCredentials, missingCredentials, signIn } from "./helpers";
 
-// O-04 / D-23 / E-07 / E-31 (Delta APP_FLOW) and the T-24 acceptance: no flash of the wrong
+// O-04 / D-23 / D-36 / E-07 / E-31 (Delta APP_FLOW) and the T-24 acceptance: no flash of the wrong
 // theme, the toggle, and axe in both themes.
 
 const BG = { dark: "rgb(11, 11, 11)", light: "rgb(246, 246, 243)" } as const;
@@ -17,21 +17,25 @@ async function blockBundles(page: Page) {
 }
 
 test.describe("no flash: the inline script decides before any bundle runs", () => {
+  // AC-8: dark on first visit whatever the device says (D-36), public and admin.
   for (const scheme of ["dark", "light"] as const) {
-    test(`follows the device setting (${scheme})`, async ({ page }, testInfo) => {
-      await page.emulateMedia({ colorScheme: scheme });
-      await blockBundles(page);
-      await page.goto("/");
-      expect(await theme(page)).toBe(scheme);
-      expect(await background(page)).toBe(BG[scheme]);
-      await testInfo.attach(`first-frame-${scheme}`, {
-        body: await page.screenshot(),
-        contentType: "image/png",
+    for (const path of ["/", "/work", "/admin/login"]) {
+      test(`dark by default on ${path} (device ${scheme})`, async ({ page }, testInfo) => {
+        await page.emulateMedia({ colorScheme: scheme });
+        await blockBundles(page);
+        await page.goto(path);
+        expect(await theme(page)).toBe("dark");
+        expect(await background(page)).toBe(BG.dark);
+        if (path === "/")
+          await testInfo.attach(`first-frame-device-${scheme}`, {
+            body: await page.screenshot(),
+            contentType: "image/png",
+          });
       });
-    });
+    }
   }
 
-  test("a saved choice beats the device setting", async ({ page }) => {
+  test("a saved light choice holds on a dark device", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "dark" });
     await page.addInitScript(() => localStorage.setItem("rr-theme", "light"));
     await blockBundles(page);
@@ -45,6 +49,13 @@ test.describe("no flash: the inline script decides before any bundle runs", () =
     await blockBundles(page);
     await page.goto("/?theme=dark");
     expect(await theme(page)).toBe("dark");
+  });
+
+  test("?theme=light is light", async ({ page }) => {
+    await blockBundles(page);
+    await page.goto("/?theme=light");
+    expect(await theme(page)).toBe("light");
+    expect(await background(page)).toBe(BG.light);
   });
 });
 
@@ -66,7 +77,7 @@ test.describe("O-04 toggle", () => {
   test("uses the Indonesian label on /id", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/id");
-    await expect(page.getByRole("button", { name: "Ganti ke mode gelap" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Ganti ke mode terang" })).toBeVisible();
   });
 
   test("still switches when storage is blocked (E-31)", async ({ page }) => {
@@ -80,9 +91,9 @@ test.describe("O-04 toggle", () => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     await page.waitForLoadState("networkidle");
-    expect(await theme(page)).toBe("light");
-    await page.getByRole("button", { name: "Switch to dark mode" }).click();
     expect(await theme(page)).toBe("dark");
+    await page.getByRole("button", { name: "Switch to light mode" }).click();
+    expect(await theme(page)).toBe("light");
   });
 
   test("admin header has the toggle", async ({ page }) => {
@@ -97,11 +108,13 @@ test.describe("O-04 toggle", () => {
 test.describe("without JS (E-07)", () => {
   test.use({ javaScriptEnabled: false });
 
-  test("follows the device setting and hides the toggle", async ({ page }) => {
+  // AC-9: dark even on a light device, content still readable.
+  test("is dark on a light device and hides the toggle", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     expect(await theme(page)).toBeNull();
-    expect(await background(page)).toBe(BG.light);
+    expect(await background(page)).toBe(BG.dark);
+    await expect(page.locator("h1")).toBeVisible();
     await expect(page.locator(".theme-toggle")).toBeHidden();
   });
 });

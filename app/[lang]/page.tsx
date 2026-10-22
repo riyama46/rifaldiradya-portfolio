@@ -5,6 +5,7 @@ import { Footer } from "@/components/site/Footer";
 import { Hero } from "@/components/site/Hero";
 import { HighlightChapter } from "@/components/site/HighlightChapter";
 import { JsonLd } from "@/components/site/JsonLd";
+import { PointerPeek } from "@/components/site/PointerPeek";
 import { SelectedWork } from "@/components/site/SelectedWork";
 import { SiteBar } from "@/components/site/SiteBar";
 import { getDictionary } from "@/i18n";
@@ -15,8 +16,9 @@ import { getPublishedProjects } from "@/lib/projects/queries";
 import { homeJsonLd } from "@/lib/seo/jsonld";
 import { buildMetadata, siteOrigin } from "@/lib/seo/metadata";
 
-// Safety net; admin saves also revalidate on demand (T-15). SDD section 5.
-export const revalidate = 300;
+// Safety net; admin saves also revalidate on demand (T-15), but the CDN keeps its copy, so keep
+// this short (D-39). SDD section 5.
+export const revalidate = 60;
 
 export async function generateMetadata({ params }: PageProps<"/[lang]">): Promise<Metadata> {
   const lang = await resolveLocale(params);
@@ -53,6 +55,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
         <HighlightChapter dict={dict} />
         <ContactChapter dict={dict} />
       </main>
+      <PointerPeek projects={selected} />
       <Footer lang={lang} dict={dict} back="top" />
     </>
   );

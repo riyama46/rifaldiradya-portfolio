@@ -14,6 +14,7 @@ import {
   Pair,
 } from "@/components/admin/FormField";
 import { LinesInput } from "@/components/admin/LinesInput";
+import { ProjectPreview } from "@/components/admin/ProjectPreview";
 import {
   fieldOrder,
   filledLines,
@@ -64,7 +65,7 @@ type TextField = {
 
 /**
  * S-12 / S-13 (CHANGE v2.0.0 Delta APP_FLOW section 6, UF-07…UF-10), in the sections of
- * admin.html without the live preview (v2.1.0). The shared Zod schema validates on blur and
+ * admin.html, with the live preview beside the form at 1024 px and up (v2.1.0). The shared Zod schema validates on blur and
  * before submit; the server validates again (and checks E-26) and its field errors show the same way.
  */
 export function ProjectForm(props: ProjectFormProps) {
@@ -272,7 +273,7 @@ export function ProjectForm(props: ProjectFormProps) {
   );
 
   return (
-    <>
+    <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_340px]">
       <form onSubmit={onSubmit} noValidate className="max-w-[860px]">
         {sessionExpired && (
           <p role="alert" className="mb-6 rounded-button bg-accent/12 px-4 py-3">
@@ -523,6 +524,8 @@ export function ProjectForm(props: ProjectFormProps) {
         </div>
       </form>
 
+      <ProjectPreview values={values} />
+
       <ConfirmDialog
         open={dialog === "discard"}
         title={t.discard.title}
@@ -544,6 +547,6 @@ export function ProjectForm(props: ProjectFormProps) {
       />
 
       {toast && <Toast key={toast.id} tone="error" message={toast.message} />}
-    </>
+    </div>
   );
 }

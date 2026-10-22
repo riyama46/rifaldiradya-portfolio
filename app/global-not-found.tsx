@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { Analytics } from "@/components/overlays/Analytics";
 import { CookieConsent } from "@/components/overlays/CookieConsent";
 import { ChapterDepth } from "@/components/site/ChapterDepth";
+import { DotField } from "@/components/site/DotField";
 import { Footer } from "@/components/site/Footer";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { SiteBar } from "@/components/site/SiteBar";
@@ -36,6 +37,7 @@ export default async function GlobalNotFound() {
       <body>
         <SkipLink label={dict.nav.skip} />
         <ScrollProgress />
+        <DotField />
         <SiteBar lang={lang} dict={dict} path={null} />
         <main id="content" tabIndex={-1}>
           <section

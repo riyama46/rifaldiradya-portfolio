@@ -7,6 +7,7 @@
  * 2. the Tailwind mapping in @theme below. Components use the mapped utilities, never raw values.
  * Rules: --calm is glow colour only, --faint is decorative lines only; neither is ever text.
  */
+/* Dark is also the no-JS fallback (E-07): :root without data-theme uses it on every device (D-36). */
 :root,
 :root[data-theme="dark"] {
   color-scheme: dark;
@@ -25,28 +26,6 @@
   --ok: #3fbf6f;
   --warn: #e2b24a;
   --danger: #ff6b6b;
-}
-
-/* Without JS there is no data-theme (E-07): follow the device setting, dark when it has none. */
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme]) {
-    color-scheme: light;
-    --bg: #f6f6f3;
-    --ink: #111111;
-    --soft: rgba(17, 17, 17, 0.64);
-    --faint: rgba(17, 17, 17, 0.14);
-    --accent: #2f4fe0;
-    --accent-ink: #ffffff;
-    --calm: #8a7152;
-    --k: 0.6;
-    --avatar-ring: rgba(17, 17, 17, 0.14);
-    --dot: rgba(17, 17, 17, 0.1);
-    --panel: #ffffff;
-    --field: #ffffff;
-    --ok: #1a7f45;
-    --warn: #a06b00;
-    --danger: #c62828;
-  }
 }
 
 :root[data-theme="light"] {
@@ -322,12 +301,21 @@
     inset: -20% 0;
   }
 
-  .depth-dots {
-    position: absolute;
-    inset: 0;
+  /* D-37: one dot field for the page, behind every chapter; taller than the screen so it can drift. */
+  .dot-field {
+    position: fixed;
+    inset: 0 0 auto;
+    height: calc(100lvh + 30vh);
+    z-index: 0;
+    pointer-events: none;
     /* Lint "gradient" defended: dot pattern Pal asked for (D-08). */
     background-image: radial-gradient(var(--dot) 1.2px, transparent 1.8px);
     background-size: 32px 32px;
+  }
+
+  /* Only chapter pages have dots (privacy never did). */
+  body:not(:has(.chapter)) .dot-field {
+    display: none;
   }
 
   .depth-glow {
@@ -373,6 +361,216 @@
     --gx: 30%;
     --gy: 24%;
     --glow: color-mix(in srgb, var(--accent) calc(26% * var(--k)), transparent);
+  }
+
+  /* ---------- Pointer layer (O-05, D-31..D-35; option-b.html .spot, .cur-dot, .cur-ring, .peek, .shot) ----------
+     Mounted only for a mouse by PointerLayer; html.has-cursor while mounted, cur-on while shown. */
+  .spot,
+  .cur-dot,
+  .cur-ring,
+  .peek {
+    position: fixed;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 300ms var(--ease);
+  }
+
+  html.cur-on,
+  html.cur-on * {
+    cursor: none !important;
+  }
+
+  html.cur-on .spot,
+  html.cur-on .cur-dot,
+  html.cur-on .cur-ring,
+  html.peek-on .peek {
+    opacity: 1;
+  }
+
+  /* The light follows the cursor, so the static light of each chapter steps aside (no double). */
+  html.has-cursor .depth-glow {
+    display: none;
+  }
+
+  .spot {
+    z-index: 0;
+    width: 820px;
+    height: 820px;
+    margin: -410px 0 0 -410px;
+  }
+
+  .spot i {
+    --spot-c: color-mix(in srgb, var(--accent) calc(16% * var(--k)), transparent);
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    /* Lint "gradient" defended: cursor light Pal asked for (D-09). */
+    background: radial-gradient(circle, var(--spot-c), transparent 62%);
+    transform: scale(var(--spot-s));
+    transition:
+      --spot-c 900ms var(--ease),
+      --spot-s 900ms var(--ease);
+  }
+
+  html[data-zone="work"] .spot i,
+  html[data-zone="all"] .spot i {
+    --spot-c: color-mix(in srgb, var(--accent) calc(32% * var(--k)), transparent);
+    --spot-s: 1.2;
+  }
+
+  html[data-zone="about"] .spot i {
+    --spot-c: color-mix(in srgb, var(--calm) calc(10% * var(--k)), transparent);
+    --spot-s: 0.8;
+  }
+
+  html[data-zone="highlight"] .spot i {
+    --spot-c: color-mix(in srgb, var(--accent) calc(22% * var(--k)), transparent);
+    --spot-s: 1;
+  }
+
+  html[data-zone="contact"] .spot i,
+  html[data-zone="more"] .spot i {
+    --spot-c: color-mix(in srgb, var(--accent) calc(36% * var(--k)), transparent);
+    --spot-s: 1.4;
+  }
+
+  .cur-dot {
+    z-index: 60;
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .cur-ring {
+    z-index: 60;
+    width: 34px;
+    height: 34px;
+    margin: -17px 0 0 -17px;
+  }
+
+  .cur-ring i {
+    position: absolute;
+    inset: 0;
+    border: 1.5px solid color-mix(in srgb, var(--accent) 70%, transparent);
+    border-radius: 50%;
+    transition:
+      transform 250ms var(--ease),
+      background-color 250ms var(--ease),
+      border-color 250ms var(--ease);
+  }
+
+  .cur-ring b {
+    position: absolute;
+    inset: -30px;
+    display: grid;
+    place-items: center;
+    font: 600 11px/1 var(--font-sans);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    opacity: 0;
+    transition: opacity 200ms var(--ease);
+  }
+
+  html.cur-hot .cur-ring i {
+    transform: scale(1.6);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    border-color: var(--accent);
+  }
+
+  html.cur-label .cur-ring i {
+    transform: scale(2.5);
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  html.cur-label .cur-ring b {
+    opacity: 1;
+  }
+
+  html.cur-label .cur-dot {
+    opacity: 0;
+  }
+
+  html.cur-down .cur-ring i {
+    transform: scale(0.8);
+  }
+
+  /* Under the fixed bar (50). Hidden on touch screens, so its lazy screenshots never load there. */
+  .peek {
+    z-index: 40;
+    display: none;
+    width: 340px;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+  }
+
+  html.has-cursor .peek {
+    display: block;
+  }
+
+  .peek > * {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 200ms var(--ease);
+  }
+
+  .peek > .on {
+    opacity: 1;
+  }
+
+  .peek-pic {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  .peek-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 24px;
+    background: color-mix(in srgb, var(--accent) 16%, var(--bg));
+  }
+
+  .peek-card b {
+    font-size: 56px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .peek-card span {
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--soft);
+  }
+
+  html.has-cursor .shot {
+    transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform 500ms var(--ease);
+  }
+
+  /* D-34: the layer stays as a marker, without travel or fades. */
+  @media (prefers-reduced-motion: reduce) {
+    .spot,
+    .spot i,
+    .cur-dot,
+    .cur-ring,
+    .cur-ring i,
+    .cur-ring b,
+    .peek,
+    .peek > * {
+      transition: none;
+    }
   }
 
   .site-foot {
@@ -1503,12 +1701,9 @@ html:not([data-theme]) .theme-toggle {
   }
 }
 
-@keyframes work-drift {
-  from {
-    transform: translateY(0);
-  }
+@keyframes dot-drift {
   to {
-    transform: translateY(-30%);
+    transform: translateY(-30vh);
   }
 }
 
@@ -1602,6 +1797,19 @@ html:not([data-theme]) .theme-toggle {
   }
 }
 
+/* The cursor light changes colour and size per chapter; unregistered, they would jump. */
+@property --spot-c {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+
+@property --spot-s {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
 /* The Highlight numbers count as integers (CSS counter). Unregistered, they jump to the end. */
 @property --n {
   syntax: "<integer>";
@@ -1635,6 +1843,12 @@ html:has(.consent-banner) {
   @media (prefers-reduced-motion: no-preference) {
     .scroll-progress {
       animation: grow-x linear both;
+      animation-timeline: scroll(root);
+    }
+
+    /* Parallax: the dot field drifts slower than the page (D-37). */
+    .dot-field {
+      animation: dot-drift linear both;
       animation-timeline: scroll(root);
     }
 
@@ -1790,12 +2004,6 @@ html:has(.consent-banner) {
       animation: rail-dot linear both;
       animation-timeline: --work;
       animation-range: contain var(--r0) contain var(--r1);
-    }
-
-    .is-pinned .depth-layer {
-      animation: work-drift linear both;
-      animation-timeline: --work;
-      animation-range: contain 0% contain 100%;
     }
 
     .is-pinned .depth-glow {

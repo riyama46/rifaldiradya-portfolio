@@ -2,10 +2,10 @@
 doc: APP_FLOW
 app: rifaldiradya.com
 tier: full
-version: 2.0.0
+version: 2.1.0
 status: current
-last_updated: 2026-10-18
-last_change: changes/archive/2026-10-18-v2.0.0-showcase-redesign
+last_updated: 2026-10-22
+last_change: changes/archive/2026-10-22-v2.1.0-pointer-layer
 ---
 
 # App Flow Document — rifaldiradya.com v2
@@ -71,6 +71,7 @@ Ada 8 layar publik (4 per bahasa), 5 layar admin, dan 4 overlay. Tidak ada layar
 | O-02 | Banner saran bahasa |  | Publik | Client | Tawarkan versi ID ke browser berbahasa Indonesia | F4 |
 | O-03 | Cookie consent |  | Publik | Client | Minta izin analytics | F8 |
 | O-04 | Toggle tema (bar publik + header admin) |  | Publik + admin | Client | Ganti tema gelap/terang | F1 |
+| O-05 | Lapisan pointer (desktop mouse) |  | Publik | Client | Kursor berlabel, cahaya per bab, preview proyek, tilt screenshot | F1, F2 |
 
 Aturan route tambahan:
 
@@ -106,7 +107,7 @@ Urutan bab tetap; tidak boleh ada bab tambahan. Tiap bab satu layar (`100svh`) d
 | # | Bab | Elemen (urut) | Aturan |
 | --- | --- | --- | --- |
 | 1 | Hero `#top` | foto bulat (avatar S-14, tanpa foto → inisial "RR") → label `[hero.role]` + `[hero.loc]` → baris availability (titik + `[hero.open]`) bila `availability_on` → H1 dua baris `[hero.l1]` / `[hero.l2]` (satu kata `<em>` aksen) → `[hero.sub]` → baris Stack → tombol "Email me" (`general`) → tautan "Scroll ↓" ke `#work` | H1 naik 900 ms tanpa fade (D-10); tidak ada gambar prioritas selain avatar kecil dengan `width`/`height` eksplisit; LCP = H1. |
-| 2 | Selected work `#work` | H2 `[work.h]` + penghitung "0n / 0N" → item proyek: label `0n / 0N · {meta} · {side}`, H3 judul (tautan ke case, panah →), deskripsi (`summary`), tautan "Open the live site ↗" bila `case_action = site`, screenshot bila `visual_type = screenshot` → rail nama proyek (anchor `#w1..#wN`) → "See all work →" ke S-02 | Data: `published AND show_on_home`, urut `sort_order`, maks. 5. Dipin: tiap item satu langkah scroll (sticky + snap); tanpa dukungan scroll-driven atau reduced motion → daftar bertumpuk biasa. 0 item → E-25. Tautan dan screenshot memakai atribut `data-cursor` (`read`/`visit`) untuk v2.1.0. |
+| 2 | Selected work `#work` | H2 `[work.h]` + penghitung "0n / 0N" → item proyek: label `0n / 0N · {meta} · {side}`, H3 judul (tautan ke case, panah →), deskripsi (`summary`), tautan "Open the live site ↗" bila `case_action = site`, screenshot bila `visual_type = screenshot` → rail nama proyek (anchor `#w1..#wN`) → "See all work →" ke S-02 | Data: `published AND show_on_home`, urut `sort_order`, maks. 5. Dipin: tiap item satu langkah scroll (sticky + snap); tanpa dukungan scroll-driven atau reduced motion → daftar bertumpuk biasa. 0 item → E-25. Tautan dan screenshot memakai atribut `data-cursor` (`read`/`visit`); judul juga `data-preview="<slug>"` (O-05). |
 | 3 | About `#about` | H2 `[about.h]` → statement `[about.s]` (terisi baris per baris saat scroll) → `[about.p1]`, `[about.p2]` → Pendidikan (`e1..e3`) → Sertifikasi → tautan Download CV | Statement tanpa dukungan scroll-driven tampil penuh. |
 | 4 | Highlight `#highlight` | label `[case.meta]` → statement `[case.t]` (bagian `<s>` dicoret saat masuk) → 3 angka (5 → 1, ~200, 13; angka menghitung naik via CSS) + label → catatan `[case.blur]` → kalimat jembatan `[bridge.q]` + tautan `[bridge.go]` ke `#contact` | Angka asli selalu ada di DOM (teks `sr`) sehingga pembaca layar dan browser tanpa dukungan membaca nilai akhir. |
 | 5 | Contact `#contact` | label `[ct.label]` → H2 `[ct.h]` → `[ct.pitch]` → tombol `role` (primer) + `project` (sekunder) → baris jangkauan: email (mailto `general`) + Copy email, LinkedIn ↗, Download CV, GitHub ↗ (bila terisi), jam `HH:mm GMT+7` → footer | Jam: teks statis "GMT+7" sebelum JS; setelah mount `HH:mm` zona `Asia/Jakarta`, `tabular-nums`, tanpa layout shift. |
@@ -115,7 +116,7 @@ Urutan bab tetap; tidak boleh ada bab tambahan. Tiap bab satu layar (`100svh`) d
 
 1. Label `[wp.label]` → H1 `[nav.work]` + jumlah proyek published (`<sup>`) → sub `[wp.sub]`, disusun dari jumlah proyek per grup (D-30): grup kosong tidak disebut, angka sampai sepuluh sebagai kata, tunggal/jamak mengikuti angka; tanpa proyek sub tidak dirender.
 2. Filter `[wp.filter]` (grup `role="group"`): tombol All / Panasonic / Websites / AI tools dengan jumlah; aktif ditandai `aria-pressed`. Tanpa JS filter tidak dirender dan semua baris tampil. Grup kosong tidak punya tombol.
-3. Daftar `<ol>` baris: `<details id="case-<slug>">` dengan `<summary>` berisi judul · meta · side · ikon +/−; isi: What it is (`case_is`), What I did (`<ul>` dari `case_did`), Stack (`tags` digabung " · "), Status, lalu tombol sesuai `case_action`: `site` → "Open the live site ↗" (`live_url`, tab baru); `walkthrough` → "Email to ask for a walkthrough" (mailto `walkthrough` dengan judul proyek); `none` → tanpa tombol.
+3. Daftar `<ol>` baris: `<details id="case-<slug>">` dengan `<summary data-preview="<slug>">` (O-05) berisi judul · meta · side · ikon +/−; isi: What it is (`case_is`), What I did (`<ul>` dari `case_did`), Stack (`tags` digabung " · "), Status, lalu tombol sesuai `case_action`: `site` → "Open the live site ↗" (`live_url`, tab baru); `walkthrough` → "Email to ask for a walkthrough" (mailto `walkthrough` dengan judul proyek); `none` → tanpa tombol.
 4. Hash `#case-<slug>` saat load atau saat hash berubah → buka baris itu, gulir ke sana, fokus ke `<summary>`, kirim `case_open` (`source: hash`). Membuka baris lewat klik → `case_open` (`source: row`). Filter yang menyembunyikan baris target di-reset ke All.
 5. Bab Contact penutup `#more` dengan H2 `[ct.h.more]` "Have a project like *these?*" dan dua tombol mailto; footer dengan "Back to home ↑".
 6. Data: `published=true`, urut `sort_order`, tanpa limit. 0 proyek → E-01.
@@ -161,8 +162,17 @@ O-01..O-03 muncul di semua layar publik dan tidak pernah di admin; O-04 ada di b
 
 - Tombol ikon dengan label teks tersembunyi (`aria-label` `[theme.toLight]`/`[theme.toDark]` sesuai tema sekarang).
 - Klik → set `data-theme` di `<html>`, simpan `rr-theme`, event `theme_switch` (jika consent).
-- Skrip inline di `<head>` (sebelum paint) menerapkan urutan D-23: query `?theme=` → `rr-theme` → `prefers-color-scheme` → `dark`; tidak ada flash tema salah.
+- Skrip inline di `<head>` (sebelum paint) menerapkan urutan D-23/D-36: query `?theme=` → `rr-theme` → `dark`; setelan perangkat tidak dipakai; tidak ada flash tema salah.
 - Transisi warna 300 ms; reduced motion → seketika. Tanpa JS toggle tidak tampil (E-07); `localStorage` diblokir → E-31.
+
+### O-05 Lapisan pointer (publik, desktop mouse)
+
+- Aktif hanya bila `(hover: hover) and (pointer: fine)` cocok dan event berasal dari `pointerType === "mouse"` (D-31); komponen `PointerLayer` dimuat terpisah setelah idle, tidak pernah di layar sentuh. Media query berubah → lapisan dimatikan dan semua class dibersihkan.
+- Elemen `aria-hidden`: `.spot` (cahaya ±820 px, warna dan kekuatan per bab lewat `data-zone` di `<html>`), `.cur-dot`, `.cur-ring` (dengan label), `.peek` (screenshot atau kartu angka per proyek published yang tampil di halaman itu, dirender server). Saat aktif, cahaya CSS statis per bab disembunyikan.
+- Pemicu: elemen dengan `data-cursor` (`read`|`visit`) memberi label `[cur.read]`/`[cur.visit]`; `a, button` lain membuat cincin membesar tanpa label; elemen `data-preview="<slug>"` (judul Selected work, `<summary>` baris Work) menampilkan preview proyek itu (340 px, 16:10); `.shot` menerima tilt (maks. sekitar 6°, 500 ms). Menekan mouse → cincin mengecil.
+- Zona cahaya: IntersectionObserver (`rootMargin: -45% 0 -45% 0`) menulis `data-zone`; tanpa listener `scroll` (D-33). Satu loop `requestAnimationFrame` yang berhenti saat semua sudah di posisi kursor (selisih < 0,4 px); hanya `transform` dan `opacity` (D-32).
+- Reduced motion: titik dan cincin tetap tanpa lag, tanpa tilt, cahaya dan preview tanpa transisi (D-34).
+- Fokus keyboard (`:focus-visible`) → lapisan disembunyikan dan kursor bawaan kembali sampai mouse bergerak lagi (D-35). Keluar dari jendela → semua disembunyikan. Edge case: E-33, E-34.
 
 ## 6. Spesifikasi layar admin
 
@@ -215,9 +225,9 @@ Form yang sama. S-13 terisi data dan punya zona hapus.
 | 15 | Visual | Number + Caption EN/ID | text + counter | number 1–12 (mis. "13", "5 → 1"); caption 1–60; wajib bila type = number | kondisional |
 | 16 | Publishing | Published | switch | Publish butuh semua kolom "ya" + kondisional valid | — |
 
-- Bantuan bagian Visual: "Screenshots appear on the homepage. Number cards are saved now and appear in the desktop preview from v2.1." Data screenshot dan number boleh tersimpan bersamaan; yang dipakai mengikuti `visual_type`.
+- Bantuan bagian Visual: "Used for the homepage picture and the preview next to the cursor on the Work page." Data screenshot dan number boleh tersimpan bersamaan; yang dipakai mengikuti `visual_type`.
 - Saat Live URL kosong dan case action = site → error "Add a live URL, or choose another button."
-- Preview live di form: tidak ada (v2.1.0).
+- Panel preview di ≥ 1024 px (sticky di samping form, tersembunyi di bawahnya): "Preview on the homepage" (label meta · side, judul, deskripsi) dan "Preview next to the cursor" (screenshot atau kartu angka; visual belum lengkap → teks petunjuk, sama dengan E-33). Diperbarui saat mengetik tanpa menyimpan; EN dengan tombol ganti ke ID.
 - Layout: form dibagi per bagian (tabel di atas); field EN dan ID berdampingan di ≥ 1024 px, bertumpuk (EN dulu) di bawahnya. Tidak memakai tab bahasa supaya kedua versi terlihat bersamaan.
 - Tombol bawah (sticky di mobile): "Save" primer + "Cancel" sekunder. Save disabled saat upload berjalan.
 - Validasi client saat blur + validasi server saat submit; pesan error di bawah field, menyebut cara memperbaiki (bagian 11). Saat submit gagal, fokus pindah ke field error pertama dan ringkasan error muncul di atas form.
@@ -313,7 +323,7 @@ Setiap edge case di bawah wajib ditangani persis seperti kolom "Perilaku"; tidak
 | E-03 | S-01 | `show_on_home` > 5 (data lama) | Selected work: 5 teratas menurut urutan. Sisanya tetap tampil di S-02. |
 | E-05 | S-01 | Screenshot gagal dimuat | Ruang screenshot tetap dicadangkan; judul, deskripsi, dan tautan tetap berfungsi. |
 | E-06 | S-01, S-02 | Situs live sedang down | Di luar kendali situs; tidak ada pengecekan otomatis. Pal mengganti case action atau menonaktifkan Published secara manual jika perlu. |
-| E-07 | Semua publik | JavaScript mati | Semua konten, link, toggle bahasa (link biasa), dan mailto tetap berfungsi; tema mengikuti setelan perangkat lewat `@media (prefers-color-scheme: light)` di CSS (`dark` bila tidak ada setelan) dan toggle tema tidak tampil; baris case tetap bisa dibuka, filter tidak tampil, jam statis "GMT+7"; O-02, O-03, GA4, Copy email tidak muncul. |
+| E-07 | Semua publik | JavaScript mati | Semua konten, link, toggle bahasa (link biasa), dan mailto tetap berfungsi; tema selalu gelap (D-36) dan toggle tema tidak tampil; baris case tetap bisa dibuka, filter tidak tampil, jam statis "GMT+7"; O-02, O-03, GA4, Copy email tidak muncul. |
 | E-09 | Contact | Clipboard API tidak tersedia/ditolak | Alamat email terseleksi otomatis + tooltip "Press Ctrl/Cmd+C to copy". |
 | E-10 | S-10 | 5 login gagal dalam 15 menit dari satu IP, atau 20 dari semua IP | 429 + pesan rate limit; tombol disabled sampai waktu habis. |
 | E-11 | S-12, S-13 | Sesi habis saat submit | 401, input dipertahankan, pesan + link login di tab baru (UF-10). |
@@ -332,8 +342,10 @@ Setiap edge case di bawah wajib ditangani persis seperti kolom "Perilaku"; tidak
 | E-28 | S-01, S-02 | `case_action = site` tetapi `live_url` kosong (data lama/rusak) | Perlakukan sebagai `none`, catat peringatan di log server. |
 | E-29 | S-02 | `#case-<slug>` tidak ada atau proyeknya draft | Halaman Work dibuka di atas, tanpa error. |
 | E-30 | S-01 | Browser tanpa `animation-timeline` (Firefox saat ini) atau reduced motion | Semua bab tampil sebagai tumpukan statis dalam keadaan akhir (statement penuh, angka akhir, "five passwords" sudah dicoret), Selected work sebagai daftar biasa, scroll snap mati saat reduced motion. |
-| E-31 | Semua | `localStorage` tidak tersedia (mode privat, diblokir) | Tema mengikuti perangkat; toggle tetap mengganti tema untuk sesi itu tanpa error. |
+| E-31 | Semua | `localStorage` tidak tersedia (mode privat, diblokir) | Tema gelap; toggle tetap mengganti tema untuk sesi itu tanpa error. |
 | E-32 | S-01, S-14 | Avatar belum diganti (320 px) | Tetap tampil; tidak ada peringatan publik; S-14 menampilkan "Current file is 320 px. A larger one is recommended." |
+| E-33 | O-05 | Proyek tanpa visual yang valid (screenshot hilang atau kartu angka kosong) | Preview tidak ditampilkan untuk proyek itu; label kursor tetap. |
+| E-34 | O-05 | Halaman dibuka dengan mouse lalu beralih ke sentuh | Lapisan dimatikan pada `pointerType` pertama yang bukan mouse, dan dinyalakan lagi pada `pointermove` mouse berikutnya. |
 
 ## 9. Data model
 
@@ -359,7 +371,7 @@ Satu entitas bisnis: **Project**, plus pengaturan situs. Kredensial admin dan se
 | `visual_type` | enum `screenshot`\|`number` | ya | default `screenshot` | Selected work, S-11 |
 | `thumbnail` | objek atau null | bila `visual_type = screenshot` dan published | `{ public_id, url, width, height }` dari storage gambar | Selected work, admin |
 | `thumbnail_alt_en` / `thumbnail_alt_id` | string atau null | wajib jika ada thumbnail | 1–140 karakter | alt gambar |
-| `card_number` | string atau null | bila `visual_type = number` | 1–12 | kartu angka (tampil mulai v2.1.0) |
+| `card_number` | string atau null | bila `visual_type = number` | 1–12 | kartu angka (preview samping kursor, O-05) |
 | `card_caption_en` / `card_caption_id` | string atau null | bila `visual_type = number` | 1–60 | kartu angka |
 | `show_on_home` | boolean | ya | default false; maks. 5 bernilai true (termasuk draft) | Selected work |
 | `sort_order` | integer | ya | posisi 1…n, unik, diatur server: project baru = 1 (yang lain +1), ↑/↓ menukar dua tetangga (API-08), hapus menutup celah; `updated_at` tidak berubah karena pergeseran posisi | urutan semua daftar |
@@ -508,7 +520,7 @@ Semua label UI tinggal di dua file kamus (`i18n/en.json`, `i18n/id.json`) dengan
 | `consent.body` | I use Google Analytics to see which pages are useful. It only runs if you allow it. | Saya memakai Google Analytics untuk melihat halaman mana yang berguna. Hanya aktif jika kamu izinkan. |
 | `notFound.title` | This page doesn't exist | Halaman ini tidak ada |
 
-Key `cur.*`, `peek.*`, `w.case` disimpan di kamus untuk v2.1.0 tetapi belum dirender. Teks proyek (`w1..w5`, `r*`, `c*`, `peek.*` di mockup) **bukan** key kamus: itu isi awal untuk admin (konten database).
+Key `cur.read` ("Read" / "Baca") dan `cur.visit` ("Visit" / "Kunjungi") dipakai label kursor O-05. Data kartu angka diambil dari database, bukan key `peek.*`. Label panel preview admin mengikuti teks UI admin (EN saja, G3). Teks proyek (`w1..w5`, `r*`, `c*`, `peek.*` di mockup) **bukan** key kamus: itu isi awal untuk admin (konten database).
 
 Tag `<em>` (kata aksen miring), `<s>` (teks dicoret), dan `<strong>` di nilai kamus adalah penanda rich-text yang dirender helper `richText()` menjadi elemen yang sudah ditentukan (SDD bagian 5), bukan HTML mentah. Tag lain tidak diizinkan. Ikon panah (↗, →) bukan bagian dari string; dirender komponen supaya bisa dianimasikan.
 
@@ -537,8 +549,8 @@ Setiap fitur PRD punya layar, flow, dan edge case yang bisa dites. Fitur diangga
 
 | Fitur PRD | Layar / overlay | Flow | Edge case | API / kontrak |
 | --- | --- | --- | --- | --- |
-| F1 Homepage | S-01, O-04 | UF-01 | E-01, E-03, E-05, E-07, E-20, E-25, E-30, E-31, E-32 | DTO publik |
-| F2 Work | S-02 | UF-01 | E-01, E-27, E-29 | DTO publik |
+| F1 Homepage | S-01, O-04, O-05 | UF-01 | E-01, E-03, E-05, E-07, E-20, E-25, E-30, E-31, E-32, E-33, E-34 | DTO publik |
+| F2 Work | S-02, O-05 | UF-01 | E-01, E-27, E-29, E-33 | DTO publik |
 | F3 Case row | S-01, S-02 | UF-01 | E-06, E-27, E-28 | `case_open`, `project_link_click` |
 | F4 Bilingual | O-01, O-02, semua publik | UF-02, UF-04 | E-07, E-18, E-20 | G1, G4, `language_switch` |
 | F5 Kontak | Bar, S-01, S-02 | UF-03 | E-09 | `contact_email_click`, `cv_download` |
@@ -550,8 +562,8 @@ Setiap fitur PRD punya layar, flow, dan edge case yang bisa dites. Fitur diangga
 **Jangan ditebak atau ditambahkan oleh coding AI**
 
 - Jangan menambah layar, section, field, filter, pencarian, paginasi, atau form kontak.
-- Motion hanya D-08 + D-10 (PRD bagian 8), CSS saja; JS klien halaman publik hanya untuk daftar di PRD bagian 10. Jangan membuat carousel, library animasi, rotasi/timer JS, parallax berbasis JavaScript, atau fade-in pada H1/sub.
-- Jangan membangun lapisan pointer atau preview admin (v2.1.0).
+- Motion hanya D-08 + D-10 + D-37 (PRD bagian 8), CSS saja, ditambah lapisan pointer O-05 (D-31..D-35); JS klien halaman publik hanya untuk daftar di PRD bagian 10. Jangan membuat carousel, library animasi, rotasi/timer JS, parallax berbasis JavaScript, atau fade-in pada H1/sub.
+- Jangan menyalakan lapisan pointer di layar sentuh atau memakai `requestAnimationFrame` di luar `PointerLayer`.
 - Jangan merender link GitHub bila kosong.
 - Jangan memakai `--calm` atau `--faint` untuk teks.
 - Jangan membaca/menulis kolom `featured`.

@@ -133,7 +133,7 @@ export const adminStrings = {
       },
       visual: {
         title: "Visual",
-        help: "Screenshots appear on the homepage. Number cards are saved now and appear in the desktop preview from v2.1.",
+        help: "Used for the homepage picture and the preview next to the cursor on the Work page.",
       },
       publishing: { title: "Publishing" },
     },
@@ -158,6 +158,16 @@ export const adminStrings = {
       thumbnail_alt_en: "Describe what the image shows",
       card_number: "A short real figure, e.g. 13 or 5 → 1.",
       published: "Off keeps it as a draft. Drafts never appear on the site.",
+    },
+    // Preview panel at 1024 px and up (CHANGE v2.1.0 Scope, admin.html .side).
+    preview: {
+      label: "Preview",
+      language: "Preview language",
+      languages: { en: "EN", id: "ID" },
+      home: "Preview on the homepage",
+      cursor: "Preview next to the cursor",
+      untitled: "Title",
+      noVisual: "Nothing shows next to the cursor until the visual is complete.",
     },
     optional: "optional",
     lines: (n: number, max: number) => `${n} ${n === 1 ? "line" : "lines"}, max ${max}`,

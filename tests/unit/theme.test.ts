@@ -1,20 +1,20 @@
 import { describe, expect, it } from "vitest";
 import { resolveTheme, themeScript } from "@/lib/theme";
 
-describe("resolveTheme (D-23 order)", () => {
+describe("resolveTheme (D-36 order)", () => {
   it("prefers ?theme= over everything", () => {
-    expect(resolveTheme("light", "dark", false)).toBe("light");
-    expect(resolveTheme("dark", "light", true)).toBe("dark");
+    expect(resolveTheme("light", "dark")).toBe("light");
+    expect(resolveTheme("dark", "light")).toBe("dark");
   });
 
   it("then the saved choice", () => {
-    expect(resolveTheme(null, "light", false)).toBe("light");
-    expect(resolveTheme("bogus", "dark", true)).toBe("dark");
+    expect(resolveTheme(null, "light")).toBe("light");
+    expect(resolveTheme("bogus", "dark")).toBe("dark");
   });
 
-  it("then the device setting, else dark", () => {
-    expect(resolveTheme(null, null, true)).toBe("light");
-    expect(resolveTheme(null, "bogus", false)).toBe("dark");
+  it("else dark", () => {
+    expect(resolveTheme(null, null)).toBe("dark");
+    expect(resolveTheme(null, "bogus")).toBe("dark");
   });
 });
 
@@ -29,6 +29,7 @@ function runScript({ search = "", stored = null, storageThrows = false, light = 
       return stored;
     },
   };
+  // A light device must not matter (D-36); the fake is here so a regression would be caught.
   const matchMedia = () => ({ matches: light });
   new Function("document", "location", "localStorage", "matchMedia", themeScript)(
     { documentElement },
@@ -43,12 +44,12 @@ describe("themeScript (inline, before paint)", () => {
   it("applies the same order as resolveTheme", () => {
     expect(runScript({ search: "?theme=light", stored: "dark" })).toBe("light");
     expect(runScript({ stored: "light" })).toBe("light");
-    expect(runScript({ light: true })).toBe("light");
+    expect(runScript({ light: true })).toBe("dark");
     expect(runScript({})).toBe("dark");
   });
 
-  it("falls back to the device setting when storage throws (E-31)", () => {
-    expect(runScript({ storageThrows: true, light: true })).toBe("light");
-    expect(runScript({ storageThrows: true })).toBe("dark");
+  it("falls back to dark when storage throws (E-31)", () => {
+    expect(runScript({ storageThrows: true, light: true })).toBe("dark");
+    expect(runScript({ storageThrows: true, search: "?theme=light" })).toBe("light");
   });
 });

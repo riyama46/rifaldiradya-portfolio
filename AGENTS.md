@@ -2,8 +2,8 @@
 
 ## Specs (source of truth)
 
-- Current: docs/specs/ (cek `version` dan `status: current` di header tiap file). Live: v2.0.0 (tag git di `main`).
-- Active change: docs/changes/v2.1.0-pointer-layer/CHANGE.md (status `approved`, belum mulai build)
+- Current: docs/specs/ (cek `version` dan `status: current` di header tiap file). Live: v2.1.0 (tag git di `main`).
+- Active change: none (terakhir: docs/changes/archive/2026-10-22-v2.1.0-pointer-layer/)
   → Implement ONLY what the active change describes. Where it conflicts with docs/specs, the change wins.
 - docs/changes/archive/ is history only — never use it as requirements.
 - Versions: PATCH = fix/tidy (builder directly) · MINOR = something new · MAJOR = direction/structure change. MINOR/MAJOR are planned as a CHANGE.md first (docs/changes/vX.Y.Z-name/CHANGE.md).
@@ -29,7 +29,7 @@
 - Tidak ada teks UI hardcode; semua dari i18n/en.json dan i18n/id.json.
 - Akses DB hanya di lib/projects, lib/images, dan lib/auth.
 - Jangan menambah layar, field, fitur, atau library di luar docs.
-- Motion scroll hanya CSS (`@supports` + fallback statis); JS klien hanya untuk komponen di PRD §10; tanpa fade-in pada H1.
+- Motion scroll hanya CSS (`@supports` + fallback statis); JS klien hanya untuk komponen di PRD §10 dan `PointerLayer` (khusus mouse, dimuat terpisah; v2.1.0 D-31..D-35); tanpa fade-in pada H1.
 - String kamus dengan penanda (<em>, <s>, <strong>) dirender lewat richText(), jangan dangerouslySetInnerHTML.
 - Folder baru dibuat saat task yang membutuhkannya dikerjakan, mengikuti struktur SDD bagian 4 (tanpa file placeholder kosong).
 
