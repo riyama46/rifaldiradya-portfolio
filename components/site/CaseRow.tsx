@@ -27,6 +27,7 @@ export function CaseRow({ dict, project }: CaseRowProps) {
           data-source="row"
           data-slug={project.slug}
           data-cursor="read"
+          data-preview={project.slug}
         >
           <span className="row-t">{project.title}</span>
           {project.meta && <span className="row-m">{project.meta}</span>}

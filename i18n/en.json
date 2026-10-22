@@ -47,6 +47,10 @@
     "open": "Open the live site ↗",
     "empty": "New work is on the way. Meanwhile, here's how to reach me."
   },
+  "cur": {
+    "read": "Read",
+    "visit": "Visit"
+  },
   "wp": {
     "label": "All work",
     "sub": {

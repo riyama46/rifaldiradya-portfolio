@@ -5,6 +5,7 @@ import { ContactChapter } from "@/components/site/ContactChapter";
 import { EmptyState } from "@/components/site/EmptyState";
 import { Footer } from "@/components/site/Footer";
 import { JsonLd } from "@/components/site/JsonLd";
+import { PointerPeek } from "@/components/site/PointerPeek";
 import { SiteBar } from "@/components/site/SiteBar";
 import { WorkFilter } from "@/components/site/WorkFilter";
 import { getDictionary } from "@/i18n";
@@ -71,6 +72,7 @@ export default async function WorkPage({ params }: PageProps<"/[lang]/work">) {
         </section>
         <ContactChapter dict={dict} variant="more" />
       </main>
+      <PointerPeek projects={projects} />
       <Footer lang={lang} dict={dict} back="home" />
     </>
   );

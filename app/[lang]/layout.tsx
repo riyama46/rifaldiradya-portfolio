@@ -3,6 +3,7 @@ import { ThemeScript } from "@/components/site/ThemeScript";
 import { Analytics } from "@/components/overlays/Analytics";
 import { CookieConsent } from "@/components/overlays/CookieConsent";
 import { DotField } from "@/components/site/DotField";
+import { Pointer } from "@/components/site/Pointer";
 import { HashFocus } from "@/components/site/HashFocus";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { SkipLink } from "@/components/site/SkipLink";
@@ -34,6 +35,8 @@ export default async function PublicLayout({ children, params }: LayoutProps<"/[
         <SkipLink label={dict.nav.skip} />
         <ScrollProgress />
         <DotField />
+        {/* Before the page so the light sits under the content (same z-index, earlier in the DOM). */}
+        <Pointer labels={dict.cur} />
         {children}
         <HashFocus />
         <CookieConsent lang={lang} dict={dict} />

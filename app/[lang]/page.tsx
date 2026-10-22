@@ -5,6 +5,7 @@ import { Footer } from "@/components/site/Footer";
 import { Hero } from "@/components/site/Hero";
 import { HighlightChapter } from "@/components/site/HighlightChapter";
 import { JsonLd } from "@/components/site/JsonLd";
+import { PointerPeek } from "@/components/site/PointerPeek";
 import { SelectedWork } from "@/components/site/SelectedWork";
 import { SiteBar } from "@/components/site/SiteBar";
 import { getDictionary } from "@/i18n";
@@ -54,6 +55,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
         <HighlightChapter dict={dict} />
         <ContactChapter dict={dict} />
       </main>
+      <PointerPeek projects={selected} />
       <Footer lang={lang} dict={dict} back="top" />
     </>
   );
