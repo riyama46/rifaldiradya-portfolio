@@ -7,6 +7,7 @@
  * 2. the Tailwind mapping in @theme below. Components use the mapped utilities, never raw values.
  * Rules: --calm is glow colour only, --faint is decorative lines only; neither is ever text.
  */
+/* Dark is also the no-JS fallback (E-07): :root without data-theme uses it on every device (D-36). */
 :root,
 :root[data-theme="dark"] {
   color-scheme: dark;
@@ -25,28 +26,6 @@
   --ok: #3fbf6f;
   --warn: #e2b24a;
   --danger: #ff6b6b;
-}
-
-/* Without JS there is no data-theme (E-07): follow the device setting, dark when it has none. */
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme]) {
-    color-scheme: light;
-    --bg: #f6f6f3;
-    --ink: #111111;
-    --soft: rgba(17, 17, 17, 0.64);
-    --faint: rgba(17, 17, 17, 0.14);
-    --accent: #2f4fe0;
-    --accent-ink: #ffffff;
-    --calm: #8a7152;
-    --k: 0.6;
-    --avatar-ring: rgba(17, 17, 17, 0.14);
-    --dot: rgba(17, 17, 17, 0.1);
-    --panel: #ffffff;
-    --field: #ffffff;
-    --ok: #1a7f45;
-    --warn: #a06b00;
-    --danger: #c62828;
-  }
 }
 
 :root[data-theme="light"] {
