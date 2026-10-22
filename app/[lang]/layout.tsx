@@ -2,6 +2,7 @@ import { CspMeta } from "@/components/site/CspMeta";
 import { ThemeScript } from "@/components/site/ThemeScript";
 import { Analytics } from "@/components/overlays/Analytics";
 import { CookieConsent } from "@/components/overlays/CookieConsent";
+import { DotField } from "@/components/site/DotField";
 import { HashFocus } from "@/components/site/HashFocus";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { SkipLink } from "@/components/site/SkipLink";
@@ -32,6 +33,7 @@ export default async function PublicLayout({ children, params }: LayoutProps<"/[
       <body>
         <SkipLink label={dict.nav.skip} />
         <ScrollProgress />
+        <DotField />
         {children}
         <HashFocus />
         <CookieConsent lang={lang} dict={dict} />

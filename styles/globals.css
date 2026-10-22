@@ -322,12 +322,21 @@
     inset: -20% 0;
   }
 
-  .depth-dots {
-    position: absolute;
-    inset: 0;
+  /* D-37: one dot field for the page, behind every chapter; taller than the screen so it can drift. */
+  .dot-field {
+    position: fixed;
+    inset: 0 0 auto;
+    height: calc(100lvh + 30vh);
+    z-index: 0;
+    pointer-events: none;
     /* Lint "gradient" defended: dot pattern Pal asked for (D-08). */
     background-image: radial-gradient(var(--dot) 1.2px, transparent 1.8px);
     background-size: 32px 32px;
+  }
+
+  /* Only chapter pages have dots (privacy never did). */
+  body:not(:has(.chapter)) .dot-field {
+    display: none;
   }
 
   .depth-glow {
@@ -1503,12 +1512,9 @@ html:not([data-theme]) .theme-toggle {
   }
 }
 
-@keyframes work-drift {
-  from {
-    transform: translateY(0);
-  }
+@keyframes dot-drift {
   to {
-    transform: translateY(-30%);
+    transform: translateY(-30vh);
   }
 }
 
@@ -1635,6 +1641,12 @@ html:has(.consent-banner) {
   @media (prefers-reduced-motion: no-preference) {
     .scroll-progress {
       animation: grow-x linear both;
+      animation-timeline: scroll(root);
+    }
+
+    /* Parallax: the dot field drifts slower than the page (D-37). */
+    .dot-field {
+      animation: dot-drift linear both;
       animation-timeline: scroll(root);
     }
 
@@ -1790,12 +1802,6 @@ html:has(.consent-banner) {
       animation: rail-dot linear both;
       animation-timeline: --work;
       animation-range: contain var(--r0) contain var(--r1);
-    }
-
-    .is-pinned .depth-layer {
-      animation: work-drift linear both;
-      animation-timeline: --work;
-      animation-range: contain 0% contain 100%;
     }
 
     .is-pinned .depth-glow {
