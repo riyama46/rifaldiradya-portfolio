@@ -4,6 +4,10 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versi
 
 ## [Unreleased]
 
+### Fixed
+
+- Snippet Google menempelkan link kontak jadi satu kata ("hello@rifaldiradya.comLinkedIn"): link di baris kontak sekarang dipisah spasi di HTML, tampilan tidak berubah.
+
 ## [2.1.0] - 2026-10-22
 
 Lapisan pointer untuk desktop, preview di admin, tema gelap default, dan perapian visual. Detail: `docs/changes/archive/2026-10-22-v2.1.0-pointer-layer/CHANGE.md`, keputusan D-31..D-39 di `docs/decisions/DECISIONS.md`.
