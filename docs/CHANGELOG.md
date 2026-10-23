@@ -4,8 +4,11 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versi
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-10-23
+
 ### Fixed
 
+- Preview proyek di samping kursor tidak muncul di halaman Work setelah pindah dari homepage lewat bar (navigasi sisi klien); baru muncul setelah ganti bahasa. Lapisan pointer kini dipasang ulang per halaman sehingga memakai `.peek` dan zona halaman yang aktif.
 - Snippet Google menempelkan link kontak jadi satu kata ("hello@rifaldiradya.comLinkedIn"): link di baris kontak sekarang dipisah spasi di HTML, tampilan tidak berubah.
 
 ## [2.1.0] - 2026-10-22
