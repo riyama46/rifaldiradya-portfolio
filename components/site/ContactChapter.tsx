@@ -74,6 +74,7 @@ function ContactReach({ dict }: { dict: Dictionary }) {
             }}
           />
         </span>
+        {/* Spaces keep crawlers from gluing the links into one word; flex drops them visually. */}{" "}
         <a
           href={siteConfig.social.linkedin}
           target="_blank"
@@ -81,8 +82,8 @@ function ContactReach({ dict }: { dict: Dictionary }) {
           className="line-link"
         >
           {ct.linkedin}
-        </a>
-        <CvLink dict={dict} location="contact" />
+        </a>{" "}
+        <CvLink dict={dict} location="contact" />{" "}
         {siteConfig.social.github && (
           <a
             href={siteConfig.social.github}
