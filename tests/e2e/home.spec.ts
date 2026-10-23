@@ -166,4 +166,10 @@ test.describe("without JS (E-07)", () => {
     await expect(page.getByRole("button", { name: "Copy email" })).toHaveCount(0);
     await expect(contact(page).getByRole("link", { name: "Email about a project" })).toBeVisible();
   });
+
+  test("contact links stay separate words in the raw text (search snippet)", async ({ page }) => {
+    await page.goto("/");
+    const text = await contact(page).locator(".reach").textContent();
+    expect(text).toContain(`${siteConfig.contactEmail} LinkedIn`);
+  });
 });
