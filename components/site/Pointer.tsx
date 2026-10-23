@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect, useState, type ComponentType } from "react";
 import type { Dictionary } from "@/i18n";
 
@@ -11,6 +12,7 @@ const MOUSE = "(hover: hover) and (pointer: fine)";
 // D-31 / D-32: loads PointerLayer after idle and only while a mouse is the pointer, so its chunk is
 // never requested on phones and tablets. Unmounting it (the query stops matching) cleans up.
 export function Pointer({ labels }: { labels: Labels }) {
+  const pathname = usePathname();
   const [mouse, setMouse] = useState(false);
   const [layer, setLayer] = useState<{ Layer: Layer } | null>(null);
 
@@ -37,5 +39,7 @@ export function Pointer({ labels }: { labels: Labels }) {
     return () => clearTimeout(id);
   }, [mouse, layer]);
 
-  return mouse && layer ? <layer.Layer labels={labels} /> : null;
+  // Remount per page: the layer finds the page's .peek and zones on mount, and this layout survives
+  // client-side navigation (home → Work would keep the old page's preview).
+  return mouse && layer ? <layer.Layer key={pathname} labels={labels} /> : null;
 }
