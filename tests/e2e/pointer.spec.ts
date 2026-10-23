@@ -141,8 +141,10 @@ test.describe("mouse", () => {
       await expect(html(page)).not.toHaveClass(/cur-on/);
       await expect(page.locator(":focus-visible")).toHaveCount(1);
 
-      // Work rows preview their project too.
-      await page.goto("/work");
+      // Work rows preview their project too, also after a client-side navigation from home (the
+      // layer lives in the layout and must pick up the new page's .peek and zones).
+      await page.locator(".site-bar-nav a.bar-link").first().click();
+      await expect(page).toHaveURL(/\/work$/);
       const row = `summary[data-preview="${hr.slug}"]`;
       await page.locator(row).scrollIntoViewIfNeeded();
       await hover(page, row);
