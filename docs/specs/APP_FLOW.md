@@ -12,383 +12,383 @@ last_change: changes/archive/2026-10-22-v2.1.0-pointer-layer
 
 Sep 27, 2026 · @Pal
 
-> **v2.0.0 (18 Okt 2026).** Home 5 bab dengan scroll snap, halaman Work dengan filter dan baris case, tema gelap/terang, funnel email 4 jenis + Download CV, model data project v2. Rujukan visual: `docs/design/v2/option-b.html` (publik) dan `docs/design/v2/admin.html` (admin); kalau mockup berbeda dengan dokumen ini, dokumen ini yang menang. Keputusan: D-01..D-30 di `docs/decisions/DECISIONS.md`.
+> **v2.0.0 (Oct 18, 2026).** A 5-chapter Home with scroll snap, a Work page with a filter and case rows, dark/light theme, an email funnel with 4 kinds + Download CV, the v2 project data model. Visual reference: `docs/design/v2/option-b.html` (public) and `docs/design/v2/admin.html` (admin); if the mockup differs from this document, this document wins. Decisions: D-01..D-30 in `docs/decisions/DECISIONS.md`.
 
-## 1. Cara pakai & aturan global
+## 1. How to use & global rules
 
-Dokumen ini adalah blueprint implementasi: setiap layar, elemen, flow, state, dan kontrak data yang boleh dibangun. **Kalau sesuatu tidak ada di sini, jangan dibangun; kalau ambigu, tanya dulu.** Sumber "apa & kenapa" ada di PRD; sumber "teknologi & arsitektur" ada di SDD.
+This document is the implementation blueprint: every screen, element, flow, state and data contract that may be built. **If something is not here, do not build it; if it is ambiguous, ask first.** The source of "what & why" is the PRD; the source of "technology & architecture" is the SDD.
 
-**Konvensi ID:** layar `S-xx`, overlay `O-xx`, flow `UF-xx`, edge case `E-xx`, endpoint `API-xx`, fitur PRD `F1–F9` (F3 = baris case). Edge case v2 mulai E-25.
+**ID conventions:** screen `S-xx`, overlay `O-xx`, flow `UF-xx`, edge case `E-xx`, endpoint `API-xx`, PRD feature `F1–F9` (F3 = case row). v2 edge cases start at E-25.
 
-**G1 — Locale dari URL, bukan dari tebakan.**
+**G1 — Locale from the URL, not from a guess.**
 
-- Locale ditentukan hanya dari path: diawali `/id` → `id`, selain itu → `en`.
-- Server tidak pernah redirect berdasarkan `Accept-Language`, IP, atau cookie. `Accept-Language` hanya dipakai untuk memutuskan tampil/tidaknya banner saran (O-02).
-- `<html lang>` = locale halaman. Semua string UI diambil dari kamus i18n per locale (bagian 11).
+- The locale is decided only from the path: starts with `/id` → `id`, otherwise → `en`.
+- The server never redirects based on `Accept-Language`, IP or cookie. `Accept-Language` is only used to decide whether the suggestion banner (O-02) shows.
+- `<html lang>` = the page locale. All UI strings come from the i18n dictionary per locale (section 11).
 
-**G2 — Layout shell publik (semua S-01 s.d. S-04)**
+**G2 — Public layout shell (all of S-01 to S-04)**
 
-1. Skip link "Skip to content" / "Langsung ke konten" (muncul saat fokus keyboard).
-2. Bar sticky: nama → home, Work, About, toggle EN|ID (O-01), toggle tema (O-04), tombol "Email me" (mailto `general`); di < 768 px mengikuti mockup.
-3. Progress bar baca tipis di atas (CSS `scroll()`).
-4. `<main id="content">` isi halaman.
-5. Footer kecil: © tahun, Privacy, Cookie settings (O-03), "Back to top ↑" (home) / "Back to home ↑" (Work).
-6. O-02 banner saran bahasa dan O-03 cookie consent (kondisional).
+1. Skip link "Skip to content" / "Langsung ke konten" (shows on keyboard focus).
+2. Sticky bar: name → home, Work, About, EN|ID toggle (O-01), theme toggle (O-04), "Email me" button (mailto `general`); below 768 px it follows the mockup.
+3. Thin reading progress bar at the top (CSS `scroll()`).
+4. `<main id="content">` page content.
+5. Small footer: © year, Privacy, Cookie settings (O-03), "Back to top ↑" (home) / "Back to home ↑" (Work).
+6. O-02 language suggestion banner and O-03 cookie consent (conditional).
 
-Setiap bab punya lapisan dekoratif `aria-hidden` (titik + cahaya) dan atribut `data-zone` untuk warna cahaya.
+Every chapter has an `aria-hidden` decorative layer (dots + light) and a `data-zone` attribute for the light color.
 
-**G3 — Layout shell admin (S-10 s.d. S-14):** header sederhana ("Rifaldi Radya Pratama Admin" · link "View site" tab baru · toggle tema O-04 · tombol Logout), tanpa footer publik, tanpa O-01/O-02/O-03, tanpa GA4. Bahasa UI admin: EN saja. Semua halaman admin mengirim `noindex, nofollow`.
+**G3 — Admin layout shell (S-10 to S-14):** a simple header ("Rifaldi Radya Pratama Admin" · "View site" link in a new tab · theme toggle O-04 · Logout button), no public footer, no O-01/O-02/O-03, no GA4. Admin UI language: EN only. Every admin page sends `noindex, nofollow`.
 
-**G4 — Cookies yang boleh ada**
+**G4 — Allowed cookies**
 
-| Cookie | Isi | Umur | Diset oleh |
+| Cookie | Content | Lifetime | Set by |
 | --- | --- | --- | --- |
-| `lang_pref` | `en` \| `id` | 365 hari | O-01 klik, O-02 aksi apa pun |
-| `consent` | `granted` \| `denied` | 180 hari | O-03 |
-| `admin_session` | token sesi (httpOnly, secure, sameSite=lax) | 7 hari | API-01 |
-| `_ga`, `_ga_*` | cookie GA4 | sesuai GA4 | GA4, hanya setelah `consent=granted` |
+| `lang_pref` | `en` \| `id` | 365 days | O-01 click, any O-02 action |
+| `consent` | `granted` \| `denied` | 180 days | O-03 |
+| `admin_session` | session token (httpOnly, secure, sameSite=lax) | 7 days | API-01 |
+| `_ga`, `_ga_*` | GA4 cookies | per GA4 | GA4, only after `consent=granted` |
 
-Tidak ada cookie lain. `localStorage` hanya `rr-theme` (`dark` | `light`, diset O-04): preferensi tampilan, tidak dikirim ke mana pun, bukan state penting.
+No other cookies. `localStorage` holds only `rr-theme` (`dark` | `light`, set by O-04): a display preference, not sent anywhere, not important state.
 
-**G5 — Konten dinamis vs statis:** dari database: semua field proyek (bagian 9) dan `availability_on`. Dari kamus i18n: hero, About, pendidikan, sertifikasi, Highlight, Contact, mailto, privacy, dan semua label UI. Dari repo (statis): PDF CV di `public/cv/`. Halaman publik dirender statis dan direvalidasi saat admin mengubah data.
+**G5 — Dynamic vs static content:** from the database: every project field (section 9) and `availability_on`. From the i18n dictionary: hero, About, education, certifications, Highlight, Contact, mailto, privacy and every UI label. From the repo (static): the CV PDF in `public/cv/`. Public pages are rendered statically and revalidated when the admin changes data.
 
-## 2. Inventaris layar
+## 2. Screen inventory
 
-Ada 8 layar publik (4 per bahasa), 5 layar admin, dan 4 overlay. Tidak ada layar lain.
+There are 8 public screens (4 per language), 5 admin screens and 4 overlays. There are no other screens.
 
-| ID | Route EN | Route ID | Akses | Render | Tujuan | Fitur |
+| ID | EN route | ID route | Access | Render | Purpose | Feature |
 | --- | --- | --- | --- | --- | --- | --- |
-| S-01 | `/` | `/id` | Publik | Statis + revalidasi | Homepage: peran, bukti, funnel ke email/CV | F1, F3, F5 |
-| S-02 | `/work` | `/id/work` | Publik | Statis + revalidasi | Semua project published sebagai baris case + filter grup | F2, F3, F5 |
-| S-03 | `/privacy` | `/id/privacy` | Publik | Statis | Kebijakan privasi & cookie | F8 |
-| S-04 | 404 (path tak dikenal) | 404 di bawah `/id/*` | Publik | Statis | Not found per bahasa | F9 |
-| S-10 | `/admin/login` | — | Publik (noindex) | Dinamis | Form login | F6 |
-| S-11 | `/admin` | — | Butuh sesi | Dinamis | Daftar project | F7 |
-| S-12 | `/admin/projects/new` | — | Butuh sesi | Dinamis | Form buat project | F7 |
-| S-13 | `/admin/projects/[id]` | — | Butuh sesi | Dinamis | Form edit + hapus project | F7 |
-| S-14 | `/admin/profile` | — | Butuh sesi | Dinamis | Foto profil di hero + saklar availability | F1, F7 |
-| O-01 | Toggle bahasa (bar) |  | Publik | Client | Pindah ke halaman padanan | F4 |
-| O-02 | Banner saran bahasa |  | Publik | Client | Tawarkan versi ID ke browser berbahasa Indonesia | F4 |
-| O-03 | Cookie consent |  | Publik | Client | Minta izin analytics | F8 |
-| O-04 | Toggle tema (bar publik + header admin) |  | Publik + admin | Client | Ganti tema gelap/terang | F1 |
-| O-05 | Lapisan pointer (desktop mouse) |  | Publik | Client | Kursor berlabel, cahaya per bab, preview proyek, tilt screenshot | F1, F2 |
+| S-01 | `/` | `/id` | Public | Static + revalidation | Homepage: role, proof, funnel to email/CV | F1, F3, F5 |
+| S-02 | `/work` | `/id/work` | Public | Static + revalidation | All published projects as case rows + group filter | F2, F3, F5 |
+| S-03 | `/privacy` | `/id/privacy` | Public | Static | Privacy & cookie policy | F8 |
+| S-04 | 404 (unknown path) | 404 under `/id/*` | Public | Static | Not found per language | F9 |
+| S-10 | `/admin/login` | — | Public (noindex) | Dynamic | Login form | F6 |
+| S-11 | `/admin` | — | Needs session | Dynamic | Project list | F7 |
+| S-12 | `/admin/projects/new` | — | Needs session | Dynamic | Create project form | F7 |
+| S-13 | `/admin/projects/[id]` | — | Needs session | Dynamic | Edit + delete project form | F7 |
+| S-14 | `/admin/profile` | — | Needs session | Dynamic | Hero profile photo + availability switch | F1, F7 |
+| O-01 | Language toggle (bar) |  | Public | Client | Go to the matching page | F4 |
+| O-02 | Language suggestion banner |  | Public | Client | Offer the ID version to Indonesian-language browsers | F4 |
+| O-03 | Cookie consent |  | Public | Client | Ask for analytics permission | F8 |
+| O-04 | Theme toggle (public bar + admin header) |  | Public + admin | Client | Switch the dark/light theme | F1 |
+| O-05 | Pointer layer (desktop mouse) |  | Public | Client | Labeled cursor, light per chapter, project preview, screenshot tilt | F1, F2 |
 
-Aturan route tambahan:
+Extra route rules:
 
-- `www.rifaldiradya.com/*` → redirect 301 ke `https://rifaldiradya.com/*` (path dan query sama); versi non-www adalah kanonik.
-- `/en` dan `/en/*` → redirect 301 ke path tanpa prefix (mis. `/en/work` → `/work`), supaya tidak ada duplikat.
-- Trailing slash dihapus dengan redirect permanen (`/work/` → `/work`); bawaan Next.js memakai 308.
-- Semua `/admin/*` kecuali `/admin/login` tanpa sesi valid → redirect 302 ke `/admin/login?next=<path>`.
-- `/admin/login` dengan sesi valid → redirect ke `/admin`.
-- `/admin/projects/[id]` dengan id tidak ada → S-11 dengan toast "Project not found".
+- `www.rifaldiradya.com/*` → 301 redirect to `https://rifaldiradya.com/*` (same path and query); the non-www version is canonical.
+- `/en` and `/en/*` → 301 redirect to the path without the prefix (e.g. `/en/work` → `/work`), so there are no duplicates.
+- Trailing slashes are removed with a permanent redirect (`/work/` → `/work`); the Next.js default uses 308.
+- Every `/admin/*` except `/admin/login` without a valid session → 302 redirect to `/admin/login?next=<path>`.
+- `/admin/login` with a valid session → redirect to `/admin`.
+- `/admin/projects/[id]` with an id that does not exist → S-11 with the toast "Project not found".
 
-## 3. Peta navigasi
+## 3. Navigation map
 
-Pintu keluar yang penting: mailto (4 jenis), Download CV, situs live (bila ada), LinkedIn. Judul proyek di S-01 → S-02 `#case-<slug>`. Admin tidak pernah ditautkan dari halaman publik.
+The important exits: mailto (4 kinds), Download CV, live site (when present), LinkedIn. A project title in S-01 → S-02 `#case-<slug>`. The admin is never linked from public pages.
 
-&#91;embedded content: peta navigasi v1 · publik dan admin terpisah\]
+&#91;embedded content: v1 navigation map · public and admin kept separate\]
 
-Navigasi yang tidak digambar supaya diagram tetap terbaca:
+Navigation not drawn so the diagram stays readable:
 
-- Bar & footer (G2) ada di semua layar publik: nama → S-01, Work → S-02, About → S-01 `#about`, Privacy → S-03, toggle → halaman padanan di locale lain, email → email app.
-- Item Selected work di S-01 menaut ke baris case di S-02; tautan situs live di S-01 dan S-02 keluar ke tab baru.
-- S-04 punya tombol ke S-01 dan S-02.
-- S-12 dan S-13 kembali ke S-11 setelah Save, Cancel, atau Delete (S-13).
-- Header admin: "View site" membuka `/` di tab baru; Logout → S-10.
+- The bar & footer (G2) are on every public screen: name → S-01, Work → S-02, About → S-01 `#about`, Privacy → S-03, toggle → matching page in the other locale, email → email app.
+- Selected work items in S-01 link to the case row in S-02; live site links in S-01 and S-02 go out to a new tab.
+- S-04 has buttons to S-01 and S-02.
+- S-12 and S-13 return to S-11 after Save, Cancel or Delete (S-13).
+- Admin header: "View site" opens `/` in a new tab; Logout → S-10.
 
-## 4. Spesifikasi layar publik
+## 4. Public screen specs
 
-Semua layar publik memakai shell G2. Teks di tanda kutip adalah copy EN; padanan ID ada di kamus i18n (bagian 11), dirujuk lewat key `[key]`.
+Every public screen uses the G2 shell. Text in quotes is EN copy; the ID equivalent is in the i18n dictionary (section 11), referenced by the key `[key]`.
 
 ### S-01 Homepage (`/`, `/id`)
 
-Urutan bab tetap; tidak boleh ada bab tambahan. Tiap bab satu layar (`100svh`) dengan scroll snap `y proximity` (mati saat reduced motion); bab boleh lebih tinggi bila isinya panjang. Tanpa label section bernomor.
+The chapter order is fixed; no extra chapters are allowed. Each chapter is one screen (`100svh`) with `y proximity` scroll snap (off under reduced motion); a chapter may be taller when its content is long. No numbered section labels.
 
-| # | Bab | Elemen (urut) | Aturan |
+| # | Chapter | Elements (in order) | Rules |
 | --- | --- | --- | --- |
-| 1 | Hero `#top` | foto bulat (avatar S-14, tanpa foto → inisial "RR") → label `[hero.role]` + `[hero.loc]` → baris availability (titik + `[hero.open]`) bila `availability_on` → H1 dua baris `[hero.l1]` / `[hero.l2]` (satu kata `<em>` aksen) → `[hero.sub]` → baris Stack → tombol "Email me" (`general`) → tautan "Scroll ↓" ke `#work` | H1 naik 900 ms tanpa fade (D-10); tidak ada gambar prioritas selain avatar kecil dengan `width`/`height` eksplisit; LCP = H1. |
-| 2 | Selected work `#work` | H2 `[work.h]` + penghitung "0n / 0N" → item proyek: label `0n / 0N · {meta} · {side}`, H3 judul (tautan ke case, panah →), deskripsi (`summary`), tautan "Open the live site ↗" bila `case_action = site`, screenshot bila `visual_type = screenshot` → rail nama proyek (anchor `#w1..#wN`) → "See all work →" ke S-02 | Data: `published AND show_on_home`, urut `sort_order`, maks. 5. Dipin: tiap item satu langkah scroll (sticky + snap); tanpa dukungan scroll-driven atau reduced motion → daftar bertumpuk biasa. 0 item → E-25. Tautan dan screenshot memakai atribut `data-cursor` (`read`/`visit`); judul juga `data-preview="<slug>"` (O-05). |
-| 3 | About `#about` | H2 `[about.h]` → statement `[about.s]` (terisi baris per baris saat scroll) → `[about.p1]`, `[about.p2]` → Pendidikan (`e1..e3`) → Sertifikasi → tautan Download CV | Statement tanpa dukungan scroll-driven tampil penuh. |
-| 4 | Highlight `#highlight` | label `[case.meta]` → statement `[case.t]` (bagian `<s>` dicoret saat masuk) → 3 angka (5 → 1, ~200, 13; angka menghitung naik via CSS) + label → catatan `[case.blur]` → kalimat jembatan `[bridge.q]` + tautan `[bridge.go]` ke `#contact` | Angka asli selalu ada di DOM (teks `sr`) sehingga pembaca layar dan browser tanpa dukungan membaca nilai akhir. |
-| 5 | Contact `#contact` | label `[ct.label]` → H2 `[ct.h]` → `[ct.pitch]` → tombol `role` (primer) + `project` (sekunder) → baris jangkauan: email (mailto `general`) + Copy email, LinkedIn ↗, Download CV, GitHub ↗ (bila terisi), jam `HH:mm GMT+7` → footer | Jam: teks statis "GMT+7" sebelum JS; setelah mount `HH:mm` zona `Asia/Jakarta`, `tabular-nums`, tanpa layout shift. |
+| 1 | Hero `#top` | round photo (S-14 avatar, no photo → initials "RR") → label `[hero.role]` + `[hero.loc]` → availability line (dot + `[hero.open]`) when `availability_on` → two-line H1 `[hero.l1]` / `[hero.l2]` (one `<em>` accent word) → `[hero.sub]` → Stack line → "Email me" button (`general`) → "Scroll ↓" link to `#work` | The H1 rises in over 900 ms without fade (D-10); no priority image other than the small avatar with explicit `width`/`height`; LCP = H1. |
+| 2 | Selected work `#work` | H2 `[work.h]` + "0n / 0N" counter → project items: label `0n / 0N · {meta} · {side}`, H3 title (link to the case, arrow →), description (`summary`), "Open the live site ↗" link when `case_action = site`, screenshot when `visual_type = screenshot` → rail of project names (anchors `#w1..#wN`) → "See all work →" to S-02 | Data: `published AND show_on_home`, ordered by `sort_order`, max. 5. Pinned: each item is one scroll step (sticky + snap); without scroll-driven support or under reduced motion → a plain stacked list. 0 items → E-25. Links and screenshots carry the `data-cursor` attribute (`read`/`visit`); the title also has `data-preview="<slug>"` (O-05). |
+| 3 | About `#about` | H2 `[about.h]` → statement `[about.s]` (fills line by line on scroll) → `[about.p1]`, `[about.p2]` → Education (`e1..e3`) → Certifications → Download CV link | Without scroll-driven support the statement shows in full. |
+| 4 | Highlight `#highlight` | label `[case.meta]` → statement `[case.t]` (the `<s>` part is struck through on entry) → 3 numbers (5 → 1, ~200, 13; numbers count up via CSS) + labels → note `[case.blur]` → bridge sentence `[bridge.q]` + link `[bridge.go]` to `#contact` | The real numbers are always in the DOM (`sr` text), so screen readers and browsers without support read the final value. |
+| 5 | Contact `#contact` | label `[ct.label]` → H2 `[ct.h]` → `[ct.pitch]` → `role` button (primary) + `project` (secondary) → reach line: email (mailto `general`) + Copy email, LinkedIn ↗, Download CV, GitHub ↗ (when filled in), `HH:mm GMT+7` clock → footer | Clock: static text "GMT+7" before JS; after mount `HH:mm` in the `Asia/Jakarta` zone, `tabular-nums`, no layout shift. |
 
 ### S-02 Work (`/work`, `/id/work`)
 
-1. Label `[wp.label]` → H1 `[nav.work]` + jumlah proyek published (`<sup>`) → sub `[wp.sub]`, disusun dari jumlah proyek per grup (D-30): grup kosong tidak disebut, angka sampai sepuluh sebagai kata, tunggal/jamak mengikuti angka; tanpa proyek sub tidak dirender.
-2. Filter `[wp.filter]` (grup `role="group"`): tombol All / Panasonic / Websites / AI tools dengan jumlah; aktif ditandai `aria-pressed`. Tanpa JS filter tidak dirender dan semua baris tampil. Grup kosong tidak punya tombol.
-3. Daftar `<ol>` baris: `<details id="case-<slug>">` dengan `<summary data-preview="<slug>">` (O-05) berisi judul · meta · side · ikon +/−; isi: What it is (`case_is`), What I did (`<ul>` dari `case_did`), Stack (`tags` digabung " · "), Status, lalu tombol sesuai `case_action`: `site` → "Open the live site ↗" (`live_url`, tab baru); `walkthrough` → "Email to ask for a walkthrough" (mailto `walkthrough` dengan judul proyek); `none` → tanpa tombol.
-4. Hash `#case-<slug>` saat load atau saat hash berubah → buka baris itu, gulir ke sana, fokus ke `<summary>`, kirim `case_open` (`source: hash`). Membuka baris lewat klik → `case_open` (`source: row`). Filter yang menyembunyikan baris target di-reset ke All.
-5. Bab Contact penutup `#more` dengan H2 `[ct.h.more]` "Have a project like *these?*" dan dua tombol mailto; footer dengan "Back to home ↑".
-6. Data: `published=true`, urut `sort_order`, tanpa limit. 0 proyek → E-01.
+1. Label `[wp.label]` → H1 `[nav.work]` + number of published projects (`<sup>`) → sub `[wp.sub]`, built from the number of projects per group (D-30): empty groups are not mentioned, numbers up to ten are words, singular/plural follows the number; with no projects the sub is not rendered.
+2. Filter `[wp.filter]` (group `role="group"`): All / Panasonic / Websites / AI tools buttons with counts; the active one is marked with `aria-pressed`. Without JS the filter is not rendered and all rows show. An empty group has no button.
+3. An `<ol>` list of rows: `<details id="case-<slug>">` with `<summary data-preview="<slug>">` (O-05) holding title · meta · side · +/− icon; content: What it is (`case_is`), What I did (`<ul>` from `case_did`), Stack (`tags` joined with " · "), Status, then the button for `case_action`: `site` → "Open the live site ↗" (`live_url`, new tab); `walkthrough` → "Email to ask for a walkthrough" (mailto `walkthrough` with the project title); `none` → no button.
+4. Hash `#case-<slug>` on load or on hash change → open that row, scroll to it, focus the `<summary>`, send `case_open` (`source: hash`). Opening a row by click → `case_open` (`source: row`). A filter that hides the target row is reset to All.
+5. Closing Contact chapter `#more` with H2 `[ct.h.more]` "Have a project like *these?*" and two mailto buttons; footer with "Back to home ↑".
+6. Data: `published=true`, ordered by `sort_order`, no limit. 0 projects → E-01.
 
 ### S-03 Privacy (`/privacy`, `/id/privacy`)
 
-H1 + teks statis dari kamus i18n: apa yang dilacak (GA4, anonim, hanya dengan izin), cookie yang dipakai (tabel G4 versi ramah pembaca), penyimpanan `rr-theme` di browser, PDF CV sebagai file statis tanpa pelacakan selain event `cv_download` bila consent, cara mengubah pilihan (tombol "Cookie settings" yang membuka O-03), kontak email. Tidak ada data dinamis.
+H1 + static text from the i18n dictionary: what is tracked (GA4, anonymous, only with permission), the cookies used (a reader-friendly version of the G4 table), the `rr-theme` storage in the browser, the CV PDF as a static file with no tracking other than the `cv_download` event with consent, how to change the choice (a "Cookie settings" button that opens O-03), contact email. No dynamic data.
 
 ### S-04 Not found
 
-Status HTTP 404. Locale mengikuti prefix path (`/id/xyz` → versi ID). Isi: H1 `[notFound.title]` "This page doesn't exist", satu kalimat, tombol ke S-01 dan S-02. Bar dan footer tetap tampil (gaya v2). `noindex`.
+HTTP status 404. The locale follows the path prefix (`/id/xyz` → ID version). Content: H1 `[notFound.title]` "This page doesn't exist", one sentence, buttons to S-01 and S-02. The bar and footer still show (v2 style). `noindex`.
 
-## 5. Overlay global
+## 5. Global overlays
 
-O-01..O-03 muncul di semua layar publik dan tidak pernah di admin; O-04 ada di bar publik dan header admin. O-02/O-03 bergaya v2 dengan posisi dan logika tetap. Banner bahasa dan GA4 hanya aktif kalau semua syaratnya terpenuhi.
+O-01..O-03 appear on every public screen and never in the admin; O-04 is in the public bar and the admin header. O-02/O-03 use the v2 style with their position and logic unchanged. The language banner and GA4 are active only when all their conditions are met.
 
-&#91;embedded content: logika tampil O-02 dan O-03\]
+&#91;embedded content: O-02 and O-03 display logic\]
 
-### O-01 Toggle bahasa
+### O-01 Language toggle
 
-- Tampilan: dua tombol teks EN dan ID dipisah garis tipis; yang aktif bergaya aksen dan diberi `aria-current`. Grup punya `aria-label` Language.
-- Klik bahasa yang tidak aktif: set `lang_pref`, kirim event `language_switch` (jika consent), navigasi ke path padanan: `/` ↔ `/id`, `/work` ↔ `/id/work`, `/privacy` ↔ `/id/privacy`; hash anchor ikut dibawa (`/#work` → `/id#work`). Dari S-04 → homepage locale tujuan.
-- Klik bahasa yang sudah aktif: tidak terjadi apa-apa.
-- Toggle adalah link `<a href>` asli (bisa dibuka di tab baru, bisa di-crawl), bukan tombol JS saja.
+- Display: two text buttons, EN and ID, separated by a thin line; the active one uses the accent style and gets `aria-current`. The group has `aria-label` Language.
+- Click on the inactive language: set `lang_pref`, send the `language_switch` event (with consent), navigate to the matching path: `/` ↔ `/id`, `/work` ↔ `/id/work`, `/privacy` ↔ `/id/privacy`; the hash anchor is carried along (`/#work` → `/id#work`). From S-04 → the homepage of the target locale.
+- Click on the language that is already active: nothing happens.
+- The toggle is a real `<a href>` link (can open in a new tab, can be crawled), not a JS-only button.
 
-### O-02 Banner saran bahasa
+### O-02 Language suggestion banner
 
-- Dievaluasi di client setelah halaman tampil, tanpa memblokir render dan tanpa menggeser layout: overlay setinggi 48 px, di bawah bar mulai 768 px dan menempel di bawah layar di HP (hero di HP hanya berjarak 24 px dari bar, jadi overlay atas akan menutupi byline). Di layar < 420 px hanya tombol yang tampil; kalimatnya tetap jadi label region untuk pembaca layar.
-- Syarat tampil (lihat diagram): path bukan `/id*`, cookie `lang_pref` tidak ada, dan `navigator.languages` berisi entri yang diawali `id`.
-- Isi: Also available in Indonesian. + tombol Lihat versi Indonesia + tombol tutup (ikon silang, `aria-label` Dismiss).
-- Lihat versi Indonesia → set `lang_pref=id` → buka halaman padanan ID. Tutup → set `lang_pref=en` → banner hilang. Keduanya permanen sampai cookie habis.
-- Di mobile tidak tampil bersamaan dengan O-03: jika O-03 tampil, O-02 menunggu sampai O-03 ditutup.
+- Evaluated on the client after the page shows, without blocking render and without shifting layout: a 48 px overlay, below the bar from 768 px and stuck to the bottom of the screen on phones (the phone hero is only 24 px from the bar, so a top overlay would cover the byline). On screens < 420 px only the buttons show; the sentence stays as the region label for screen readers.
+- Display conditions (see diagram): the path is not `/id*`, the `lang_pref` cookie does not exist, and `navigator.languages` holds an entry that starts with `id`.
+- Content: Also available in Indonesian. + a Lihat versi Indonesia button + a close button (cross icon, `aria-label` Dismiss).
+- Lihat versi Indonesia → set `lang_pref=id` → open the matching ID page. Close → set `lang_pref=en` → the banner goes away. Both are permanent until the cookie expires.
+- On mobile it does not show at the same time as O-03: if O-03 shows, O-02 waits until O-03 is closed.
 
 ### O-03 Cookie consent
 
-- Muncul jika cookie `consent` belum ada. Posisi: bar di bawah layar (mobile full-width, desktop kartu kanan bawah maks 420 px). Tidak menutupi CTA hero di 375 × 667.
-- Isi: 1–2 kalimat `[consent.body]` + link Privacy + tombol Accept dan Reject dengan bobot visual setara (tanpa dark pattern).
-- Accept → `consent=granted` → update Consent Mode (`analytics_storage: granted`) → GA4 mengirim `page_view` halaman saat ini. Reject → `consent=denied`, GA4 tidak menyimpan cookie.
-- Link footer Cookie settings dan tombol di S-03 membuka O-03 lagi dengan pilihan saat ini ditandai. Mengubah dari granted ke denied juga menghapus cookie `_ga*` yang ada.
-- User mengabaikan banner: dianggap denied, banner muncul lagi di halaman berikutnya.
+- Shows when the `consent` cookie does not exist yet. Position: a bar at the bottom of the screen (full width on mobile, a bottom-right card max. 420 px on desktop). It does not cover the hero CTA at 375 × 667.
+- Content: 1–2 sentences `[consent.body]` + Privacy link + Accept and Reject buttons with equal visual weight (no dark pattern).
+- Accept → `consent=granted` → update Consent Mode (`analytics_storage: granted`) → GA4 sends `page_view` for the current page. Reject → `consent=denied`, GA4 stores no cookie.
+- The Cookie settings footer link and the button in S-03 open O-03 again with the current choice marked. Changing from granted to denied also deletes the existing `_ga*` cookies.
+- The user ignores the banner: treated as denied, the banner shows again on the next page.
 
-### O-04 Toggle tema
+### O-04 Theme toggle
 
-- Tombol ikon dengan label teks tersembunyi (`aria-label` `[theme.toLight]`/`[theme.toDark]` sesuai tema sekarang).
-- Klik → set `data-theme` di `<html>`, simpan `rr-theme`, event `theme_switch` (jika consent).
-- Skrip inline di `<head>` (sebelum paint) menerapkan urutan D-23/D-36: query `?theme=` → `rr-theme` → `dark`; setelan perangkat tidak dipakai; tidak ada flash tema salah.
-- Transisi warna 300 ms; reduced motion → seketika. Tanpa JS toggle tidak tampil (E-07); `localStorage` diblokir → E-31.
+- Icon button with a hidden text label (`aria-label` `[theme.toLight]`/`[theme.toDark]` according to the current theme).
+- Click → set `data-theme` on `<html>`, store `rr-theme`, `theme_switch` event (with consent).
+- An inline script in `<head>` (before paint) applies the D-23/D-36 order: `?theme=` query → `rr-theme` → `dark`; the device setting is not used; no flash of the wrong theme.
+- 300 ms color transition; reduced motion → instant. Without JS the toggle does not show (E-07); `localStorage` blocked → E-31.
 
-### O-05 Lapisan pointer (publik, desktop mouse)
+### O-05 Pointer layer (public, desktop mouse)
 
-- Aktif hanya bila `(hover: hover) and (pointer: fine)` cocok dan event berasal dari `pointerType === "mouse"` (D-31); komponen `PointerLayer` dimuat terpisah setelah idle, tidak pernah di layar sentuh. Media query berubah → lapisan dimatikan dan semua class dibersihkan.
-- Elemen `aria-hidden`: `.spot` (cahaya ±820 px, warna dan kekuatan per bab lewat `data-zone` di `<html>`), `.cur-dot`, `.cur-ring` (dengan label), `.peek` (screenshot atau kartu angka per proyek published yang tampil di halaman itu, dirender server). Saat aktif, cahaya CSS statis per bab disembunyikan.
-- Pemicu: elemen dengan `data-cursor` (`read`|`visit`) memberi label `[cur.read]`/`[cur.visit]`; `a, button` lain membuat cincin membesar tanpa label; elemen `data-preview="<slug>"` (judul Selected work, `<summary>` baris Work) menampilkan preview proyek itu (340 px, 16:10); `.shot` menerima tilt (maks. sekitar 6°, 500 ms). Menekan mouse → cincin mengecil.
-- Zona cahaya: IntersectionObserver (`rootMargin: -45% 0 -45% 0`) menulis `data-zone`; tanpa listener `scroll` (D-33). Satu loop `requestAnimationFrame` yang berhenti saat semua sudah di posisi kursor (selisih < 0,4 px); hanya `transform` dan `opacity` (D-32).
-- Reduced motion: titik dan cincin tetap tanpa lag, tanpa tilt, cahaya dan preview tanpa transisi (D-34).
-- Fokus keyboard (`:focus-visible`) → lapisan disembunyikan dan kursor bawaan kembali sampai mouse bergerak lagi (D-35). Keluar dari jendela → semua disembunyikan. Edge case: E-33, E-34.
+- Active only when `(hover: hover) and (pointer: fine)` matches and the event comes from `pointerType === "mouse"` (D-31); the `PointerLayer` component is loaded separately after idle, never on touch screens. The media query changes → the layer is turned off and every class is cleaned up.
+- `aria-hidden` elements: `.spot` (light ~820 px, color and strength per chapter through `data-zone` on `<html>`), `.cur-dot`, `.cur-ring` (with a label), `.peek` (screenshot or numbers card for each published project shown on that page, rendered by the server). While active, the static CSS light per chapter is hidden.
+- Triggers: elements with `data-cursor` (`read`|`visit`) give the label `[cur.read]`/`[cur.visit]`; other `a, button` make the ring grow without a label; `data-preview="<slug>"` elements (Selected work title, Work row `<summary>`) show that project's preview (340 px, 16:10); `.shot` gets tilt (max. about 6°, 500 ms). Pressing the mouse → the ring shrinks.
+- Light zones: an IntersectionObserver (`rootMargin: -45% 0 -45% 0`) writes `data-zone`; no `scroll` listener (D-33). One `requestAnimationFrame` loop that stops once everything is at the cursor position (difference < 0.4 px); only `transform` and `opacity` (D-32).
+- Reduced motion: the dot and ring stay without lag, no tilt, light and preview without transitions (D-34).
+- Keyboard focus (`:focus-visible`) → the layer is hidden and the native cursor comes back until the mouse moves again (D-35). Leaving the window → everything is hidden. Edge cases: E-33, E-34.
 
-## 6. Spesifikasi layar admin
+## 6. Admin screen specs
 
-Semua layar admin memakai shell G3, satu kolom di < 768 px, input font ≥ 16 px, dan tombol aksi utama selalu terlihat tanpa scroll horizontal.
+Every admin screen uses the G3 shell, one column below 768 px, input font ≥ 16 px, and the main action buttons are always visible with no horizontal scroll.
 
 ### S-10 Login (`/admin/login`)
 
-| Elemen | Aturan |
+| Element | Rule |
 | --- | --- |
 | Heading | "Sign in" |
-| Email | `type=email`, `autocomplete=username`, wajib |
-| Password | `type=password`, `autocomplete=current-password`, wajib, tombol show/hide |
-| Tombol | "Sign in"; saat submit → disabled + spinner, teks "Signing in…" |
-| Error kredensial | Di atas form: "Email or password is incorrect." Field password dikosongkan, fokus ke password. |
-| Error rate limit | "Too many attempts. Try again in {n} minutes." Tombol disabled sampai waktu habis. |
-| Sukses | Redirect ke `next` (jika path `/admin*` yang valid) atau `/admin`. |
+| Email | `type=email`, `autocomplete=username`, required |
+| Password | `type=password`, `autocomplete=current-password`, required, show/hide button |
+| Button | "Sign in"; on submit → disabled + spinner, text "Signing in…" |
+| Credential error | Above the form: "Email or password is incorrect." The password field is cleared, focus goes to password. |
+| Rate limit error | "Too many attempts. Try again in {n} minutes." The button is disabled until the time is up. |
+| Success | Redirect to `next` (when it is a valid `/admin*` path) or `/admin`. |
 
-Tidak ada link "forgot password" dan "sign up". Reset password dilakukan manual lewat skrip/ENV (dijelaskan di SDD).
+No "forgot password" and no "sign up" links. Password reset is done manually through a script/ENV (explained in the SDD).
 
 ### S-11 Project list (`/admin`)
 
-- Header halaman: "Projects" + jumlah ("2 projects") + tombol primer "New project" → S-12.
-- Daftar baris (desktop: tabel; mobile: kartu bertumpuk), urut posisi (`sort_order`) asc. Kolom: # posisi · Visual (thumbnail 64 × 40 atau angka kartu) · Judul EN (link ke S-13) + meta kecil · Grup · Status (Published/Draft) · Tampil (Homepage / Work page only) · Diperbarui (relatif) · ↑/↓ · Edit. Filter grup di atas daftar (client-only, tidak mengubah urutan).
-- **Urutan (T-18b):** tombol ↑ / ↓ (44 × 44 px, label "Move {title} up/down") menukar project dengan tetangganya lewat API-08 dan langsung tersimpan; ↑ nonaktif di #1, ↓ nonaktif di posisi terakhir. Fokus tetap di tombol yang ditekan, posisi baru diumumkan ke pembaca layar. Posisi selalu 1…n tanpa angka kembar; tidak ada field urutan di form. Tanpa drag-and-drop, inline toggle, atau bulk action; perubahan lain lewat S-13.
-- Header admin (G3) punya navigasi "Projects" · "Profile" (S-14).
-- Info di bawah header: "{n} projects · {p} published · {d} drafts"; "Selected work on the homepage: {k} of 5. Turn one off before adding another." (kuning bila k = 5); "The order here is the order on the site. Use ↑ and ↓ to move a project."
-- Empty state (0 project): "No projects yet. Add your first one to show it on the site." + tombol "New project".
-- Toast sukses dari aksi sebelumnya ("Project created", "Changes saved", "Project deleted") tampil 4 detik, `role=status`.
+- Page header: "Projects" + count ("2 projects") + primary button "New project" → S-12.
+- List of rows (desktop: table; mobile: stacked cards), ordered by position (`sort_order`) asc. Columns: # position · Visual (64 × 40 thumbnail or card number) · EN title (link to S-13) + small meta · Group · Status (Published/Draft) · Shown (Homepage / Work page only) · Updated (relative) · ↑/↓ · Edit. Group filter above the list (client-only, does not change the order).
+- **Order (T-18b):** ↑ / ↓ buttons (44 × 44 px, label "Move {title} up/down") swap the project with its neighbor through API-08 and save right away; ↑ is disabled at #1, ↓ is disabled at the last position. Focus stays on the pressed button, and the new position is announced to screen readers. Positions are always 1…n with no duplicates; there is no order field in the form. No drag-and-drop, inline toggle or bulk action; other changes go through S-13.
+- The admin header (G3) has the navigation "Projects" · "Profile" (S-14).
+- Info below the header: "{n} projects · {p} published · {d} drafts"; "Selected work on the homepage: {k} of 5. Turn one off before adding another." (yellow when k = 5); "The order here is the order on the site. Use ↑ and ↓ to move a project."
+- Empty state (0 projects): "No projects yet. Add your first one to show it on the site." + a "New project" button.
+- Success toast from the previous action ("Project created", "Changes saved", "Project deleted") shows for 4 seconds, `role=status`.
 
-### S-12 New project dan S-13 Edit project
+### S-12 New project and S-13 Edit project
 
-Form yang sama. S-13 terisi data dan punya zona hapus.
+The same form. S-13 is filled with data and has a delete zone.
 
-| # | Bagian | Field | Tipe UI | Validasi | Wajib untuk Publish |
+| # | Section | Field | UI type | Validation | Required to publish |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Basics | Title EN / ID | text + counter | 1–80 | ya |
-| 2 | Basics | Group | segmented: Panasonic / Websites / AI tools | enum `panasonic`\|`web`\|`ai` | ya (default `web`) |
-| 3 | Basics | Meta line EN / ID | text + counter | 1–40, mis. "Panasonic · 13 companies" | ya |
-| 4 | Basics | Side EN / ID | text + counter | 0–20, mis. "2022–now", "WordPress"; bantuan: "Right column on the Work page, and the end of the homepage label." | tidak |
-| 5 | Homepage | Short description EN / ID | textarea + counter | 1–160 (kolom `summary`) | ya |
-| 6 | Homepage | Show in Selected work | switch | maks. 5 proyek dengan saklar on (termasuk draft); ke-6 → E-26 | tidak |
-| 7 | Case | What it is EN / ID | textarea + counter | 1–220 | ya |
-| 8 | Case | What I did EN / ID | daftar baris (+ Add a line, × hapus, urutan tetap; paste beberapa baris mengisi satu baris per kolom) | 1–8 baris per bahasa, tiap baris 1–160; baris kosong dibuang saat simpan | ya (≥ 1 baris per bahasa) |
-| 9 | Case | Stack | chip (Enter/koma) | 0–6 item, 1–24 karakter, unik (kolom `tags`) | tidak |
-| 10 | Case | Status EN / ID | text | 1–40, mis. "Live, 2022–now" | ya |
-| 11 | Button on the case | Case action | radio: Open the live site / Email to ask for a walkthrough / No button | enum `site`\|`walkthrough`\|`none` | ya (default `site`) |
-| 12 | Button on the case | Live URL | url, "optional" | kosong atau `https://` valid maks. 300; **wajib bila case action = site** | kondisional |
-| 13 | Visual | Visual type | segmented: Screenshot / Number card | enum `screenshot`\|`number` | ya (default `screenshot`) |
-| 14 | Visual | Screenshot + alt EN/ID | ImageUploader (16:10) + text | JPG/PNG/WebP, ≤ 5 MB, min 1200 px lebar, dicrop 16:10; alt 1–140; wajib bila type = screenshot | kondisional |
-| 15 | Visual | Number + Caption EN/ID | text + counter | number 1–12 (mis. "13", "5 → 1"); caption 1–60; wajib bila type = number | kondisional |
-| 16 | Publishing | Published | switch | Publish butuh semua kolom "ya" + kondisional valid | — |
+| 1 | Basics | Title EN / ID | text + counter | 1–80 | yes |
+| 2 | Basics | Group | segmented: Panasonic / Websites / AI tools | enum `panasonic`\|`web`\|`ai` | yes (default `web`) |
+| 3 | Basics | Meta line EN / ID | text + counter | 1–40, e.g. "Panasonic · 13 companies" | yes |
+| 4 | Basics | Side EN / ID | text + counter | 0–20, e.g. "2022–now", "WordPress"; help: "Right column on the Work page, and the end of the homepage label." | no |
+| 5 | Homepage | Short description EN / ID | textarea + counter | 1–160 (`summary` column) | yes |
+| 6 | Homepage | Show in Selected work | switch | max. 5 projects with the switch on (drafts included); the 6th → E-26 | no |
+| 7 | Case | What it is EN / ID | textarea + counter | 1–220 | yes |
+| 8 | Case | What I did EN / ID | list of lines (+ Add a line, × remove, fixed order; pasting several lines fills one line per field) | 1–8 lines per language, each line 1–160; empty lines are dropped on save | yes (≥ 1 line per language) |
+| 9 | Case | Stack | chips (Enter/comma) | 0–6 items, 1–24 characters, unique (`tags` column) | no |
+| 10 | Case | Status EN / ID | text | 1–40, e.g. "Live, 2022–now" | yes |
+| 11 | Button on the case | Case action | radio: Open the live site / Email to ask for a walkthrough / No button | enum `site`\|`walkthrough`\|`none` | yes (default `site`) |
+| 12 | Button on the case | Live URL | url, "optional" | empty or a valid `https://` max. 300; **required when case action = site** | conditional |
+| 13 | Visual | Visual type | segmented: Screenshot / Number card | enum `screenshot`\|`number` | yes (default `screenshot`) |
+| 14 | Visual | Screenshot + alt EN/ID | ImageUploader (16:10) + text | JPG/PNG/WebP, ≤ 5 MB, min 1200 px wide, cropped 16:10; alt 1–140; required when type = screenshot | conditional |
+| 15 | Visual | Number + Caption EN/ID | text + counter | number 1–12 (e.g. "13", "5 → 1"); caption 1–60; required when type = number | conditional |
+| 16 | Publishing | Published | switch | Publish needs every "yes" field + valid conditionals | — |
 
-- Bantuan bagian Visual: "Used for the homepage picture and the preview next to the cursor on the Work page." Data screenshot dan number boleh tersimpan bersamaan; yang dipakai mengikuti `visual_type`.
-- Saat Live URL kosong dan case action = site → error "Add a live URL, or choose another button."
-- Panel preview di ≥ 1024 px (sticky di samping form, tersembunyi di bawahnya): "Preview on the homepage" (label meta · side, judul, deskripsi) dan "Preview next to the cursor" (screenshot atau kartu angka; visual belum lengkap → teks petunjuk, sama dengan E-33). Diperbarui saat mengetik tanpa menyimpan; EN dengan tombol ganti ke ID.
-- Layout: form dibagi per bagian (tabel di atas); field EN dan ID berdampingan di ≥ 1024 px, bertumpuk (EN dulu) di bawahnya. Tidak memakai tab bahasa supaya kedua versi terlihat bersamaan.
-- Tombol bawah (sticky di mobile): "Save" primer + "Cancel" sekunder. Save disabled saat upload berjalan.
-- Validasi client saat blur + validasi server saat submit; pesan error di bawah field, menyebut cara memperbaiki (bagian 11). Saat submit gagal, fokus pindah ke field error pertama dan ringkasan error muncul di atas form.
-- Cancel dengan perubahan belum disimpan → dialog "Discard changes?" (Discard / Keep editing). Navigasi browser keluar juga memicu peringatan `beforeunload`.
-- ImageUploader: pilih file → validasi tipe & ukuran di client → kompres di browser (crop 16:10, 4 lebar WebP) → upload langsung (API-06) dengan progress bar → preview → tombol "Replace" dan "Remove". Gambar lama di storage baru dihapus setelah project berhasil disimpan dengan gambar baru.
-- **Zona hapus (S-13 saja):** di paling bawah, dipisah garis, tombol merah "Delete project" → ConfirmDialog "Delete {title EN}? This removes it from the site and deletes its image. This can't be undone." (Delete / Cancel). Fokus awal di Cancel.
+- Help for the Visual section: "Used for the homepage picture and the preview next to the cursor on the Work page." Screenshot and number data may be stored at the same time; the one used follows `visual_type`.
+- When Live URL is empty and case action = site → error "Add a live URL, or choose another button."
+- Preview panel at ≥ 1024 px (sticky beside the form, hidden below that): "Preview on the homepage" (meta · side label, title, description) and "Preview next to the cursor" (screenshot or numbers card; an incomplete visual → hint text, the same as E-33). It updates while typing without saving; EN with a button to switch to ID.
+- Layout: the form is split by section (table above); EN and ID fields sit side by side at ≥ 1024 px and stack (EN first) below that. No language tabs, so both versions are visible at the same time.
+- Bottom buttons (sticky on mobile): primary "Save" + secondary "Cancel". Save is disabled while an upload runs.
+- Client validation on blur + server validation on submit; the error message sits below the field and says how to fix it (section 11). When submit fails, focus moves to the first error field and an error summary appears above the form.
+- Cancel with unsaved changes → "Discard changes?" dialog (Discard / Keep editing). Leaving through browser navigation also triggers a `beforeunload` warning.
+- ImageUploader: pick a file → type & size validation on the client → compress in the browser (16:10 crop, 4 WebP widths) → direct upload (API-06) with a progress bar → preview → "Replace" and "Remove" buttons. The old image in storage is deleted only after the project is saved with the new image.
+- **Delete zone (S-13 only):** at the very bottom, separated by a line, a red "Delete project" button → ConfirmDialog "Delete {title EN}? This removes it from the site and deletes its image. This can't be undone." (Delete / Cancel). Initial focus on Cancel.
 
 ### S-14 Profile (`/admin/profile`)
 
 - Heading "Profile".
-- Photo: ImageUploader mode avatar, JPG/PNG/WebP ≤ 5 MB, minimal 640 × 640 px, dicrop persegi di tengah, dikompres di browser ke 320 dan 640 px; preview bulat; Replace / Remove. Bantuan: "Shown as a small circle next to your role in the hero. Upload at least 640 × 640 px so it stays sharp." Foto 320 px lama tetap tampil sampai diganti (E-32). Tanpa foto → inisial "RR".
-- Availability: satu switch "Show availability" + bantuan "Hide it when you are not taking new work, or when you'd rather people at work didn't see it." Tidak ada field teks (D-16).
-- Tombol "Save" (nonaktif selama upload atau jika tidak ada perubahan) → API-09 (foto dan availability disimpan dalam satu transaksi) → revalidasi semua halaman publik → toast "Profile saved" (kuning jika revalidasi gagal, E-19).
+- Photo: ImageUploader in avatar mode, JPG/PNG/WebP ≤ 5 MB, at least 640 × 640 px, center-cropped square, compressed in the browser to 320 and 640 px; round preview; Replace / Remove. Help: "Shown as a small circle next to your role in the hero. Upload at least 640 × 640 px so it stays sharp." An old 320 px photo keeps showing until it is replaced (E-32). No photo → initials "RR".
+- Availability: one "Show availability" switch + help "Hide it when you are not taking new work, or when you'd rather people at work didn't see it." No text field (D-16).
+- "Save" button (disabled during an upload or when nothing changed) → API-09 (photo and availability saved in one transaction) → revalidate every public page → toast "Profile saved" (yellow if revalidation fails, E-19).
 
 ## 7. User flows
 
-10 flow di bawah adalah semua jalur yang harus berfungsi. Setiap langkah menyebut layar dan hasil yang diharapkan.
+The 10 flows below are every path that must work. Each step names the screen and the expected result.
 
-### UF-01 Recruiter menilai Pal (EN) — flow utama
+### UF-01 A recruiter evaluates Pal (EN) — main flow
 
-1. Recruiter membuka tautan dari LinkedIn di HP → S-01; O-03 tampil.
-2. Membaca label peran, H1, sub, stack.
-3. Gulir ke Selected work; tap judul "HR System" → S-02 `#case-hr-system` terbuka (`case_open` source `home_title`).
-4. Membaca case; tap "Email to ask for a walkthrough" → mail app dengan subject "Walkthrough: HR System" dan body terisi (`contact_email_click` kind `walkthrough`, location `case`).
-5. Alternatif: kembali ke home → About → Download CV (`cv_download` location `about`), atau Contact → "Email about a full-time role" (kind `role`).
+1. The recruiter opens a link from LinkedIn on a phone → S-01; O-03 shows.
+2. Reads the role label, H1, sub, stack.
+3. Scrolls to Selected work; taps the "HR System" title → S-02 `#case-hr-system` opens (`case_open` source `home_title`).
+4. Reads the case; taps "Email to ask for a walkthrough" → mail app with the subject "Walkthrough: HR System" and a filled body (`contact_email_click` kind `walkthrough`, location `case`).
+5. Alternative: back to home → About → Download CV (`cv_download` location `about`), or Contact → "Email about a full-time role" (kind `role`).
 
-### UF-02 Pengunjung lokal pindah ke versi Indonesia
+### UF-02 A local visitor moves to the Indonesian version
 
-1. Pengunjung dengan browser berbahasa Indonesia membuka `/` → S-01 EN + O-02 muncul (jika O-03 tidak sedang tampil di mobile).
-2. Klik "Lihat versi Indonesia" → `lang_pref=id` → `/id`.
-3. Kunjungan berikutnya ke `/`: O-02 tidak muncul lagi (cookie ada); pengunjung tetap bisa pakai toggle.
-4. Alternatif: klik tutup di O-02 → `lang_pref=en`, tetap di EN.
+1. A visitor with an Indonesian-language browser opens `/` → S-01 EN + O-02 appears (if O-03 is not showing on mobile).
+2. Clicks "Lihat versi Indonesia" → `lang_pref=id` → `/id`.
+3. Next visit to `/`: O-02 does not appear again (the cookie exists); the visitor can still use the toggle.
+4. Alternative: clicks close on O-02 → `lang_pref=en`, stays on EN.
 
-### UF-03 Menghubungi via email
+### UF-03 Contact via email
 
-1. Klik tombol email (bar, hero, Contact, Contact penutup S-02, atau tombol walkthrough di case) → event `contact_email_click` dengan `kind` dan `location` → browser membuka `mailto:hello@rifaldiradya.com` dengan subject dan body sesuai jenis dan locale (bagian 11).
-2. Jika tidak ada mail client, pengunjung memakai tombol "Copy email" di Contact → alamat tersalin → label berubah jadi "Copied" 2 detik (`aria-live=polite`).
-3. Jika Clipboard API gagal (E-09) → alamat teks terseleksi otomatis supaya bisa disalin manual.
+1. Click an email button (bar, hero, Contact, S-02 closing Contact, or the walkthrough button in a case) → `contact_email_click` event with `kind` and `location` → the browser opens `mailto:hello@rifaldiradya.com` with the subject and body for that kind and locale (section 11).
+2. If there is no mail client, the visitor uses the "Copy email" button in Contact → the address is copied → the label changes to "Copied" for 2 seconds (`aria-live=polite`).
+3. If the Clipboard API fails (E-09) → the address text is selected automatically so it can be copied by hand.
 
-### UF-04 Ganti bahasa lewat toggle
+### UF-04 Switch language with the toggle
 
-1. Di halaman mana pun, klik bahasa yang tidak aktif di O-01.
-2. `lang_pref` diset → pindah ke path padanan (termasuk hash) → halaman tujuan tampil di locale baru; O-02 tidak muncul.
+1. On any page, click the inactive language in O-01.
+2. `lang_pref` is set → move to the matching path (including the hash) → the target page shows in the new locale; O-02 does not appear.
 
-### UF-05 Mengatur consent
+### UF-05 Manage consent
 
-1. Kunjungan pertama → O-03 tampil.
-2. Accept → GA4 aktif mulai halaman ini. Reject → tidak ada GA4.
-3. Kapan pun: footer "Cookie settings" → O-03 dengan pilihan saat ini → ubah → berlaku langsung tanpa reload.
+1. First visit → O-03 shows.
+2. Accept → GA4 is active from this page. Reject → no GA4.
+3. Any time: footer "Cookie settings" → O-03 with the current choice → change → applies right away without a reload.
 
 ### UF-06 Admin login
 
-1. Pal membuka `/admin` → tidak ada sesi → redirect `/admin/login?next=/admin`.
-2. Isi email + password → Sign in → API-01.
-3. Sukses → cookie sesi → redirect ke `next`. Gagal → pesan error (S-10), tetap di halaman.
+1. Pal opens `/admin` → no session → redirect `/admin/login?next=/admin`.
+2. Fill in email + password → Sign in → API-01.
+3. Success → session cookie → redirect to `next`. Failure → error message (S-10), stays on the page.
 
-### UF-07 Tambah project baru
+### UF-07 Add a new project
 
-&#91;embedded content: UF-07 tambah project · 6 langkah, 1 validasi server\]
+&#91;embedded content: UF-07 add project · 6 steps, 1 server validation\]
 
-1. Di S-11 klik "New project" → S-12 kosong, Published off, Show in Selected work off. Setelah disimpan, project baru otomatis di posisi #1 dan yang lain mundur satu.
-2. Isi Basics, Homepage, Case (EN dan ID), tombol case (+ Live URL bila situs).
-3. Visual: upload screenshot → API-06 → preview tampil, isi alt EN dan ID; atau isi kartu angka.
-4. Nyalakan Published (dan Show in Selected work bila perlu) → Save → API-03.
-5. Server menolak (422) → error per field, semua input tetap, fokus ke error pertama; perbaiki lalu Save lagi.
-6. Server menerima → simpan → revalidasi `/`, `/work`, `/id`, `/id/work` → redirect S-11 + toast "Project created".
-7. Buka situs publik: project tampil di S-02 (dan Selected work di S-01 bila Show in Selected work on) dalam ≤ 60 detik.
+1. In S-11 click "New project" → empty S-12, Published off, Show in Selected work off. Once saved, the new project goes to position #1 automatically and the others move down one.
+2. Fill in Basics, Homepage, Case (EN and ID), the case button (+ Live URL for a site).
+3. Visual: upload a screenshot → API-06 → the preview shows, fill in the EN and ID alt; or fill in the numbers card.
+4. Turn on Published (and Show in Selected work if needed) → Save → API-03.
+5. The server rejects it (422) → errors per field, every input stays, focus on the first error; fix it and Save again.
+6. The server accepts it → save → revalidate `/`, `/work`, `/id`, `/id/work` → redirect S-11 + toast "Project created".
+7. Open the public site: the project shows in S-02 (and in Selected work in S-01 when Show in Selected work is on) within ≤ 60 seconds.
 
-### UF-08 Edit atau unpublish project
+### UF-08 Edit or unpublish a project
 
-1. S-11 → klik judul/Edit → S-13 terisi.
-2. Ubah field (mis. matikan Published untuk menyembunyikan) → Save → API-04 → revalidasi 4 halaman → S-11 + toast "Changes saved".
-3. Project unpublished hilang dari situs publik dalam ≤ 60 detik, tetap ada di S-11 dengan badge Draft.
+1. S-11 → click title/Edit → filled S-13.
+2. Change fields (e.g. turn off Published to hide it) → Save → API-04 → revalidate 4 pages → S-11 + toast "Changes saved".
+3. The unpublished project disappears from the public site within ≤ 60 seconds and stays in S-11 with a Draft badge.
 
-### UF-09 Hapus project
+### UF-09 Delete a project
 
 1. S-13 → "Delete project" → ConfirmDialog.
-2. Delete → API-05 → data dan gambar dihapus → revalidasi → S-11 + toast "Project deleted". Cancel → dialog tertutup, tidak ada perubahan.
+2. Delete → API-05 → data and image are deleted → revalidate → S-11 + toast "Project deleted". Cancel → the dialog closes, nothing changes.
 
-### UF-10 Logout & sesi habis
+### UF-10 Logout & expired session
 
-1. Klik Logout → API-02 → cookie sesi dihapus → S-10.
-2. Sesi habis saat mengisi form → Save mengembalikan 401 → form tidak dikosongkan, muncul pesan "Your session expired. Sign in again in a new tab, then save." dengan link login `target=_blank` (E-11).
+1. Click Logout → API-02 → the session cookie is deleted → S-10.
+2. The session expires while filling a form → Save returns 401 → the form is not cleared, and the message "Your session expired. Sign in again in a new tab, then save." appears with a `target=_blank` login link (E-11).
 
-## 8. State & edge case
+## 8. States & edge cases
 
-Setiap edge case di bawah wajib ditangani persis seperti kolom "Perilaku"; tidak boleh ada layar kosong, error mentah, atau stack trace yang terlihat pengunjung.
+Every edge case below must be handled exactly as in the "Behavior" column; there must be no empty screen, raw error or stack trace visible to visitors.
 
-| ID | Layar | Kondisi | Perilaku |
+| ID | Screen | Condition | Behavior |
 | --- | --- | --- | --- |
-| E-01 | S-01, S-02 | 0 project published | S-01: bab Selected work tidak dirender (E-25). S-02: teks `[work.empty]` "New work is on the way. Meanwhile, here's how to reach me." + tombol ke `#contact`. |
-| E-02 | S-01, S-02 | Database tidak bisa diakses saat revalidasi | Halaman statis terakhir tetap disajikan; error dicatat di log server. Build pertama tanpa DB → render E-01, bukan gagal build. |
-| E-03 | S-01 | `show_on_home` > 5 (data lama) | Selected work: 5 teratas menurut urutan. Sisanya tetap tampil di S-02. |
-| E-05 | S-01 | Screenshot gagal dimuat | Ruang screenshot tetap dicadangkan; judul, deskripsi, dan tautan tetap berfungsi. |
-| E-06 | S-01, S-02 | Situs live sedang down | Di luar kendali situs; tidak ada pengecekan otomatis. Pal mengganti case action atau menonaktifkan Published secara manual jika perlu. |
-| E-07 | Semua publik | JavaScript mati | Semua konten, link, toggle bahasa (link biasa), dan mailto tetap berfungsi; tema selalu gelap (D-36) dan toggle tema tidak tampil; baris case tetap bisa dibuka, filter tidak tampil, jam statis "GMT+7"; O-02, O-03, GA4, Copy email tidak muncul. |
-| E-09 | Contact | Clipboard API tidak tersedia/ditolak | Alamat email terseleksi otomatis + tooltip "Press Ctrl/Cmd+C to copy". |
-| E-10 | S-10 | 5 login gagal dalam 15 menit dari satu IP, atau 20 dari semua IP | 429 + pesan rate limit; tombol disabled sampai waktu habis. |
-| E-11 | S-12, S-13 | Sesi habis saat submit | 401, input dipertahankan, pesan + link login di tab baru (UF-10). |
-| E-12 | S-12, S-13 | Upload gagal (jaringan, file rusak, > 5 MB, tipe salah) | Pesan spesifik di bawah uploader (bagian 11), tombol Retry; field lain tidak terganggu; Save disabled selama upload berjalan. |
-| E-13 | S-12, S-13 | Save gagal karena error server (500) | Toast merah "Couldn't save. Your changes are still here — try again.", input dipertahankan. |
-| E-14 | S-13 | Project sudah dihapus di tab lain | Save/Delete mengembalikan 404 → redirect S-11 + toast "This project no longer exists." |
-| E-15 | S-13 | Dua tab mengedit project yang sama | v1: last write wins (hanya 1 admin). Tidak ada locking. |
-| E-16 | S-12, S-13 | Published on tapi field wajib publish belum lengkap | Validasi menolak dengan pesan di field terkait; saran "Turn off Published to save as draft." |
-| E-17 | S-12, S-13 | Draft disimpan tanpa visual | Diizinkan; di S-11 kolom Visual tampil kosong. |
-| E-18 | Semua publik | Path tak dikenal | S-04 dengan status 404 di locale sesuai prefix. |
-| E-19 | Revalidasi | Revalidasi gagal setelah simpan | Data tetap tersimpan; toast kuning "Saved, but the site may take a few minutes to update."; halaman tetap bisa revalidasi berbasis waktu (maks 1 jam) sebagai jaring pengaman. |
-| E-20 | Semua | Teks ID jauh lebih panjang dari EN | Layout tidak boleh pecah: tombol boleh turun baris, tidak ada teks terpotong; bab satu layar boleh lebih tinggi dari satu layar bila isinya panjang. |
-| E-25 | S-01 | Selected work 0 proyek (`show_on_home` kosong) | Bab Selected work tidak dirender; Hero "Scroll ↓" menuju `#about`; S-02 tetap menampilkan semua proyek. |
-| E-26 | S-12, S-13, API-03/04 | Saklar Show in Selected work ke-6 | Saklar nonaktif di UI dengan teks bantuan; server menolak dengan 422 bila tetap dikirim. |
-| E-27 | S-02 | Proyek published dari v1 tanpa field v2 | Baris tampil dengan judul + summary; bagian case kosong disembunyikan; tanpa tombol bila `live_url` kosong; tetap valid sampai diedit, saat Save wajib melengkapi field publish. |
-| E-28 | S-01, S-02 | `case_action = site` tetapi `live_url` kosong (data lama/rusak) | Perlakukan sebagai `none`, catat peringatan di log server. |
-| E-29 | S-02 | `#case-<slug>` tidak ada atau proyeknya draft | Halaman Work dibuka di atas, tanpa error. |
-| E-30 | S-01 | Browser tanpa `animation-timeline` (Firefox saat ini) atau reduced motion | Semua bab tampil sebagai tumpukan statis dalam keadaan akhir (statement penuh, angka akhir, "five passwords" sudah dicoret), Selected work sebagai daftar biasa, scroll snap mati saat reduced motion. |
-| E-31 | Semua | `localStorage` tidak tersedia (mode privat, diblokir) | Tema gelap; toggle tetap mengganti tema untuk sesi itu tanpa error. |
-| E-32 | S-01, S-14 | Avatar belum diganti (320 px) | Tetap tampil; tidak ada peringatan publik; S-14 menampilkan "Current file is 320 px. A larger one is recommended." |
-| E-33 | O-05 | Proyek tanpa visual yang valid (screenshot hilang atau kartu angka kosong) | Preview tidak ditampilkan untuk proyek itu; label kursor tetap. |
-| E-34 | O-05 | Halaman dibuka dengan mouse lalu beralih ke sentuh | Lapisan dimatikan pada `pointerType` pertama yang bukan mouse, dan dinyalakan lagi pada `pointermove` mouse berikutnya. |
+| E-01 | S-01, S-02 | 0 published projects | S-01: the Selected work chapter is not rendered (E-25). S-02: text `[work.empty]` "New work is on the way. Meanwhile, here's how to reach me." + a button to `#contact`. |
+| E-02 | S-01, S-02 | The database cannot be reached during revalidation | The last static page is still served; the error is written to the server log. A first build without a DB → render E-01, not a failed build. |
+| E-03 | S-01 | `show_on_home` > 5 (old data) | Selected work: the top 5 by order. The rest still show in S-02. |
+| E-05 | S-01 | Screenshot fails to load | The screenshot space stays reserved; the title, description and link still work. |
+| E-06 | S-01, S-02 | The live site is down | Outside the site's control; no automatic check. Pal changes the case action or turns off Published by hand if needed. |
+| E-07 | All public | JavaScript off | All content, links, the language toggle (plain links) and mailto still work; the theme is always dark (D-36) and the theme toggle does not show; case rows can still be opened, the filter does not show, the clock is static "GMT+7"; O-02, O-03, GA4, Copy email do not appear. |
+| E-09 | Contact | Clipboard API unavailable/denied | The email address is selected automatically + tooltip "Press Ctrl/Cmd+C to copy". |
+| E-10 | S-10 | 5 failed logins within 15 minutes from one IP, or 20 from all IPs | 429 + rate limit message; the button is disabled until the time is up. |
+| E-11 | S-12, S-13 | Session expires on submit | 401, input kept, message + login link in a new tab (UF-10). |
+| E-12 | S-12, S-13 | Upload fails (network, broken file, > 5 MB, wrong type) | A specific message below the uploader (section 11), a Retry button; other fields are not affected; Save is disabled while the upload runs. |
+| E-13 | S-12, S-13 | Save fails because of a server error (500) | Red toast "Couldn't save. Your changes are still here — try again.", input kept. |
+| E-14 | S-13 | The project was already deleted in another tab | Save/Delete returns 404 → redirect S-11 + toast "This project no longer exists." |
+| E-15 | S-13 | Two tabs edit the same project | v1: last write wins (only 1 admin). No locking. |
+| E-16 | S-12, S-13 | Published is on but the publish-required fields are not complete | Validation rejects it with a message on the related field; suggestion "Turn off Published to save as draft." |
+| E-17 | S-12, S-13 | A draft is saved without a visual | Allowed; in S-11 the Visual column shows empty. |
+| E-18 | All public | Unknown path | S-04 with status 404 in the locale of the prefix. |
+| E-19 | Revalidation | Revalidation fails after save | The data stays saved; yellow toast "Saved, but the site may take a few minutes to update."; pages can still revalidate on a time basis (max. 1 hour) as a safety net. |
+| E-20 | All | ID text is much longer than EN | The layout must not break: buttons may wrap, no text is cut off; a one-screen chapter may be taller than one screen when its content is long. |
+| E-25 | S-01 | Selected work has 0 projects (`show_on_home` empty) | The Selected work chapter is not rendered; Hero "Scroll ↓" goes to `#about`; S-02 still shows every project. |
+| E-26 | S-12, S-13, API-03/04 | The 6th Show in Selected work switch | The switch is disabled in the UI with help text; the server rejects it with 422 if it is sent anyway. |
+| E-27 | S-02 | A published v1 project without v2 fields | The row shows with title + summary; empty case parts are hidden; no button when `live_url` is empty; it stays valid until edited, and on Save the publish fields must be completed. |
+| E-28 | S-01, S-02 | `case_action = site` but `live_url` is empty (old/broken data) | Treat it as `none`, write a warning to the server log. |
+| E-29 | S-02 | `#case-<slug>` does not exist or the project is a draft | The Work page opens at the top, with no error. |
+| E-30 | S-01 | Browser without `animation-timeline` (Firefox today) or reduced motion | Every chapter shows as a static stack in its final state (full statement, final numbers, "five passwords" already struck through), Selected work as a plain list, scroll snap off under reduced motion. |
+| E-31 | All | `localStorage` unavailable (private mode, blocked) | Dark theme; the toggle still switches the theme for that session without errors. |
+| E-32 | S-01, S-14 | Avatar not replaced yet (320 px) | Still shows; no public warning; S-14 shows "Current file is 320 px. A larger one is recommended." |
+| E-33 | O-05 | A project without a valid visual (missing screenshot or empty numbers card) | No preview is shown for that project; the cursor label stays. |
+| E-34 | O-05 | The page is opened with a mouse and then switches to touch | The layer is turned off on the first `pointerType` that is not a mouse, and turned on again on the next mouse `pointermove`. |
 
 ## 9. Data model
 
-Satu entitas bisnis: **Project**, plus pengaturan situs. Kredensial admin dan sesi adalah data teknis; mekanisme penyimpanannya (tabel vs environment variable) diputuskan di SDD, tapi perilakunya dikunci di sini.
+One business entity: **Project**, plus site settings. Admin credentials and sessions are technical data; their storage mechanism (table vs environment variable) is decided in the SDD, but their behavior is locked here.
 
 ### Project
 
-| Field | Tipe | Wajib | Aturan | Dipakai di |
+| Field | Type | Required | Rule | Used in |
 | --- | --- | --- | --- | --- |
-| `id` | string (UUID/cuid) | ya | dibuat server, tidak bisa diubah | route S-13, API |
-| `slug` | string | ya | dibuat otomatis dari `title_en` (kebab-case, unik, ditambah `-2` jika bentrok); tidak ditampilkan di UI v1 | event analytics, schema, masa depan (case study) |
-| `title_en` / `title_id` | string | ya | 1–80 karakter, di-trim | Selected work, baris case, admin, schema |
-| `group` | enum `panasonic`\|`web`\|`ai` | ya | default `web` | filter S-02, S-11 |
-| `meta_en` / `meta_id` | string atau null | publish | 1–40 | baris case, label Selected work |
-| `side_en` / `side_id` | string atau null | tidak | 0–20 | kolom kanan baris case, akhir label Selected work |
-| `summary_en` / `summary_id` | string | ya | 1–160 karakter, di-trim, teks biasa (tanpa HTML/markdown) | deskripsi singkat di Selected work; pengganti `case_is` bila kosong (E-27) |
-| `case_is_en` / `case_is_id` | string atau null | publish | 1–220 | baris case |
-| `case_did_en` / `case_did_id` | string\[\] atau null | publish | 1–8 item, tiap 1–160 | baris case |
-| `tags` | string\[\] | tidak | 0–6 item, tiap item 1–24 karakter, unik (case-insensitive) | "Stack" di baris case |
-| `status_en` / `status_id` | string atau null | publish | 1–40 | baris case |
-| `case_action` | enum `site`\|`walkthrough`\|`none` | ya | default `site` | tombol baris case, tautan Selected work |
-| `live_url` | string atau null | bila `case_action = site` | URL valid, skema `https`, maks 300 | tautan situs, schema |
-| `visual_type` | enum `screenshot`\|`number` | ya | default `screenshot` | Selected work, S-11 |
-| `thumbnail` | objek atau null | bila `visual_type = screenshot` dan published | `{ public_id, url, width, height }` dari storage gambar | Selected work, admin |
-| `thumbnail_alt_en` / `thumbnail_alt_id` | string atau null | wajib jika ada thumbnail | 1–140 karakter | alt gambar |
-| `card_number` | string atau null | bila `visual_type = number` | 1–12 | kartu angka (preview samping kursor, O-05) |
-| `card_caption_en` / `card_caption_id` | string atau null | bila `visual_type = number` | 1–60 | kartu angka |
-| `show_on_home` | boolean | ya | default false; maks. 5 bernilai true (termasuk draft) | Selected work |
-| `sort_order` | integer | ya | posisi 1…n, unik, diatur server: project baru = 1 (yang lain +1), ↑/↓ menukar dua tetangga (API-08), hapus menutup celah; `updated_at` tidak berubah karena pergeseran posisi | urutan semua daftar |
-| `featured` | boolean | — | **deprecated**, tidak dibaca/ditulis (D-22) | — |
-| `published` | boolean | ya | default false | filter publik |
-| `created_at` / `updated_at` | datetime (UTC) | ya | diisi server | urutan sekunder, `lastmod` sitemap, S-11 |
+| `id` | string (UUID/cuid) | yes | created by the server, cannot be changed | S-13 route, API |
+| `slug` | string | yes | created automatically from `title_en` (kebab-case, unique, `-2` added on a clash); not shown in the v1 UI | analytics events, schema, future (case study) |
+| `title_en` / `title_id` | string | yes | 1–80 characters, trimmed | Selected work, case row, admin, schema |
+| `group` | enum `panasonic`\|`web`\|`ai` | yes | default `web` | S-02 filter, S-11 |
+| `meta_en` / `meta_id` | string or null | publish | 1–40 | case row, Selected work label |
+| `side_en` / `side_id` | string or null | no | 0–20 | right column of the case row, end of the Selected work label |
+| `summary_en` / `summary_id` | string | yes | 1–160 characters, trimmed, plain text (no HTML/markdown) | short description in Selected work; stands in for `case_is` when empty (E-27) |
+| `case_is_en` / `case_is_id` | string or null | publish | 1–220 | case row |
+| `case_did_en` / `case_did_id` | string\[\] or null | publish | 1–8 items, each 1–160 | case row |
+| `tags` | string\[\] | no | 0–6 items, each item 1–24 characters, unique (case-insensitive) | "Stack" in the case row |
+| `status_en` / `status_id` | string or null | publish | 1–40 | case row |
+| `case_action` | enum `site`\|`walkthrough`\|`none` | yes | default `site` | case row button, Selected work link |
+| `live_url` | string or null | when `case_action = site` | valid URL, `https` scheme, max. 300 | site link, schema |
+| `visual_type` | enum `screenshot`\|`number` | yes | default `screenshot` | Selected work, S-11 |
+| `thumbnail` | object or null | when `visual_type = screenshot` and published | `{ public_id, url, width, height }` from image storage | Selected work, admin |
+| `thumbnail_alt_en` / `thumbnail_alt_id` | string or null | required when there is a thumbnail | 1–140 characters | image alt |
+| `card_number` | string or null | when `visual_type = number` | 1–12 | numbers card (preview beside the cursor, O-05) |
+| `card_caption_en` / `card_caption_id` | string or null | when `visual_type = number` | 1–60 | numbers card |
+| `show_on_home` | boolean | yes | default false; max. 5 set to true (drafts included) | Selected work |
+| `sort_order` | integer | yes | position 1…n, unique, managed by the server: new project = 1 (others +1), ↑/↓ swaps two neighbors (API-08), delete closes the gap; `updated_at` does not change from a position shift | order of every list |
+| `featured` | boolean | — | **deprecated**, not read/written (D-22) | — |
+| `published` | boolean | yes | default false | public filter |
+| `created_at` / `updated_at` | datetime (UTC) | yes | filled by the server | secondary order, sitemap `lastmod`, S-11 |
 
-**Aturan turunan**
+**Derived rules**
 
-- Publik hanya melihat `published = true`. Draft tidak pernah bocor ke HTML, sitemap, schema, atau API publik.
-- Urutan standar: `sort_order` (posisi) asc; `created_at` desc hanya sebagai cadangan jika posisi kembar (tidak terjadi setelah migrasi 0003).
-- Menghapus project juga menghapus `thumbnail.public_id` di storage. Mengganti thumbnail menghapus gambar lama setelah simpan berhasil.
-- `lastmod` sitemap = `max(updated_at)` dari project published.
-- Selected work = `published AND show_on_home` urut `sort_order`, maks. 5.
-- Proyek published v1 yang belum diisi field v2 tetap valid dan tampil di S-02 dengan bagian case yang kosong disembunyikan (E-27), sampai diedit.
+- The public only sees `published = true`. Drafts never leak into HTML, the sitemap, schema or a public API.
+- Standard order: `sort_order` (position) asc; `created_at` desc only as a fallback when positions are equal (does not happen after migration 0003).
+- Deleting a project also deletes `thumbnail.public_id` in storage. Replacing a thumbnail deletes the old image after the save succeeds.
+- Sitemap `lastmod` = `max(updated_at)` of published projects.
+- Selected work = `published AND show_on_home` ordered by `sort_order`, max. 5.
+- Published v1 projects whose v2 fields are not filled in yet stay valid and show in S-02 with the empty case parts hidden (E-27), until edited.
 
-**DTO publik (bentuk data yang diterima komponen publik, per locale)**
+**Public DTO (the data shape public components receive, per locale)**
 
 ```json
 {
@@ -412,45 +412,45 @@ Satu entitas bisnis: **Project**, plus pengaturan situs. Kredensial admin dan se
 
 `visual` = `{ type: "screenshot", url, width, height, alt }` | `{ type: "number", number, caption }` | `null`.
 
-Contoh di atas hanya ilustrasi bentuk; isi project asli diisi Pal lewat admin.
+The example above only illustrates the shape; the real project content is filled in by Pal through the admin.
 
-### Pengaturan situs
+### Site settings
 
-- `availability_on` boolean, default true bila belum pernah disimpan (S-14).
-- `profile_photo` id gambar avatar atau null (S-14).
+- `availability_on` boolean, default true when never saved (S-14).
+- `profile_photo` avatar image id or null (S-14).
 
-### Admin credential & sesi (perilaku)
+### Admin credentials & session (behavior)
 
-- Tepat satu admin. Email + hash password (bcrypt/argon2) disimpan di sisi server, tidak pernah di repo atau client.
-- Sesi: token acak atau token bertanda tangan di cookie `admin_session` (G4), berlaku 7 hari, dicabut saat logout.
-- Rate limit login: 5 gagal / 15 menit / IP.
+- Exactly one admin. Email + password hash (bcrypt/argon2) stored on the server side, never in the repo or the client.
+- Session: a random token or a signed token in the `admin_session` cookie (G4), valid for 7 days, revoked on logout.
+- Login rate limit: 5 failures / 15 minutes / IP.
 
-## 10. Kontrak API admin
+## 10. Admin API contract
 
-Hanya admin yang menulis data; halaman publik membaca langsung di server saat render, jadi tidak ada API publik. Kontrak di bawah berlaku apakah SDD mengimplementasikannya sebagai Route Handler atau Server Action: input, output, dan kode error harus sama.
+Only the admin writes data; public pages read directly on the server during render, so there is no public API. The contract below holds whether the SDD implements it as a Route Handler or a Server Action: input, output and error codes must be the same.
 
-**Aturan umum**
+**General rules**
 
-- Semua endpoint di bawah `/api/admin/*`; semua kecuali API-01 butuh cookie `admin_session` valid → jika tidak: `401 UNAUTHENTICATED`.
-- Request tulis wajib same-origin (header `Origin` = domain situs) → jika tidak: `403 FORBIDDEN_ORIGIN`.
-- Body JSON kecuali API-06 (multipart). Validasi di server memakai aturan yang sama dengan bagian 6 dan 9.
-- Bentuk error selalu:
+- Every endpoint is under `/api/admin/*`; all except API-01 need a valid `admin_session` cookie → otherwise: `401 UNAUTHENTICATED`.
+- Write requests must be same-origin (`Origin` header = the site domain) → otherwise: `403 FORBIDDEN_ORIGIN`.
+- JSON body except API-06 (multipart). Server validation uses the same rules as sections 6 and 9.
+- The error shape is always:
 
 ```json
 { "error": { "code": "VALIDATION_FAILED", "message": "Some fields need attention.", "fields": { "live_url": "URL must start with https://" } } }
 ```
 
-| ID | Method & path | Request | Sukses | Error |
+| ID | Method & path | Request | Success | Error |
 | --- | --- | --- | --- | --- |
-| API-01 | `POST /api/admin/login` | `{ email, password }` | `200 { ok: true }` + Set-Cookie sesi | `400 VALIDATION_FAILED` · `401 INVALID_CREDENTIALS` · `403 FORBIDDEN_ORIGIN` · `429 RATE_LIMITED` + `retryAfterSeconds` (+ header `Retry-After`) · `503 ADMIN_NOT_CONFIGURED` (env admin tidak valid) · `500 SERVER_ERROR` |
-| API-02 | `POST /api/admin/logout` | — | `204` + cookie dihapus | — (selalu sukses) |
-| API-03 | `POST /api/admin/projects` | `ProjectInput` | `201 { project, revalidated: boolean }` | `401` · `422 VALIDATION_FAILED` + `fields` (termasuk `fields.show_on_home` "Selected work already has 5 projects. Turn one off first.", E-26) · `500 SERVER_ERROR` |
-| API-04 | `PATCH /api/admin/projects/:id` | `ProjectInput` parsial | `200 { project, revalidated }` | `401` · `404 NOT_FOUND` · `422` (termasuk E-26) · `500` |
-| API-05 | `DELETE /api/admin/projects/:id` | — | `200 { revalidated }` (gambar ikut dihapus) | `401` · `404` · `500` |
-| API-06 | `POST /api/admin/uploads` | multipart: 1–4 bagian `variant` (lebar hasil kompresi browser dari satu gambar); `kind=avatar` minimal 640 × 640 | `201 { public_id, url, width, height }` | `401` · `413 FILE_TOO_LARGE` · `415 UNSUPPORTED_TYPE` · `422 IMAGE_TOO_SMALL` / `VALIDATION_FAILED` · `502 UPLOAD_FAILED` |
-| API-07 | `DELETE /api/admin/uploads/:public_id` | — | `204` | `401` · `404` (dianggap sukses oleh UI) · `409 IMAGE_IN_USE` (gambar dipakai project tersimpan atau foto profil; tidak dihapus) |
-| API-08 | `POST /api/admin/projects/:id/move` | `{ direction: "up" | "down" }` | `200 { position, revalidated }` (posisi tetap jika sudah di ujung) | `401` · `404` · `422 VALIDATION_FAILED` · `500` |
-| API-09 | `PUT /api/admin/profile` | `{ photo_public_id?: string \| null, availability_on?: boolean }` (field yang tidak dikirim tidak berubah; foto dari API-06 `kind=avatar`, persegi) | `200 { photo, availability_on, revalidated }`; keduanya disimpan dalam satu transaksi; foto lama dihapus; avatar varian 320/640 | `401` · `422` + `fields.photo` / `fields.availability_on` · `500` |
+| API-01 | `POST /api/admin/login` | `{ email, password }` | `200 { ok: true }` + session Set-Cookie | `400 VALIDATION_FAILED` · `401 INVALID_CREDENTIALS` · `403 FORBIDDEN_ORIGIN` · `429 RATE_LIMITED` + `retryAfterSeconds` (+ `Retry-After` header) · `503 ADMIN_NOT_CONFIGURED` (admin env not valid) · `500 SERVER_ERROR` |
+| API-02 | `POST /api/admin/logout` | — | `204` + cookie deleted | — (always succeeds) |
+| API-03 | `POST /api/admin/projects` | `ProjectInput` | `201 { project, revalidated: boolean }` | `401` · `422 VALIDATION_FAILED` + `fields` (including `fields.show_on_home` "Selected work already has 5 projects. Turn one off first.", E-26) · `500 SERVER_ERROR` |
+| API-04 | `PATCH /api/admin/projects/:id` | partial `ProjectInput` | `200 { project, revalidated }` | `401` · `404 NOT_FOUND` · `422` (including E-26) · `500` |
+| API-05 | `DELETE /api/admin/projects/:id` | — | `200 { revalidated }` (the image is deleted too) | `401` · `404` · `500` |
+| API-06 | `POST /api/admin/uploads` | multipart: 1–4 `variant` parts (widths from the browser compression of one image); `kind=avatar` at least 640 × 640 | `201 { public_id, url, width, height }` | `401` · `413 FILE_TOO_LARGE` · `415 UNSUPPORTED_TYPE` · `422 IMAGE_TOO_SMALL` / `VALIDATION_FAILED` · `502 UPLOAD_FAILED` |
+| API-07 | `DELETE /api/admin/uploads/:public_id` | — | `204` | `401` · `404` (treated as success by the UI) · `409 IMAGE_IN_USE` (the image is used by a saved project or the profile photo; not deleted) |
+| API-08 | `POST /api/admin/projects/:id/move` | `{ direction: "up" | "down" }` | `200 { position, revalidated }` (the position stays when already at the end) | `401` · `404` · `422 VALIDATION_FAILED` · `500` |
+| API-09 | `PUT /api/admin/profile` | `{ photo_public_id?: string \| null, availability_on?: boolean }` (fields not sent do not change; the photo comes from API-06 `kind=avatar`, square) | `200 { photo, availability_on, revalidated }`; both are saved in one transaction; the old photo is deleted; avatar variants 320/640 | `401` · `422` + `fields.photo` / `fields.availability_on` · `500` |
 
 **`ProjectInput`**
 
@@ -476,35 +476,35 @@ Hanya admin yang menulis data; halaman publik membaca langsung di server saat re
 }
 ```
 
-- `featured` diabaikan bila dikirim; `tags` maks. 6; `live_url` boleh `null` kecuali `case_action = site`.
-- `thumbnail` boleh `null` saat `published = false`. Server hanya memakai `thumbnail.public_id`; `url`, `width`, `height` diambil dari penyimpanan gambar. `public_id` yang sudah tidak ada → `422` dengan pesan di field `thumbnail`.
-- `revalidated: false` → UI menampilkan E-19.
-- API-07 dipanggil saat user klik Remove/Replace pada gambar yang belum pernah tersimpan, atau Cancel form dengan upload baru. Gambar yang sudah tersimpan hanya dihapus lewat API-04/05.
-- Daftar project di S-11 dan data S-13 dibaca langsung di server (bukan lewat endpoint publik), tetap dilindungi sesi.
+- `featured` is ignored when sent; `tags` max. 6; `live_url` may be `null` except when `case_action = site`.
+- `thumbnail` may be `null` when `published = false`. The server only uses `thumbnail.public_id`; `url`, `width`, `height` are taken from image storage. A `public_id` that no longer exists → `422` with a message on the `thumbnail` field.
+- `revalidated: false` → the UI shows E-19.
+- API-07 is called when the user clicks Remove/Replace on an image that was never saved, or Cancels a form with a new upload. Saved images are only deleted through API-04/05.
+- The S-11 project list and the S-13 data are read directly on the server (not through a public endpoint), still protected by the session.
 
-**Revalidasi (efek samping API-03/04/05):** `/`, `/work`, `/id`, `/id/work`, dan `sitemap.xml`.
+**Revalidation (side effect of API-03/04/05):** `/`, `/work`, `/id`, `/id/work` and `sitemap.xml`.
 
-## 11. Kontrak analytics & string i18n
+## 11. Analytics contract & i18n strings
 
-### Event GA4
+### GA4 events
 
-Hanya event ini yang dikirim, semuanya hanya setelah `consent=granted`. Nama event format `object_action`, huruf kecil.
+Only these events are sent, all of them only after `consent=granted`. Event names use the `object_action` format, lowercase.
 
-| Event | Kapan | Parameter |
+| Event | When | Parameters |
 | --- | --- | --- |
-| `page_view` | Otomatis GA4 tiap halaman publik | `page_location`, `language` (`en`/`id`) |
-| `contact_email_click` | Klik mailto atau Copy email | `kind`: `general`\|`role`\|`project`\|`walkthrough`; `location`: `bar`\|`hero`\|`contact`\|`work_contact`\|`case`; `method`: `mailto`\|`copy`; `language`; `project_slug` (hanya kind walkthrough) |
-| `cv_download` | Klik Download CV | `location`: `about`\|`contact`; `language` |
-| `case_open` | Baris case dibuka | `project_slug`; `source`: `home_title`\|`row`\|`hash`; `language` |
-| `project_link_click` | Klik situs live | `project_slug`; `page`: `home`\|`work`; `placement`: `home`\|`case`; `language` |
-| `theme_switch` | Klik O-04 | `to`: `dark`\|`light` |
-| `language_switch` | Klik O-01 atau aksi O-02 | `from`, `to`, `source`: `toggle` \| `banner` |
+| `page_view` | Automatic GA4 on each public page | `page_location`, `language` (`en`/`id`) |
+| `contact_email_click` | Click on mailto or Copy email | `kind`: `general`\|`role`\|`project`\|`walkthrough`; `location`: `bar`\|`hero`\|`contact`\|`work_contact`\|`case`; `method`: `mailto`\|`copy`; `language`; `project_slug` (kind walkthrough only) |
+| `cv_download` | Click on Download CV | `location`: `about`\|`contact`; `language` |
+| `case_open` | A case row is opened | `project_slug`; `source`: `home_title`\|`row`\|`hash`; `language` |
+| `project_link_click` | Click on a live site | `project_slug`; `page`: `home`\|`work`; `placement`: `home`\|`case`; `language` |
+| `theme_switch` | Click on O-04 | `to`: `dark`\|`light` |
+| `language_switch` | Click on O-01 or an O-02 action | `from`, `to`, `source`: `toggle` \| `banner` |
 
-Key event (konversi) di GA4: `contact_email_click` dan `cv_download`. Admin tidak memuat GA4 sama sekali. `sessionStorage` `rr-case-from-home` adalah penanda sekali pakai agar klik judul di home tidak terhitung dua kali sebagai `case_open`.
+Key events (conversions) in GA4: `contact_email_click` and `cv_download`. The admin does not load GA4 at all. The `sessionStorage` `rr-case-from-home` is a one-time marker so a title click on home is not counted twice as `case_open`.
 
-### String i18n
+### i18n strings
 
-Semua label UI tinggal di dua file kamus (`i18n/en.json`, `i18n/id.json`) dengan key yang sama. Kamus v2 = key `T` di `option-b.html` (`skip`, `nav.*`, `cta`, `hero.*`, `work.*`, `w.*`, `about.*`, `e1..e3*`, `case.*`, `st*`, `bridge.*`, `ct.*`, `wp.*`, `c.*`, `mail.*`, `ft.*`), dengan tambahan dan perubahan:
+Every UI label lives in two dictionary files (`i18n/en.json`, `i18n/id.json`) with the same keys. The v2 dictionary = the `T` keys in `option-b.html` (`skip`, `nav.*`, `cta`, `hero.*`, `work.*`, `w.*`, `about.*`, `e1..e3*`, `case.*`, `st*`, `bridge.*`, `ct.*`, `wp.*`, `c.*`, `mail.*`, `ft.*`), with these additions and changes:
 
 | Key | EN | ID |
 | --- | --- | --- |
@@ -515,65 +515,65 @@ Semua label UI tinggal di dua file kamus (`i18n/en.json`, `i18n/id.json`) dengan
 | `work.empty` | New work is on the way. Meanwhile, here's how to reach me. | Karya baru sedang disiapkan. Sementara itu, ini cara menghubungi saya. |
 | `theme.toDark` / `theme.toLight` | Switch to dark mode / Switch to light mode | Ganti ke mode gelap / Ganti ke mode terang |
 | `group.panasonic` / `group.web` / `group.ai` | Panasonic / Websites / AI tools | Panasonic / Website / Alat AI |
-| `wp.sub.*` | Potongan per grup (`one`/`other`), penghubung, penutup, kata angka 1–10 (D-30) | sama |
-| `langBanner.text` | Also available in Indonesian. | (tidak dipakai, banner hanya di EN) |
+| `wp.sub.*` | Pieces per group (`one`/`other`), connector, closer, number words 1–10 (D-30) | same |
+| `langBanner.text` | Also available in Indonesian. | (not used, the banner is EN only) |
 | `consent.body` | I use Google Analytics to see which pages are useful. It only runs if you allow it. | Saya memakai Google Analytics untuk melihat halaman mana yang berguna. Hanya aktif jika kamu izinkan. |
 | `notFound.title` | This page doesn't exist | Halaman ini tidak ada |
 
-Key `cur.read` ("Read" / "Baca") dan `cur.visit` ("Visit" / "Kunjungi") dipakai label kursor O-05. Data kartu angka diambil dari database, bukan key `peek.*`. Label panel preview admin mengikuti teks UI admin (EN saja, G3). Teks proyek (`w1..w5`, `r*`, `c*`, `peek.*` di mockup) **bukan** key kamus: itu isi awal untuk admin (konten database).
+The keys `cur.read` ("Read" / "Baca") and `cur.visit` ("Visit" / "Kunjungi") are used for the O-05 cursor label. Numbers card data comes from the database, not the `peek.*` keys. The admin preview panel labels follow the admin UI text (EN only, G3). Project text (`w1..w5`, `r*`, `c*`, `peek.*` in the mockup) is **not** dictionary keys: it is the starting content for the admin (database content).
 
-Tag `<em>` (kata aksen miring), `<s>` (teks dicoret), dan `<strong>` di nilai kamus adalah penanda rich-text yang dirender helper `richText()` menjadi elemen yang sudah ditentukan (SDD bagian 5), bukan HTML mentah. Tag lain tidak diizinkan. Ikon panah (↗, →) bukan bagian dari string; dirender komponen supaya bisa dianimasikan.
+The `<em>` (italic accent word), `<s>` (struck-through text) and `<strong>` tags in dictionary values are rich-text markers that the `richText()` helper renders into predefined elements (SDD section 5), not raw HTML. Other tags are not allowed. Arrow icons (↗, →) are not part of the string; they are rendered by the component so they can be animated.
 
-**Pesan error admin (EN saja)**
+**Admin error messages (EN only)**
 
-| Kondisi | Pesan |
+| Condition | Message |
 | --- | --- |
-| Field wajib kosong | {Field} is required. |
-| Terlalu panjang | Keep it under {n} characters ({current} now). |
-| URL tidak valid | URL must start with https:// and be a full address. |
+| Required field empty | {Field} is required. |
+| Too long | Keep it under {n} characters ({current} now). |
+| Invalid URL | URL must start with https:// and be a full address. |
 | Stack > 6 | Use up to 6 items. |
 | What I did > 8 | Use up to 8 lines. |
-| Site tanpa Live URL | Add a live URL, or choose another button. |
-| Selected work penuh | Selected work already has 5 projects. Turn one off first. |
+| Site without Live URL | Add a live URL, or choose another button. |
+| Selected work full | Selected work already has 5 projects. Turn one off first. |
 | File > 5 MB | This image is {size} MB. Upload one under 5 MB. |
-| Tipe salah | Use a JPG, PNG, or WebP image. |
-| Lebar < 1200 px | This image is {w} px wide. Use one at least 1200 px wide. |
-| Upload gagal | Upload failed. Check your connection and try again. |
-| Publish belum lengkap | Add a screenshot and alt text to publish, or turn off Published to save as draft. |
+| Wrong type | Use a JPG, PNG, or WebP image. |
+| Width < 1200 px | This image is {w} px wide. Use one at least 1200 px wide. |
+| Upload failed | Upload failed. Check your connection and try again. |
+| Publish incomplete | Add a screenshot and alt text to publish, or turn off Published to save as draft. |
 
-Copy ID di tabel ini adalah draft awal dan boleh direvisi Pal saat penulisan konten; key-nya tidak boleh berubah.
+The ID copy in these tables is an early draft and Pal may revise it while writing content; the keys must not change.
 
-## 12. Traceability & batasan untuk coding AI
+## 12. Traceability & limits for AI coding
 
-Setiap fitur PRD punya layar, flow, dan edge case yang bisa dites. Fitur dianggap selesai hanya jika semua acceptance criteria PRD-nya lolos dan flow terkaitnya jalan end-to-end.
+Every PRD feature has screens, flows and edge cases that can be tested. A feature counts as done only when all its PRD acceptance criteria pass and its related flows work end to end.
 
-| Fitur PRD | Layar / overlay | Flow | Edge case | API / kontrak |
+| PRD feature | Screen / overlay | Flow | Edge case | API / contract |
 | --- | --- | --- | --- | --- |
-| F1 Homepage | S-01, O-04, O-05 | UF-01 | E-01, E-03, E-05, E-07, E-20, E-25, E-30, E-31, E-32, E-33, E-34 | DTO publik |
-| F2 Work | S-02, O-05 | UF-01 | E-01, E-27, E-29, E-33 | DTO publik |
+| F1 Homepage | S-01, O-04, O-05 | UF-01 | E-01, E-03, E-05, E-07, E-20, E-25, E-30, E-31, E-32, E-33, E-34 | Public DTO |
+| F2 Work | S-02, O-05 | UF-01 | E-01, E-27, E-29, E-33 | Public DTO |
 | F3 Case row | S-01, S-02 | UF-01 | E-06, E-27, E-28 | `case_open`, `project_link_click` |
-| F4 Bilingual | O-01, O-02, semua publik | UF-02, UF-04 | E-07, E-18, E-20 | G1, G4, `language_switch` |
-| F5 Kontak | Bar, S-01, S-02 | UF-03 | E-09 | `contact_email_click`, `cv_download` |
+| F4 Bilingual | O-01, O-02, all public | UF-02, UF-04 | E-07, E-18, E-20 | G1, G4, `language_switch` |
+| F5 Contact | Bar, S-01, S-02 | UF-03 | E-09 | `contact_email_click`, `cv_download` |
 | F6 Admin login | S-10, G3 | UF-06, UF-10 | E-10, E-11 | API-01, API-02 |
-| F7 Admin CRUD | S-11, S-12, S-13, S-14 | UF-07, UF-08, UF-09 | E-11 s.d. E-17, E-19, E-26 | API-03 s.d. API-09 |
-| F8 GA4 + consent | O-03, S-03 | UF-05 | E-07 | Event GA4, G4 |
-| F9 SEO | Semua publik, S-04 | — | E-18 | PRD bagian 9 |
+| F7 Admin CRUD | S-11, S-12, S-13, S-14 | UF-07, UF-08, UF-09 | E-11 to E-17, E-19, E-26 | API-03 to API-09 |
+| F8 GA4 + consent | O-03, S-03 | UF-05 | E-07 | GA4 events, G4 |
+| F9 SEO | All public, S-04 | — | E-18 | PRD section 9 |
 
-**Jangan ditebak atau ditambahkan oleh coding AI**
+**Not to be guessed or added by AI coding**
 
-- Jangan menambah layar, section, field, filter, pencarian, paginasi, atau form kontak.
-- Motion hanya D-08 + D-10 + D-37 (PRD bagian 8), CSS saja, ditambah lapisan pointer O-05 (D-31..D-35); JS klien halaman publik hanya untuk daftar di PRD bagian 10. Jangan membuat carousel, library animasi, rotasi/timer JS, parallax berbasis JavaScript, atau fade-in pada H1/sub.
-- Jangan menyalakan lapisan pointer di layar sentuh atau memakai `requestAnimationFrame` di luar `PointerLayer`.
-- Jangan merender link GitHub bila kosong.
-- Jangan memakai `--calm` atau `--faint` untuk teks.
-- Jangan membaca/menulis kolom `featured`.
-- Jangan auto-redirect berdasarkan bahasa browser, IP, atau cookie.
-- Jangan memuat GA4 atau cookie analytics sebelum `consent=granted`.
-- Jangan menyimpan gambar di filesystem server atau di repo.
-- Jangan hardcode data project di komponen; jangan menampilkan project `published=false` di mana pun di sisi publik.
-- Jangan menerjemahkan otomatis di runtime; semua teks berasal dari kamus i18n atau field database per bahasa.
-- Jangan membuat akun admin kedua, halaman register, atau reset password publik.
-- Jangan mengganti font, warna, atau copy yang sudah dikunci di PRD tanpa persetujuan.
-- Jika dokumen ini, PRD, dan SDD tidak menjawab sebuah pertanyaan implementasi: berhenti dan tanya, jangan mengarang.
+- Do not add screens, sections, fields, filters, search, pagination or a contact form.
+- Motion is only D-08 + D-10 + D-37 (PRD section 8), CSS only, plus the O-05 pointer layer (D-31..D-35); client JS on public pages is only for the list in PRD section 10. Do not build a carousel, an animation library, JS rotation/timers, JavaScript-based parallax, or a fade-in on the H1/sub.
+- Do not turn on the pointer layer on touch screens or use `requestAnimationFrame` outside `PointerLayer`.
+- Do not render the GitHub link when it is empty.
+- Do not use `--calm` or `--faint` for text.
+- Do not read/write the `featured` column.
+- Do not auto-redirect based on browser language, IP or cookie.
+- Do not load GA4 or analytics cookies before `consent=granted`.
+- Do not store images on the server filesystem or in the repo.
+- Do not hardcode project data in components; do not show `published=false` projects anywhere on the public side.
+- Do not auto-translate at runtime; all text comes from the i18n dictionary or per-language database fields.
+- Do not create a second admin account, a register page or a public password reset.
+- Do not change fonts, colors or copy locked in the PRD without approval.
+- If this document, the PRD and the SDD do not answer an implementation question: stop and ask, do not make it up.
 
-**Urutan dokumen:** PRD (apa & kenapa) → dokumen ini (layar, flow, state, kontrak) → SDD (arsitektur, library, struktur repo, deploy ke Hostinger via GitHub, aturan kerja dengan coding AI).
+**Document order:** PRD (what & why) → this document (screens, flows, states, contracts) → SDD (architecture, libraries, repo structure, deploy to Hostinger via GitHub, rules for working with AI coding).
