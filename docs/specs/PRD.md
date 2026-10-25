@@ -10,224 +10,224 @@ last_change: changes/archive/2026-10-22-v2.1.0-pointer-layer
 
 # PRD — rifaldiradya.com Portfolio v2
 
-Sep 27, 2026 · @Pal · v2.0.0: 18 Okt 2026
+Sep 27, 2026 · @Pal · v2.0.0: Oct 18, 2026
 
-> **v2.0.0 (showcase software engineer).** Arah situs berubah dari menjual landing page ke klien Upwork menjadi showcase software engineer full-stack .NET untuk recruiter dan hiring manager, dengan klien proyek sebagai audiens kedua. Rujukan visual dan interaksi: `docs/design/v2/option-b.html` (publik) dan `docs/design/v2/admin.html` (admin). Kalau mockup berbeda dengan dokumen ini, dokumen ini yang menang; kalau dokumen ini diam, ikuti mockup. Keputusan v2 (D-01..D-30) ada di `docs/decisions/DECISIONS.md`; riwayat perubahan di `docs/changes/archive/2026-10-18-v2.0.0-showcase-redesign/CHANGE.md`.
+> **v2.0.0 (software engineer showcase).** The site's direction changes from selling landing pages to Upwork clients into a showcase of a full-stack .NET software engineer for recruiters and hiring managers, with project clients as the second audience. Visual and interaction reference: `docs/design/v2/option-b.html` (public) and `docs/design/v2/admin.html` (admin). If the mockup differs from this document, this document wins; if this document is silent, follow the mockup. The v2 decisions (D-01..D-30) are in `docs/decisions/DECISIONS.md`; the change history is in `docs/changes/archive/2026-10-18-v2.0.0-showcase-redesign/CHANGE.md`.
 
-## 1. Ringkasan produk
+## 1. Product summary
 
-rifaldiradya.com adalah portfolio bilingual (EN default, ID sekunder) yang menampilkan Pal sebagai **software engineer full-stack .NET**, dengan bukti utama HRMS yang dipakai 13 perusahaan grup PT Panasonic Manufacturing Indonesia. Situs adalah **funnel ke email** (posisi full-time atau proyek) plus Download CV; admin single-user tetap untuk mengelola proyek.
+rifaldiradya.com is a bilingual portfolio (EN default, ID secondary) that presents Pal as a **full-stack .NET software engineer**, with the HRMS used by 13 PT Panasonic Manufacturing Indonesia group companies as the main proof. The site is a **funnel to email** (full-time role or project) plus Download CV; a single-user admin stays for managing projects.
 
-**Problem.** Recruiter dan hiring manager membandingkan banyak kandidat dalam beberapa detik, kebanyakan di HP. Pekerjaan utama Pal bersifat internal sehingga tidak bisa diklik, jadi situs harus menjelaskannya dengan angka nyata, isi case, CV, dan tawaran walkthrough.
+**Problem.** Recruiters and hiring managers compare many candidates in a few seconds, mostly on a phone. Pal's main work is internal and cannot be clicked, so the site must explain it with real numbers, case content, a CV and a walkthrough offer.
 
-**Konteks pemilik.** Pal sedang aktif melamar; pengunjung datang dari LinkedIn, Upwork, dan Fiverr, kebanyakan lewat HP. Panasonic boleh disebut; layar HRMS internal dan tidak ditampilkan.
+**Owner context.** Pal is actively applying; visitors come from LinkedIn, Upwork and Fiverr, mostly on a phone. Panasonic may be named; the HRMS screens are internal and are not shown.
 
-## 2. Target user & persona
+## 2. Target users & personas
 
-| Persona | Siapa | Yang dicari | Bahasa | Aksi yang diharapkan |
+| Persona | Who | Looking for | Language | Expected action |
 | --- | --- | --- | --- | --- |
-| P1 — Recruiter / hiring manager (primer) | Datang dari LinkedIn, Upwork, atau Fiverr, mayoritas lewat HP | Peran, stack, skala sistem, bukti, cara menghubungi | EN atau ID | Baca hero → Selected work/Work → Download CV atau "Email about a full-time role" |
-| P2 — Klien proyek (sekunder) | Perusahaan yang butuh sistem HR atau aplikasi internal | Bukti sistem serupa dan cara menghubungi | EN atau ID | "Email about a project" |
-| P3 — Admin (Pal) | Pemilik situs, satu-satunya user admin | Tambah/edit project dalam < 5 menit, dari laptop atau HP | UI admin EN | Login → CRUD project |
+| P1 — Recruiter / hiring manager (primary) | Comes from LinkedIn, Upwork or Fiverr, mostly on a phone | Role, stack, system scale, proof, how to get in touch | EN or ID | Read hero → Selected work/Work → Download CV or "Email about a full-time role" |
+| P2 — Project client (secondary) | A company that needs an HR system or an internal app | Proof of similar systems and how to get in touch | EN or ID | "Email about a project" |
+| P3 — Admin (Pal) | Site owner, the only admin user | Add/edit a project in < 5 minutes, from a laptop or a phone | EN admin UI | Login → project CRUD |
 
 ## 3. Goals, non-goals & success metrics
 
 **Goals**
 
-1. Recruiter paham peran, stack, dan skala kerja Pal dari layar pertama di HP.
-2. Setiap bab mengarah ke email atau CV.
-3. Pekerjaan internal bisa dinilai tanpa layarnya (angka nyata, isi case, walkthrough).
-4. Pal bisa menambah dan mengatur proyek, termasuk proyek tanpa URL, tanpa menyentuh kode.
-5. SEO dua bahasa tidak turun.
+1. A recruiter understands Pal's role, stack and scale of work from the first screen on a phone.
+2. Every chapter leads to email or the CV.
+3. Internal work can be judged without its screens (real numbers, case content, walkthrough).
+4. Pal can add and arrange projects, including projects without a URL, without touching code.
+5. SEO in both languages does not drop.
 
 **Non-goals**
 
-- Form kontak dan penyimpanan data pengunjung.
-- Halaman case study per proyek.
-- Blog, testimoni.
-- Multi-user admin atau sistem role.
+- A contact form and storage of visitor data.
+- A case study page per project.
+- Blog, testimonials.
+- Multi-user admin or a role system.
 
 **Success metrics**
 
-| Metrik | Target | Cara ukur |
+| Metric | Target | How measured |
 | --- | --- | --- |
 | Lighthouse Performance (mobile) | ≥ 90 | PageSpeed Insights |
-| Core Web Vitals | LCP < 2,5 s · INP < 200 ms · CLS < 0,1 | PageSpeed Insights / Search Console |
+| Core Web Vitals | LCP < 2.5 s · INP < 200 ms · CLS < 0.1 | PageSpeed Insights / Search Console |
 | Lighthouse Accessibility & SEO | ≥ 95 | Lighthouse |
-| Halaman terindex | 4 halaman publik (/, /work, /id, /id/work) | Google Search Console |
-| Waktu tambah 1 project via admin | < 5 menit | Uji manual |
-| Email posisi full-time yang berujung interview | ≥ 1 dalam 60 hari setelah rilis v2.0.0 | Dicatat manual oleh Pal |
-| `contact_email_click` per `kind` | Baseline 30 hari pertama | GA4 |
-| `cv_download` | Baseline 30 hari pertama (sinyal awal minat recruiter) | GA4 |
+| Indexed pages | 4 public pages (/, /work, /id, /id/work) | Google Search Console |
+| Time to add 1 project via admin | < 5 minutes | Manual test |
+| Full-time role emails that lead to an interview | ≥ 1 within 60 days after the v2.0.0 release | Logged manually by Pal |
+| `contact_email_click` per `kind` | Baseline for the first 30 days | GA4 |
+| `cv_download` | Baseline for the first 30 days (early signal of recruiter interest) | GA4 |
 
 ## 4. Positioning, promise & copy
 
-**Positioning:** software engineer full-stack .NET (C#, ASP.NET, SQL Server, Azure). Sejak Nov 2022 membangun dan menjaga HRMS yang dipakai 13 perusahaan grup PT Panasonic Manufacturing Indonesia. Situs adalah showcase untuk recruiter dan klien proyek, dan funnel ke email.
+**Positioning:** full-stack .NET software engineer (C#, ASP.NET, SQL Server, Azure). Since Nov 2022 has built and maintained the HRMS used by 13 PT Panasonic Manufacturing Indonesia group companies. The site is a showcase for recruiters and project clients, and a funnel to email.
 
-Sumber copy final EN/ID = objek `T` di `option-b.html`, dipindah ke `i18n/en.json` dan `i18n/id.json` (key di App Flow §11). Pengecualian terhadap `T`: teks availability tetap di i18n (D-16), label Copy email (D-17), subject walkthrough (D-25), sub halaman Work dihitung dari data (D-30), dan copy baru yang tidak ada di mockup: Download CV, Copy email, meta SEO (§9).
+The source of the final EN/ID copy = the `T` object in `option-b.html`, moved into `i18n/en.json` and `i18n/id.json` (keys in App Flow §11). Exceptions to `T`: the availability text stays in i18n (D-16), the Copy email label (D-17), the walkthrough subject (D-25), the Work page sub computed from data (D-30), and new copy that is not in the mockup: Download CV, Copy email, SEO meta (§9).
 
-Aturan copy: tanpa em dash, tanpa pola "Not X. Y.", tanpa kata klise, tombol menyebut persis apa yang terjadi, EN dan ID ditulis terpisah (transcreation), tanpa angka atau testimoni karangan, angka proyeksi selalu ditulis "projected"/"perkiraan".
+Copy rules: no em dash, no "Not X. Y." pattern, no cliché words, buttons say exactly what happens, EN and ID are written separately (transcreation), no invented numbers or testimonials, projected numbers are always written "projected"/"perkiraan".
 
-| Elemen | EN | ID |
+| Element | EN | ID |
 | --- | --- | --- |
-| Bar | Rifaldi Radya Pratama · Work · About · EN/ID · tema · Email me | … · Karya · Tentang · … · Kirim email |
-| Label hero | Software engineer · Full-stack .NET · Jakarta, Indonesia | … · Jabodetabek |
-| Availability (hanya bila saklar on) | Open to full-time roles and projects | Terbuka untuk posisi full-time dan proyek |
+| Bar | Rifaldi Radya Pratama · Work · About · EN/ID · theme · Email me | … · Karya · Tentang · … · Kirim email |
+| Hero label | Software engineer · Full-stack .NET · Jakarta, Indonesia | … · Jabodetabek |
+| Availability (only when the switch is on) | Open to full-time roles and projects | Terbuka untuk posisi full-time dan proyek |
 | H1 | Building HR software / for *thousands.* | Membangun software HR / untuk *ribuan karyawan.* |
 | Sub | Four years building and running the HR system of 13 Panasonic group companies: hundreds of HR users, thousands of employee records. | Empat tahun membangun dan menjaga sistem HR 13 perusahaan grup Panasonic: ratusan pengguna HR, ribuan data karyawan. |
-| Stack | C# · ASP.NET · SQL Server · Azure · Power Automate · Next.js · TypeScript | sama |
+| Stack | C# · ASP.NET · SQL Server · Azure · Power Automate · Next.js · TypeScript | same |
 | Highlight | One login instead of ~~five passwords.~~ · 5 → 1 · ~200 · 13 | ~~Lima password~~ jadi satu login. · ±200 |
 | Contact H2 | Tell me what you're *building.* | Ada posisi atau *proyek?* |
-| Tombol Contact | Email about a full-time role · Email about a project | Email soal posisi full-time · Email soal proyek |
+| Contact buttons | Email about a full-time role · Email about a project | Email soal posisi full-time · Email soal proyek |
 | Download CV | Download CV (PDF) | Unduh CV (PDF) |
 | Copy email | Copy email → Copied | Salin email → Tersalin |
 
-Angka dan sumbernya (CV v1.0, Drive `01_Personal Docs/Current/Career`, dicek ulang 17 Okt 2026): 13 perusahaan grup, Pal memegang 6; ratusan staf HR/admin, ribuan data karyawan, ±2.000 di site utama; SSO 4–5 password → 1 untuk ±200 staf, live sejak awal 2023; Teams approval ±57 → 4 menit **proyeksi** (tahap usulan); tim 3 orang.
+Numbers and their sources (CV v1.0, Drive `01_Personal Docs/Current/Career`, rechecked Oct 17, 2026): 13 group companies, Pal handles 6; hundreds of HR/admin staff, thousands of employee records, ~2,000 at the main site; SSO 4–5 passwords → 1 for ~200 staff, live since early 2023; Teams approval ~57 → 4 minutes **projected** (proposal stage); team of 3.
 
 ## 5. Information architecture & site map
 
-URL publik: `/`, `/work`, `/privacy`, `/id`, `/id/work`, `/id/privacy`; admin `/admin/*`. EN tinggal di root, ID di prefix `/id`.
+Public URLs: `/`, `/work`, `/privacy`, `/id`, `/id/work`, `/id/privacy`; admin `/admin/*`. EN lives at the root, ID under the `/id` prefix.
 
-Setiap halaman EN berpasangan dengan versi ID lewat hreflang dan toggle bahasa. Admin tidak dwibahasa, tidak masuk sitemap, dan diblok dari index (`noindex`).
+Every EN page pairs with its ID version through hreflang and the language toggle. The admin is not bilingual, is not in the sitemap and is blocked from indexing (`noindex`).
 
 **Home:** bar → Hero `#top` → Selected work `#work` → About `#about` → Highlight `#highlight` → Contact `#contact` → footer.
 
-**Work:** bar → judul + filter + baris case (`#case-<slug>`) → Contact penutup `#more` → footer.
+**Work:** bar → title + filter + case rows (`#case-<slug>`) → closing Contact `#more` → footer.
 
-Tanpa label section bernomor.
+No numbered section labels.
 
-## 6. Fitur
+## 6. Features
 
-| ID | Fitur | Persona | Prioritas |
+| ID | Feature | Persona | Priority |
 | --- | --- | --- | --- |
 | F1 | Homepage (Hero, Selected work, About, Highlight, Contact) | P1, P2 | P0 |
-| F2 | Halaman Work (filter grup + baris case) | P1, P2 | P0 |
-| F3 | Case row (menggantikan project card v1) | P1, P2 | P0 |
-| F4 | Bilingual routing EN/ID + toggle + banner saran bahasa | P1, P2 | P0 |
-| F5 | Kontak: mailto 4 jenis, Copy email, Download CV | P1, P2 | P0 |
-| F6 | Admin login single-user | P3 | P0 |
-| F7 | Admin CRUD project (field case EN+ID, grup, tombol case, visual, Show in Selected work, publish) | P3 | P0 |
-| F8 | GA4 + cookie consent banner | P3 (insight), P1 (privasi) | P0 |
-| F9 | Fondasi SEO (meta, hreflang, sitemap, robots, schema Person) | Semua | P0 |
+| F2 | Work page (group filter + case rows) | P1, P2 | P0 |
+| F3 | Case row (replaces the v1 project card) | P1, P2 | P0 |
+| F4 | Bilingual EN/ID routing + toggle + language suggestion banner | P1, P2 | P0 |
+| F5 | Contact: 4 kinds of mailto, Copy email, Download CV | P1, P2 | P0 |
+| F6 | Single-user admin login | P3 | P0 |
+| F7 | Admin project CRUD (EN+ID case fields, group, case button, visual, Show in Selected work, publish) | P3 | P0 |
+| F8 | GA4 + cookie consent banner | P3 (insight), P1 (privacy) | P0 |
+| F9 | SEO foundation (meta, hreflang, sitemap, robots, Person schema) | All | P0 |
 
 ### F1 — Homepage
 
-**Story:** Sebagai recruiter, saya mau langsung paham peran, stack, dan skala kerja Rifaldi dari layar pertama di HP, lalu menghubungi atau mengunduh CV.
+**Story:** As a recruiter, I want to understand Rifaldi's role, stack and scale of work from the first screen on my phone, then get in touch or download the CV.
 
-- [ ] Urutan bab sesuai bagian 5; tiap bab satu layar (`100svh`) dengan scroll snap `y proximity`; reduced motion → snap dimatikan.
-- [ ] Layar pertama di 390 × 844 dan 375 × 667 memuat label peran, H1, dan tombol "Email me", termasuk saat banner consent tampil.
-- [ ] Baris availability hanya tampil bila `availability_on` (S-14) aktif.
-- [ ] Selected work menampilkan proyek `published AND show_on_home`, urut `sort_order`, maks. 5, dengan penghitung "0n / 0N" dan rail nama proyek; judul proyek menaut ke `/work#case-<slug>` (locale aktif).
-- [ ] Proyek dengan `case_action = site` menampilkan tautan "Open the live site ↗"; proyek bervisual screenshot menampilkan screenshot yang menaut ke `live_url` bila ada, selain itu ke case.
-- [ ] About: statement, dua paragraf, Pendidikan, Sertifikasi, tautan Download CV.
-- [ ] Highlight SSO: statement dengan "five passwords" dicoret, tiga angka (5 → 1, ~200, 13), catatan HRMS internal, kalimat jembatan ke Contact.
-- [ ] Contact: dua tombol mailto (role, project), email sebagai tautan + tombol Copy email, LinkedIn, Download CV, jam GMT+7; GitHub hanya bila terisi (D-19).
+- [ ] Chapter order follows section 5; each chapter is one screen (`100svh`) with `y proximity` scroll snap; reduced motion → snap is turned off.
+- [ ] The first screen at 390 × 844 and 375 × 667 holds the role label, the H1 and the "Email me" button, including while the consent banner shows.
+- [ ] The availability line shows only when `availability_on` (S-14) is on.
+- [ ] Selected work shows `published AND show_on_home` projects, ordered by `sort_order`, max. 5, with a "0n / 0N" counter and a rail of project names; the project title links to `/work#case-<slug>` (active locale).
+- [ ] A project with `case_action = site` shows an "Open the live site ↗" link; a project with a screenshot visual shows the screenshot linking to `live_url` when present, otherwise to the case.
+- [ ] About: statement, two paragraphs, Education, Certifications, Download CV link.
+- [ ] SSO Highlight: statement with "five passwords" struck through, three numbers (5 → 1, ~200, 13), an internal-HRMS note, a bridge sentence to Contact.
+- [ ] Contact: two mailto buttons (role, project), the email as a link + a Copy email button, LinkedIn, Download CV, GMT+7 clock; GitHub only when filled in (D-19).
 
-### F2 — Halaman Work
+### F2 — Work page
 
-**Story:** Sebagai recruiter, saya mau melihat semua proyek dan membuka detail satu proyek tanpa pindah halaman.
+**Story:** As a recruiter, I want to see all projects and open the details of one project without leaving the page.
 
-- [ ] H1 "Work" dengan jumlah proyek published; sub dihitung dari jumlah proyek per grup (D-30).
-- [ ] Filter All / Panasonic / Websites / AI tools (dengan jumlah per grup); filter hanya di klien, tanpa JS semua baris tampil.
-- [ ] Semua proyek published sebagai baris (judul · meta · side), urut `sort_order`.
-- [ ] Baris dibuka untuk melihat What it is, What I did (1–8 poin), Stack, Status, dan tombol sesuai `case_action`.
-- [ ] `/work#case-<slug>` membuka dan menggulir ke baris itu.
-- [ ] Bab Contact penutup "Have a project like *these?*".
-- [ ] Empty state kalau 0 project: pesan singkat + CTA email (tidak pernah halaman kosong).
+- [ ] H1 "Work" with the number of published projects; the sub is computed from the number of projects per group (D-30).
+- [ ] Filter All / Panasonic / Websites / AI tools (with a count per group); the filter is client-only, and without JS all rows show.
+- [ ] All published projects as rows (title · meta · side), ordered by `sort_order`.
+- [ ] A row opens to show What it is, What I did (1–8 points), Stack, Status and the button for its `case_action`.
+- [ ] `/work#case-<slug>` opens and scrolls to that row.
+- [ ] Closing Contact chapter "Have a project like *these?*".
+- [ ] Empty state when there are 0 projects: a short message + email CTA (never an empty page).
 
 ### F3 — Case row
 
-Kartu v1 diganti baris case (F2) dan item Selected work (F1); tag tech stack menjadi "Stack" (maks. 6).
+The v1 card is replaced by the case row (F2) and the Selected work item (F1); the tech stack tags become "Stack" (max. 6).
 
-- [ ] Tautan keluar ke situs live membuka tab baru dengan `rel="noopener noreferrer"`; `live_url` hanya dirender bila `https:`.
-- [ ] Semua teks baris mengikuti bahasa halaman aktif; alt text screenshot juga per bahasa.
-- [ ] Klik tautan situs tercatat sebagai `project_link_click` (placement `home` atau `case`), membuka baris tercatat sebagai `case_open`, hanya jika consent analytics diberikan.
+- [ ] Outbound links to a live site open a new tab with `rel="noopener noreferrer"`; `live_url` is rendered only when it is `https:`.
+- [ ] All row text follows the active page language; screenshot alt text is per language too.
+- [ ] A click on a site link is logged as `project_link_click` (placement `home` or `case`), opening a row is logged as `case_open`, only when analytics consent is given.
 
 ### F4 — Bilingual EN/ID
 
-**Story:** Sebagai klien lokal, saya mau membaca situs dalam Bahasa Indonesia tanpa kehilangan posisi.
+**Story:** As a local client, I want to read the site in Indonesian without losing my place.
 
-- [ ] EN di `/` dan `/work`; ID di `/id` dan `/id/work`. Kedua versi selalu bisa diakses langsung tanpa redirect paksa.
-- [ ] Toggle "EN | ID" di navbar, bahasa aktif ditandai; klik membawa ke halaman padanan (`/work` ↔ `/id/work`), bukan ke homepage.
-- [ ] Pilihan bahasa disimpan di cookie `lang_pref` (365 hari).
-- [ ] Banner saran: muncul hanya jika user berada di versi EN, header `Accept-Language` mengandung `id`, dan cookie `lang_pref` belum ada. Isi: "Also available in Indonesian" + tombol "Lihat versi Indonesia" + tombol tutup. Klik apa pun menyimpan `lang_pref`, banner tidak muncul lagi.
-- [ ] Tidak ada auto-redirect berbasis IP atau `Accept-Language`; crawler selalu mendapat konten sesuai URL.
-- [ ] Atribut `<html lang>` = `en` atau `id` sesuai halaman.
+- [ ] EN at `/` and `/work`; ID at `/id` and `/id/work`. Both versions can always be opened directly with no forced redirect.
+- [ ] "EN | ID" toggle in the navbar, the active language is marked; a click goes to the matching page (`/work` ↔ `/id/work`), not to the homepage.
+- [ ] The language choice is stored in the `lang_pref` cookie (365 days).
+- [ ] Suggestion banner: shows only when the user is on the EN version, the `Accept-Language` header contains `id` and the `lang_pref` cookie is not set yet. Content: "Also available in Indonesian" + a "Lihat versi Indonesia" button + a close button. Any click stores `lang_pref`, and the banner does not show again.
+- [ ] No auto-redirect based on IP or `Accept-Language`; crawlers always get the content that matches the URL.
+- [ ] The `<html lang>` attribute = `en` or `id` according to the page.
 
-### F5 — Kontak
+### F5 — Contact
 
-**Story:** Sebagai recruiter atau klien yang tertarik, saya mau menghubungi Rifaldi dengan satu klik atau mengunduh CV-nya.
+**Story:** As an interested recruiter or client, I want to contact Rifaldi in one click or download his CV.
 
-- [ ] Semua tombol email adalah `mailto:hello@rifaldiradya.com` dengan subject dan body terisi per jenis: `general` (bar, hero), `role`, `project` (Contact), `walkthrough` (case dengan `case_action = walkthrough`, subject menyebut judul proyek), per bahasa halaman (App Flow §11).
-- [ ] Copy email hanya di Contact (D-17).
-- [ ] Download CV di About dan Contact.
-- [ ] Event `contact_email_click` dengan `kind`, `cv_download` (bila consent).
-- [ ] Tidak ada form dan tidak ada data pengunjung di server.
+- [ ] Every email button is `mailto:hello@rifaldiradya.com` with the subject and body filled per kind: `general` (bar, hero), `role`, `project` (Contact), `walkthrough` (a case with `case_action = walkthrough`, the subject names the project title), in the page language (App Flow §11).
+- [ ] Copy email only in Contact (D-17).
+- [ ] Download CV in About and Contact.
+- [ ] Events `contact_email_click` with `kind`, `cv_download` (with consent).
+- [ ] No form and no visitor data on the server.
 
 ### F6 — Admin login
 
-**Story:** Sebagai Pal, saya mau area admin yang hanya bisa saya buka.
+**Story:** As Pal, I want an admin area that only I can open.
 
-- [ ] Hanya satu akun admin; tidak ada halaman register atau reset password publik.
-- [ ] Login dengan email + password; sesi via cookie `httpOnly`, `secure`, `sameSite=lax`, kedaluwarsa 7 hari.
-- [ ] Semua route `/admin/*` (kecuali `/admin/login`) dan semua API tulis menolak request tanpa sesi valid (redirect ke login / respons 401).
-- [ ] Rate limit login: maksimal 5 percobaan gagal per 15 menit per IP.
-- [ ] Pesan error login generik: "Email or password is incorrect" (tidak membocorkan mana yang salah).
-- [ ] Tombol logout menghapus sesi.
+- [ ] Only one admin account; no public register or password reset page.
+- [ ] Login with email + password; session via an `httpOnly`, `secure`, `sameSite=lax` cookie that expires in 7 days.
+- [ ] Every `/admin/*` route (except `/admin/login`) and every write API rejects a request without a valid session (redirect to login / 401 response).
+- [ ] Login rate limit: at most 5 failed attempts per 15 minutes per IP.
+- [ ] Generic login error message: "Email or password is incorrect" (does not reveal which one is wrong).
+- [ ] The logout button deletes the session.
 
-### F7 — Admin CRUD project
+### F7 — Admin project CRUD
 
-**Story:** Sebagai Pal, saya mau menambah project baru dalam kurang dari 5 menit supaya portfolio selalu up to date.
+**Story:** As Pal, I want to add a new project in under 5 minutes so the portfolio is always up to date.
 
-- [ ] Field dan aturan publish mengikuti App Flow S-12/S-13: judul, grup, meta + side, deskripsi singkat, Show in Selected work, What it is, What I did, Stack, Status, tombol case (situs / walkthrough / tanpa tombol) + Live URL, visual (screenshot + alt atau kartu angka), Published.
-- [ ] "Show in Selected work" maks. 5 (UI menonaktifkan saklar ke-6, API menolak dengan 422); urutan ↑/↓ tetap.
-- [ ] Live URL hanya wajib bila tombol case = situs; harus `https://`.
-- [ ] Upload gambar: JPG/PNG/WebP, dikompres di browser, disimpan di MySQL (bukan filesystem server).
-- [ ] Pesan error menyebut cara memperbaikinya.
-- [ ] Delete butuh konfirmasi dialog; gambar terkait ikut dihapus.
-- [ ] Setelah simpan/hapus, halaman publik ter-update maksimal 60 detik tanpa redeploy.
-- [ ] Form admin nyaman dipakai di HP (input ≥ 16 px, satu kolom di < 768 px).
+- [ ] Fields and publish rules follow App Flow S-12/S-13: title, group, meta + side, short description, Show in Selected work, What it is, What I did, Stack, Status, case button (site / walkthrough / no button) + Live URL, visual (screenshot + alt or numbers card), Published.
+- [ ] "Show in Selected work" max. 5 (the UI disables the 6th switch, the API rejects it with 422); ↑/↓ ordering stays.
+- [ ] Live URL is required only when the case button = site; it must be `https://`.
+- [ ] Image upload: JPG/PNG/WebP, compressed in the browser, stored in MySQL (not the server filesystem).
+- [ ] Error messages say how to fix the problem.
+- [ ] Delete needs a confirmation dialog; related images are deleted too.
+- [ ] After save/delete, the public pages update within 60 seconds without a redeploy.
+- [ ] The admin form is comfortable on a phone (inputs ≥ 16 px, one column below 768 px).
 
 ### F8 — GA4 + cookie consent
 
-**Story:** Sebagai Pal, saya mau tahu apakah portfolio bekerja, tanpa melanggar privasi pengunjung EU.
+**Story:** As Pal, I want to know whether the portfolio works, without breaking the privacy of EU visitors.
 
-- [ ] Banner consent muncul pada kunjungan pertama dengan dua pilihan setara: "Accept" dan "Reject" (+ link kebijakan privasi singkat).
-- [ ] Google Consent Mode v2 dengan default `analytics_storage = denied`; GA4 tidak menyimpan cookie sebelum Accept.
-- [ ] Pilihan disimpan di cookie `consent` (180 hari); link "Cookie settings" di footer untuk mengubah pilihan.
-- [ ] Event terlacak: `page_view`, `contact_email_click` (dengan `kind`), `project_link_click`, `case_open`, `theme_switch`, `cv_download`, `language_switch`. Key event: `contact_email_click` dan `cv_download`.
-- [ ] Admin tidak dilacak.
-- [ ] Halaman kebijakan privasi singkat per bahasa (`/privacy`, `/id/privacy`), `noindex` tidak diperlukan.
+- [ ] The consent banner shows on the first visit with two equal choices: "Accept" and "Reject" (+ a short privacy policy link).
+- [ ] Google Consent Mode v2 with the default `analytics_storage = denied`; GA4 stores no cookie before Accept.
+- [ ] The choice is stored in the `consent` cookie (180 days); a "Cookie settings" link in the footer changes the choice.
+- [ ] Tracked events: `page_view`, `contact_email_click` (with `kind`), `project_link_click`, `case_open`, `theme_switch`, `cv_download`, `language_switch`. Key events: `contact_email_click` and `cv_download`.
+- [ ] The admin is not tracked.
+- [ ] A short privacy policy page per language (`/privacy`, `/id/privacy`); `noindex` is not needed.
 
-### F9 — Fondasi SEO
+### F9 — SEO foundation
 
-Detail lengkap di bagian 9. Acceptance ringkas:
+Full detail in section 9. Short acceptance:
 
-- [ ] Title dan meta description unik per halaman per bahasa.
-- [ ] hreflang `en`, `id`, dan `x-default` (→ EN) di semua halaman publik.
-- [ ] `sitemap.xml` dan `robots.txt` digenerate otomatis; admin tidak masuk sitemap.
-- [ ] JSON-LD `Person` + `WebSite` di homepage.
-- [ ] Open Graph + Twitter card per halaman (gambar OG 1200 × 630).
+- [ ] Title and meta description unique per page per language.
+- [ ] hreflang `en`, `id` and `x-default` (→ EN) on every public page.
+- [ ] `sitemap.xml` and `robots.txt` are generated automatically; the admin is not in the sitemap.
+- [ ] `Person` + `WebSite` JSON-LD on the homepage.
+- [ ] Open Graph + Twitter card per page (OG image 1200 × 630).
 
-## 7. Out of scope (roadmap setelahnya)
+## 7. Out of scope (later roadmap)
 
-Semua item di bawah sengaja ditunda. Trigger = kondisi yang membuat item layak dikerjakan.
+Every item below is deliberately deferred. Trigger = the condition that makes the item worth doing.
 
-| Item | Kenapa ditunda | Trigger untuk dikerjakan |
+| Item | Why deferred | Trigger to do it |
 | --- | --- | --- |
-| Halaman case study per URL | Baris case di halaman Work sudah cukup | Ada proyek dengan cerita yang tidak muat di satu baris |
-| Form kontak dengan penyimpanan data | Email sudah cukup; form menambah data pribadi + spam handling | Volume inquiry naik atau butuh brief terstruktur |
-| Screenshot HRMS diblur | Layar internal | Pal mendapat izin dan ingin mengganti kartu angka |
-| Link profil Upwork/Fiverr | Belum diputuskan | Profil aktif dan ingin ditautkan |
-| Testimoni | Belum ada testimoni tertulis | Ada testimoni tertulis yang boleh dipakai |
-| Blog/artikel | Beban konten besar, bukan kebutuhan funnel | Portfolio stabil dan ada waktu konten rutin |
-| Layanan non-engineering | Di luar positioning | Tidak direncanakan |
+| Case study page per URL | The case row on the Work page is enough | A project has a story that does not fit in one row |
+| Contact form with data storage | Email is enough; a form adds personal data + spam handling | Inquiry volume grows or a structured brief is needed |
+| Blurred HRMS screenshots | Internal screens | Pal gets permission and wants to replace the numbers card |
+| Upwork/Fiverr profile links | Not decided yet | The profiles are active and should be linked |
+| Testimonials | No written testimonials yet | A written testimonial exists that may be used |
+| Blog/articles | Heavy content load, not a funnel need | The portfolio is stable and there is time for regular content |
+| Non-engineering services | Outside the positioning | Not planned |
 
-## 8. Arah UI/UX & visual identity
+## 8. UI/UX direction & visual identity
 
-Arah **"Opsi B"** (D-02): hitam/putih hangat dengan banyak ruang, satu adegan per layar, aksen cobalt hanya di satu kata miring per judul, tombol primer, garis/hover aksen, dan cahaya bab. Mode gelap selalu default (tidak mengikuti setelan perangkat) dan terang lewat toggle yang diingat, tanpa flash saat load (D-23, D-36). Rujukan nilai: blok `:root` di `option-b.html`, dipindah apa adanya ke lapisan token (SDD §8):
+**"Option B"** direction (D-02): warm black/white with lots of space, one scene per screen, a cobalt accent only on one italic word per heading, primary buttons, accent lines/hover and chapter light. Dark mode is always the default (it does not follow the device setting) and light comes through a remembered toggle, with no flash on load (D-23, D-36). Value reference: the `:root` block in `option-b.html`, moved as is into the token layer (SDD §8):
 
-| Token | Gelap (default) | Terang |
+| Token | Dark (default) | Light |
 | --- | --- | --- |
 | `--bg` | `#0b0b0b` | `#f6f6f3` |
 | `--ink` | `#f1f1ef` | `#111111` |
@@ -236,152 +236,152 @@ Arah **"Opsi B"** (D-02): hitam/putih hangat dengan banyak ruang, satu adegan pe
 | `--accent` | `#7b93ff` | `#2f4fe0` |
 | `--accent-ink` | `#0b0b0b` | `#ffffff` |
 | `--calm` | `#d2bf9f` | `#8a7152` |
-| `--k` (kekuatan cahaya) | `1` | `0.6` |
+| `--k` (light strength) | `1` | `0.6` |
 
-Kontras (WCAG, dihitung 17 Okt 2026): ink di bg 17,4 / 17,4; soft di bg 6,98 / 5,55; accent sebagai teks 6,99 / 5,85; label di atas tombol aksen 6,99 / 6,33 (semua lulus AA). **Aturan:** `--calm` hanya untuk warna cahaya, tidak pernah untuk teks (terang hanya 4,25:1); `--faint` hanya garis dekoratif, tidak pernah satu-satunya batas input (1,35–1,49:1), input admin wajib punya batas ≥ 3:1 (pakai `--soft`).
+Contrast (WCAG, computed Oct 17, 2026): ink on bg 17.4 / 17.4; soft on bg 6.98 / 5.55; accent as text 6.99 / 5.85; label on the accent button 6.99 / 6.33 (all pass AA). **Rule:** `--calm` is only for light color, never for text (light is only 4.25:1); `--faint` is only for decorative lines, never the only border of an input (1.35–1.49:1); admin inputs must have a border ≥ 3:1 (use `--soft`).
 
-**Tipografi:** Archivo (400, 500, 600, italic 500/600), self-host lewat `next/font`.
+**Typography:** Archivo (400, 500, 600, italic 500/600), self-hosted through `next/font`.
 
-**Motion** (D-08, D-10): satu bidang titik untuk seluruh halaman dengan parallax pelan (D-37), cahaya per bab, fokus blur/fade per bab, statement About terisi baris per baris, "five passwords" dicoret lalu angka menghitung, progress bar, langkah Selected work dipin, hover garis aksen judul. Semua CSS scroll-driven (`view()`/`scroll()`) di dalam `@supports`, dengan fallback tumpukan statis untuk browser lama dan reduced motion. H1 punya animasi masuk naik 900 ms **tanpa fade** (`opacity` 1 sejak frame pertama, LCP = teks H1). Tidak ada listener scroll JavaScript, library animasi, atau rotasi/timer JS. Tabel motion lengkap mengikuti mockup.
+**Motion** (D-08, D-10): one dot field for the whole page with slow parallax (D-37), light per chapter, blur/fade focus per chapter, the About statement filling line by line, "five passwords" struck through and then the numbers counting, a progress bar, pinned Selected work steps, accent line hover on titles. All CSS scroll-driven (`view()`/`scroll()`) inside `@supports`, with a static stack fallback for old browsers and reduced motion. The H1 has a 900 ms rise-in animation **without fade** (`opacity` 1 from the first frame, LCP = the H1 text). No JavaScript scroll listener, animation library, or JS rotation/timer. The full motion table follows the mockup.
 
-**Lapisan pointer (khusus mouse, D-31..D-35):** kursor titik + cincin yang tertinggal sedikit, membesar di atas tautan/tombol dan berlabel "Read"/"Visit" sesuai `data-cursor`; cahaya mengikuti kursor dengan warna dan kekuatan per bab; preview proyek (screenshot atau kartu angka) di samping kursor saat hover judul Selected work dan baris Work; tilt screenshot di Selected work (maks. sekitar 6°). Hanya aktif bila `(hover: hover) and (pointer: fine)` dan `pointerType === "mouse"`; tidak tampil di layar sentuh dan tidak dimuat di sana.
+**Pointer layer (mouse only, D-31..D-35):** a dot cursor + a ring that trails slightly, grows over links/buttons and is labeled "Read"/"Visit" according to `data-cursor`; a light that follows the cursor with a color and strength per chapter; a project preview (screenshot or numbers card) beside the cursor while hovering a Selected work title and a Work row; screenshot tilt in Selected work (max. about 6°). Active only when `(hover: hover) and (pointer: fine)` and `pointerType === "mouse"`; it does not show on touch screens and is not loaded there.
 
-**Komponen:** SDD §4.
+**Components:** SDD §4.
 
-**Mobile-first (wajib):** didesain dari 375 px dulu. Target sentuh ≥ 44 × 44 px dengan jarak ≥ 8 px. Tidak ada horizontal scroll di lebar berapa pun.
+**Mobile-first (required):** designed from 375 px first. Touch targets ≥ 44 × 44 px with spacing ≥ 8 px. No horizontal scroll at any width.
 
-## 9. Requirement SEO & bilingual (i18n)
+## 9. SEO & bilingual (i18n) requirements
 
-SEO = level **standard**: fondasi teknis yang benar untuk 2 bahasa, on-page per halaman, structured data personal brand, dan kesiapan untuk AI search. Link building dan konten blog di luar scope.
+SEO = **standard** level: a correct technical foundation for 2 languages, on-page per page, personal-brand structured data and readiness for AI search. Link building and blog content are out of scope.
 
-**Struktur URL & bahasa**
+**URL & language structure**
 
-- Subfolder, bukan subdomain atau query param: EN di root, ID di `/id`. Slug tetap sama di kedua bahasa (`/work`, `/id/work`) supaya pemetaan padanan sederhana.
-- Setiap halaman publik: `<link rel="canonical">` ke dirinya sendiri (bukan ke versi EN).
-- hreflang dua arah + `x-default` → versi EN, di `<head>` dan di sitemap.
-- Tidak ada redirect otomatis berbasis bahasa/lokasi (lihat F4); crawler dan manusia melihat konten yang sama untuk URL yang sama.
+- Subfolder, not subdomain or query param: EN at the root, ID at `/id`. Slugs stay the same in both languages (`/work`, `/id/work`) so the page mapping stays simple.
+- Every public page: `<link rel="canonical">` to itself (not to the EN version).
+- Two-way hreflang + `x-default` → EN version, in `<head>` and in the sitemap.
+- No automatic redirect based on language/location (see F4); crawlers and people see the same content for the same URL.
 
-**Meta per halaman**
+**Meta per page**
 
-| Halaman | Title | Description |
+| Page | Title | Description |
 | --- | --- | --- |
 | `/` | Rifaldi Radya Pratama, Software Engineer (Full-Stack .NET) | Software engineer building the HR system 13 Panasonic group companies run on. C#, ASP.NET, SQL Server and Azure. Based in Jakarta, Indonesia. |
 | `/work` | Work: HR Systems, Websites, AI Tools \| Rifaldi Radya Pratama | HR systems inside Panasonic, websites and AI tools by Rifaldi Radya Pratama. Open a row for what it is, what I did and the stack. |
 | `/id` | Rifaldi Radya Pratama, Software Engineer (Full-Stack .NET) | Software engineer yang membangun sistem HR 13 perusahaan grup Panasonic. C#, ASP.NET, SQL Server, dan Azure. Berbasis di Jabodetabek. |
 | `/id/work` | Karya: Sistem HR, Website, Alat AI \| Rifaldi Radya Pratama | Sistem HR di Panasonic, website, dan alat AI karya Rifaldi Radya Pratama. Buka satu baris untuk melihat apa itu, yang saya kerjakan, dan stack-nya. |
 
-Meta tidak menyebut availability (D-26).
+Meta does not mention availability (D-26).
 
-**Keyword hipotesis:** "software engineer .NET Jakarta", "full-stack .NET developer", "ASP.NET developer Indonesia" + nama pribadi. Target realistis: ranking untuk **nama sendiri** (branded search).
+**Keyword hypothesis:** "software engineer .NET Jakarta", "full-stack .NET developer", "ASP.NET developer Indonesia" + personal name. Realistic target: ranking for **his own name** (branded search).
 
 **On-page**
 
-- Satu H1 per halaman (headline hero di homepage), hierarki H2/H3 berurutan.
-- Semua gambar via `next/image`: WebP/AVIF, ukuran responsif, `width`/`height` eksplisit (anti-CLS), lazy-load kecuali gambar di atas fold, alt text per bahasa.
-- HTML semantik: `header`, `nav`, `main`, `section`, `footer`; link keluar ke project live pakai anchor text deskriptif.
-- Open Graph + Twitter card per halaman per bahasa, `og:locale` = `en_US` / `id_ID` dengan `og:locale:alternate`.
+- One H1 per page (the hero headline on the homepage), H2/H3 hierarchy in order.
+- All images via `next/image`: WebP/AVIF, responsive sizes, explicit `width`/`height` (anti-CLS), lazy-load except images above the fold, alt text per language.
+- Semantic HTML: `header`, `nav`, `main`, `section`, `footer`; outbound links to live projects use descriptive anchor text.
+- Open Graph + Twitter card per page per language, `og:locale` = `en_US` / `id_ID` with `og:locale:alternate`.
 
 **Structured data (JSON-LD)**
 
-- Homepage: `Person` (name, url, `jobTitle` "Software Engineer", email, `worksFor` PT Panasonic Manufacturing Indonesia, `knowsAbout` C#, ASP.NET, SQL Server, Microsoft Azure, Next.js, TypeScript; `sameAs` `https://www.linkedin.com/in/rifaldiradya` + GitHub bila terisi) + `WebSite` (name, url, inLanguage).
-- Halaman Work: `CollectionPage` dengan `ItemList` project (name, `live_url` bila ada, selain itu URL case `…/work#case-<slug>`).
-- Isi schema harus sama dengan konten yang terlihat di halaman.
+- Homepage: `Person` (name, url, `jobTitle` "Software Engineer", email, `worksFor` PT Panasonic Manufacturing Indonesia, `knowsAbout` C#, ASP.NET, SQL Server, Microsoft Azure, Next.js, TypeScript; `sameAs` `https://www.linkedin.com/in/rifaldiradya` + GitHub when filled in) + `WebSite` (name, url, inLanguage).
+- Work page: `CollectionPage` with an `ItemList` of projects (name, `live_url` when present, otherwise the case URL `…/work#case-<slug>`).
+- Schema content must match the content visible on the page.
 
-**Teknis crawl & index**
+**Crawl & index technical**
 
-- Rendering: halaman publik dirender statis (SSG) dengan revalidasi on-demand saat admin menyimpan, jadi HTML lengkap tersedia untuk crawler.
-- `sitemap.xml` otomatis: 4 halaman publik + 2 halaman privacy, masing-masing dengan `xhtml:link` alternate hreflang dan `lastmod` dari update project terakhir.
-- `robots.txt`: allow semua, disallow `/admin` dan `/api`, cantumkan URL sitemap. Crawler AI (GPTBot, ClaudeBot, PerplexityBot) diizinkan supaya profil bisa dikutip di AI search.
-- Admin: `noindex, nofollow` via meta dan header.
-- Halaman 404 custom per bahasa dengan link balik ke homepage dan Work.
-- HTTPS wajib. Versi kanonik: `https://rifaldiradya.com` (non-www); `www.rifaldiradya.com` dan `http://` redirect 301 ke versi kanonik dengan path yang sama.
+- Rendering: public pages are rendered statically (SSG) with on-demand revalidation when the admin saves, so full HTML is available to crawlers.
+- Automatic `sitemap.xml`: 4 public pages + 2 privacy pages, each with `xhtml:link` alternate hreflang and `lastmod` from the last project update.
+- `robots.txt`: allow all, disallow `/admin` and `/api`, list the sitemap URL. AI crawlers (GPTBot, ClaudeBot, PerplexityBot) are allowed so the profile can be quoted in AI search.
+- Admin: `noindex, nofollow` via meta and header.
+- Custom 404 page per language with links back to the homepage and Work.
+- HTTPS required. Canonical version: `https://rifaldiradya.com` (non-www); `www.rifaldiradya.com` and `http://` redirect 301 to the canonical version with the same path.
 
-**Siap AI search (GEO dasar):** paragraf About ditulis faktual dan mudah dikutip: siapa, peran, perusahaan, stack, cara kontak, dalam kalimat utuh, bukan hanya ikon.
+**Ready for AI search (basic GEO):** the About paragraph is written factually and easy to quote: who, role, company, stack, how to get in touch, in full sentences, not only icons.
 
-**Setelah launch:** verifikasi domain di Google Search Console, submit sitemap, cek coverage kedua bahasa dan laporan hreflang; cek Rich Results Test untuk schema.
+**After launch:** verify the domain in Google Search Console, submit the sitemap, check coverage for both languages and the hreflang report; check the Rich Results Test for the schema.
 
 ## 10. Non-functional requirements
 
-| Area | Requirement | Cara verifikasi |
+| Area | Requirement | How verified |
 | --- | --- | --- |
-| Performance | Lighthouse mobile ≥ 90; LCP < 2,5 s, INP < 200 ms, CLS < 0,1; LCP = teks H1; JS klien halaman publik (di luar runtime Next.js dan GA4) hanya: toggle tema, filter + hash Work, Copy email, jam GMT+7, consent, banner bahasa, target gabungan ≤ 6 KB gzip; animasi scroll hanya CSS, tanpa listener `scroll`. Lapisan pointer (D-31..D-35): ≤ 3 KB gzip, dimuat terpisah dan hanya di perangkat mouse; tidak ada long task > 50 ms darinya saat menggerakkan mouse di halaman Work; INP tetap < 200 ms | PageSpeed Insights di 4 halaman publik dalam kedua tema + Performance panel DevTools |
-| Aksesibilitas | WCAG 2.2 AA: kontras, focus ring terlihat (`:focus-visible`), navigasi keyboard penuh, elemen native (`button`, `a`), target sentuh ≥ 44 px, `prefers-reduced-motion` dihormati, skip link ke konten | Lighthouse ≥ 95 + uji keyboard manual + axe DevTools |
-| Responsif | Layout benar di 360, 375, 768, 1024, 1440 px; tanpa horizontal scroll | Uji manual di DevTools + 1 HP Android/iOS nyata |
-| Browser | 2 versi terakhir Chrome, Safari (termasuk iOS), Firefox, Edge | Uji manual |
-| Keamanan | HTTPS; password admin di-hash (bcrypt/argon2); sesi cookie httpOnly + secure; rate limit login; validasi input server-side; upload dibatasi tipe & ukuran; secret hanya di environment variable, tidak pernah di repo; security headers (CSP, X-Frame-Options, Referrer-Policy) | Review kode + cek header via securityheaders.com |
-| Privasi | Tidak menyimpan data pribadi pengunjung di server; GA4 hanya aktif setelah consent; `localStorage` `rr-theme` hanya preferensi tampilan, tidak dikirim ke mana pun; kebijakan privasi per bahasa menyebutnya | Uji: tolak consent → tidak ada cookie `_ga` |
-| Ketersediaan | Situs publik tetap tampil walau database/storage sedang gangguan (menyajikan halaman statis terakhir) | Simulasi: matikan koneksi DB di staging |
-| Maintainability | Konten project hanya lewat admin; copy statis di file terjemahan terpisah per bahasa (bukan hardcode di komponen) | Review struktur repo |
-| Biaya | Rp 0 tambahan per bulan di luar hosting Hostinger Business + domain (semua layanan pihak ketiga di tier gratis) | Cek dashboard tiap layanan |
+| Performance | Lighthouse mobile ≥ 90; LCP < 2.5 s, INP < 200 ms, CLS < 0.1; LCP = the H1 text; client JS on public pages (outside the Next.js runtime and GA4) is only: theme toggle, Work filter + hash, Copy email, GMT+7 clock, consent, language banner, combined target ≤ 6 KB gzip; scroll animation is CSS only, no `scroll` listener. Pointer layer (D-31..D-35): ≤ 3 KB gzip, loaded separately and only on mouse devices; no long task > 50 ms from it while moving the mouse on the Work page; INP stays < 200 ms | PageSpeed Insights on 4 public pages in both themes + DevTools Performance panel |
+| Accessibility | WCAG 2.2 AA: contrast, visible focus ring (`:focus-visible`), full keyboard navigation, native elements (`button`, `a`), touch targets ≥ 44 px, `prefers-reduced-motion` respected, skip link to content | Lighthouse ≥ 95 + manual keyboard test + axe DevTools |
+| Responsive | Correct layout at 360, 375, 768, 1024, 1440 px; no horizontal scroll | Manual test in DevTools + 1 real Android/iOS phone |
+| Browsers | Last 2 versions of Chrome, Safari (including iOS), Firefox, Edge | Manual test |
+| Security | HTTPS; admin password hashed (bcrypt/argon2); httpOnly + secure session cookie; login rate limit; server-side input validation; uploads limited by type & size; secrets only in environment variables, never in the repo; security headers (CSP, X-Frame-Options, Referrer-Policy) | Code review + header check via securityheaders.com |
+| Privacy | No visitor personal data stored on the server; GA4 is active only after consent; `localStorage` `rr-theme` is only a display preference and is not sent anywhere; the privacy policy in each language mentions it | Test: reject consent → no `_ga` cookie |
+| Availability | The public site still shows while the database/storage has an outage (serves the last static pages) | Simulation: cut the DB connection on staging |
+| Maintainability | Project content only through the admin; static copy in separate translation files per language (not hardcoded in components) | Repo structure review |
+| Cost | Rp 0 extra per month beyond Hostinger Business hosting + domain (all third-party services on free tiers) | Check each service's dashboard |
 
-## 11. Constraints teknis & hosting
+## 11. Technical & hosting constraints
 
-| Constraint | Keputusan | Status |
+| Constraint | Decision | Status |
 | --- | --- | --- |
 | Framework | Next.js (App Router), TypeScript | Final |
-| Hosting | Hostinger **Business Web Hosting** → fitur Node.js Web Apps (paket Business termasuk yang didukung; runtime Node 18/20/22/24) | Final, perlu cek di hPanel |
-| Deploy | Push ke GitHub → Hostinger GitHub integration build otomatis (install → build → start) setiap push ke branch `main` | Final |
-| Domain | rifaldiradya.com (sudah dimiliki); project demo di `staging0.` dan `staging1.rifaldiradya.com` | Final |
+| Hosting | Hostinger **Business Web Hosting** → Node.js Web Apps feature (the Business plan is among the supported ones; Node 18/20/22/24 runtime) | Final, needs a check in hPanel |
+| Deploy | Push to GitHub → Hostinger GitHub integration builds automatically (install → build → start) on every push to the `main` branch | Final |
+| Domain | rifaldiradya.com (already owned); demo projects at `staging0.` and `staging1.rifaldiradya.com` | Final |
 | Email | hello@rifaldiradya.com | Final |
-| Penyimpanan gambar | Bukan filesystem server, supaya aman dari redeploy. Dikunci: MySQL Hostinger, dikompres di browser admin (16:10, WebP, 4 lebar) | Final (29 Sep 2026, tanpa vendor pihak ketiga) |
-| Database | Database terkelola kecil untuk data project + akun admin (kandidat dibandingkan di SDD: MySQL bawaan Hostinger vs Postgres terkelola seperti Supabase/Neon) | Diputuskan di SDD |
+| Image storage | Not the server filesystem, so it is safe from redeploys. Locked: Hostinger MySQL, compressed in the admin browser (16:10, WebP, 4 widths) | Final (Sep 29, 2026, no third-party vendor) |
+| Database | A small managed database for project data + the admin account (candidates compared in the SDD: Hostinger's built-in MySQL vs managed Postgres such as Supabase/Neon) | Decided in the SDD |
 | Analytics | Google Analytics 4 + Consent Mode v2 | Final |
-| Font | Archivo, self-host via `next/font` | Final |
-| Waktu kerja | 5–10 jam/minggu di luar kerja full-time | Final |
-| Data sensitif | Hanya kredensial admin (hash) dan secret API; tidak ada data pembayaran; tidak ada data pribadi pengunjung selain cookie analytics berbasis consent | Final |
+| Font | Archivo, self-hosted via `next/font` | Final |
+| Working time | 5–10 hours/week outside a full-time job | Final |
+| Sensitive data | Only admin credentials (hashed) and API secrets; no payment data; no visitor personal data other than consent-based analytics cookies | Final |
 
-**Catatan penting dari dokumentasi Hostinger:** alur deploy Node.js membuat slot website baru untuk domain. Kalau rifaldiradya.com sudah terdaftar sebagai website (mis. WordPress) di paket hosting, website itu harus dihapus dulu sebelum deploy app Node.js di domain yang sama ([Hostinger docs](https://docs.hostinger.com/node.js/creating-an-app)). Cek dulu apakah subdomain `staging0`/`staging1` ikut terdampak sebelum menghapus apa pun.
+**Important note from the Hostinger docs:** the Node.js deploy flow creates a new website slot for the domain. If rifaldiradya.com is already registered as a website (e.g. WordPress) in the hosting plan, that website must be deleted first before deploying the Node.js app on the same domain ([Hostinger docs](https://docs.hostinger.com/node.js/creating-an-app)). First check whether the `staging0`/`staging1` subdomains are affected before deleting anything.
 
-Alur GitHub → build otomatis dan paket yang didukung: [Hostinger GitHub integration](https://docs.hostinger.com/node.js/github), [panduan deploy Next.js resmi Hostinger](https://github.com/hostinger/deploy-nextjs).
+GitHub → automatic build flow and supported plans: [Hostinger GitHub integration](https://docs.hostinger.com/node.js/github), [Hostinger's official Next.js deploy guide](https://github.com/hostinger/deploy-nextjs).
 
-## 12. Dependensi konten (v2)
+## 12. Content dependencies (v2)
 
-- [ ] Isi 7 proyek di admin **produksi** setelah rilis (teks EN/ID dari `T` di mockup: `w*`, `r*`, `c*`, `peek.*`), atur `show_on_home` dan urutan (D-18, D-29).
-- [x] PDF CV versi web: varian Software Engineer tanpa nomor HP, dibersihkan metadata generator, `public/cv/rifaldi-radya-pratama-cv.pdf`.
-- [ ] Foto profil ≥ 640 × 640 px diunggah ulang di S-14.
-- [ ] Konfirmasi akhir teks hero dan About.
-- [ ] Opsional: screenshot HRMS diblur.
+- [ ] Fill in 7 projects in the **production** admin after the release (EN/ID text from `T` in the mockup: `w*`, `r*`, `c*`, `peek.*`), set `show_on_home` and the order (D-18, D-29).
+- [x] Web version of the CV PDF: Software Engineer variant without a phone number, cleaned of generator metadata, `public/cv/rifaldi-radya-pratama-cv.pdf`.
+- [ ] Profile photo ≥ 640 × 640 px re-uploaded in S-14.
+- [ ] Final confirmation of the hero and About text.
+- [ ] Optional: blurred HRMS screenshots.
 
-## 13. Risiko, asumsi & open questions
+## 13. Risks, assumptions & open questions
 
-**Risiko**
+**Risks**
 
-| Risiko | Dampak | Mitigasi |
+| Risk | Impact | Mitigation |
 | --- | --- | --- |
-| Rekan kerja melihat "Open to full-time roles" | Situasi canggung di kantor | Saklar availability di S-14 (D-16); meta tanpa availability (D-26) |
-| Scroll-driven animation berbeda di Safari/Firefox | Bab tidak terbaca | Fallback tumpukan statis + QA wajib |
-| Rollback setelah ada proyek tanpa URL | Kode v1 rusak | Revert merge **dan** restore backup DB pra-rilis (D-21) |
-| Blur/filter dan font menurunkan skor mobile | Lighthouse < 90 | Gate Lighthouse diuji di staging sebelum rilis |
-| Scope creep (admin, bilingual, GA4) memperlambat launch | Rencana transisi 6 bulan mundur | Scope v1 dikunci di dokumen ini; item baru masuk tabel bagian 7 |
-| Deploy Node.js di Hostinger bentrok dengan website WordPress lama di domain yang sama | Downtime atau subdomain demo terganggu | Cek daftar website di hPanel dulu; backup; uji di subdomain sementara sebelum pindah ke domain utama |
-| Build di Hostinger gagal karena versi Node/konfigurasi | Deploy tertunda | Kunci versi Node di `package.json` (`engines`), uji build lokal sebelum push |
-| Konten (About, deskripsi, screenshot) belum siap saat kode selesai | Launch tertunda | Kerjakan konten paralel sejak minggu pertama (bagian 12) |
-| Copy terjemahan mesin terasa kaku | Trust turun, terutama di EN | Wajib revisi manual; minta 1 orang fasih EN membaca sebelum launch |
-| Layanan gratis (storage/DB) mengubah kuota | Upload/admin gagal | Pilih vendor dengan free tier jauh di atas kebutuhan; halaman publik tetap statis |
+| Coworkers see "Open to full-time roles" | Awkward situation at the office | Availability switch in S-14 (D-16); meta without availability (D-26) |
+| Scroll-driven animation behaves differently in Safari/Firefox | Chapters are unreadable | Static stack fallback + required QA |
+| Rollback after projects without a URL exist | v1 code breaks | Revert the merge **and** restore the pre-release DB backup (D-21) |
+| Blur/filters and fonts lower the mobile score | Lighthouse < 90 | Lighthouse gate tested on staging before release |
+| Scope creep (admin, bilingual, GA4) slows the launch | The 6-month transition plan slips | v1 scope is locked in this document; new items go into the section 7 table |
+| The Node.js deploy on Hostinger clashes with the old WordPress website on the same domain | Downtime or the demo subdomains are disrupted | Check the website list in hPanel first; back up; test on a temporary subdomain before moving to the main domain |
+| The Hostinger build fails because of the Node version/configuration | Deploy is delayed | Pin the Node version in `package.json` (`engines`), test the build locally before pushing |
+| Content (About, descriptions, screenshots) is not ready when the code is done | Launch is delayed | Work on content in parallel from the first week (section 12) |
+| Machine-translated copy feels stiff | Trust drops, especially in EN | Manual revision required; ask 1 fluent EN speaker to read it before launch |
+| Free services (storage/DB) change their quotas | Upload/admin fails | Pick vendors with a free tier far above the need; public pages stay static |
 
-**Asumsi**
+**Assumptions**
 
-- Paket Business Hostinger menampilkan menu Node.js Apps di hPanel akun Pal.
-- Pal mengelola akun GitHub sendiri dan repo bisa private.
-- Pekerjaan Panasonic boleh disebut (dikonfirmasi Pal); layar internal tidak ditampilkan.
-- Trafik awal kecil (< 1.000 kunjungan/bulan), jadi tier gratis semua layanan cukup.
+- The Hostinger Business plan shows the Node.js Apps menu in Pal's hPanel account.
+- Pal manages his own GitHub account and the repo can be private.
+- Panasonic work may be named (confirmed by Pal); internal screens are not shown.
+- Early traffic is small (< 1,000 visits/month), so the free tier of every service is enough.
 
 **Open questions**
 
-- [x] Apakah rifaldiradya.com saat ini masih terpasang sebagai website WordPress di Hostinger? **Ya, masih WordPress**, dan **tidak ada kontennya yang dibutuhkan** (dikonfirmasi 28 Sep 2026). WordPress tetap di-backup sebagai jaring pengaman, lalu diganti di Fase 4 setelah versi uji lolos QA (SDD bagian 10).
-- [ ] Subdomain demo tetap `staging0/1` untuk v1 (diputuskan). Ganti nama nanti cukup edit URL project di admin.
-- [x] Versi kanonik: **`rifaldiradya.com` (non-www)**, disetujui 28 Sep 2026.
-- [x] Link sosial di footer: **LinkedIn** `https://www.linkedin.com/in/rifaldiradya` (diputuskan 28 Sep 2026). GitHub menyusul jika diinginkan.
-- [x] Zona waktu di blok fakta About: **GMT+7 (WIB)**, dikonfirmasi 28 Sep 2026.
+- [x] Is rifaldiradya.com currently still installed as a WordPress website on Hostinger? **Yes, still WordPress**, and **none of its content is needed** (confirmed Sep 28, 2026). WordPress is still backed up as a safety net, then replaced in Phase 4 after the test version passes QA (SDD section 10).
+- [ ] The demo subdomains stay `staging0/1` for v1 (decided). Renaming later only needs an edit of the project URL in the admin.
+- [x] Canonical version: **`rifaldiradya.com` (non-www)**, approved Sep 28, 2026.
+- [x] Social link in the footer: **LinkedIn** `https://www.linkedin.com/in/rifaldiradya` (decided Sep 28, 2026). GitHub follows if wanted.
+- [x] Time zone in the About facts block: **GMT+7 (WIB)**, confirmed Sep 28, 2026.
 
-## 14. Rencana rilis & milestone
+## 14. Release plan & milestones
 
-Target: v1 live sekitar **4 minggu** setelah dokumen perencanaan selesai, dengan asumsi 5–10 jam/minggu (total kira-kira 20–40 jam). Ini estimasi, bukan komitmen; gate di bawah lebih penting daripada tanggal.
+Target: v1 live about **4 weeks** after the planning documents are done, assuming 5–10 hours/week (roughly 20–40 hours in total). This is an estimate, not a commitment; the gates below matter more than the dates.
 
-&#91;embedded content: rencana rilis v1 · 4 fase, 2 gate, 1 jalur konten paralel\]
+&#91;embedded content: v1 release plan · 4 phases, 2 gates, 1 parallel content track\]
 
-Pipeline deploy diuji di minggu pertama dengan halaman kosong, supaya masalah Hostinger ketahuan sebelum fitur dibangun. Launch hanya jika semua acceptance criteria di bagian 6 tercentang dan metrik bagian 3 terpenuhi.
+The deploy pipeline is tested in the first week with an empty page, so Hostinger problems show up before features are built. Launch only when every acceptance criterion in section 6 is checked and the section 3 metrics are met.
 
-**Urutan dokumen perencanaan:** PRD (dokumen ini) → App Flow Document (layar, navigasi, flow langkah demi langkah, state, edge case, kontrak data/API) → SDD (arsitektur, pilihan DB/storage final, struktur repo, aturan kerja dengan coding AI). Eksekusi kode dilakukan terpisah dengan setup vibe-coding-builder.
+**Planning document order:** PRD (this document) → App Flow Document (screens, navigation, step-by-step flows, states, edge cases, data/API contracts) → SDD (architecture, final DB/storage choice, repo structure, rules for working with AI coding). Code execution happens separately with the vibe-coding-builder setup.
 
-**v2.0.0:** dirakit di `staging` (task T-23..T-33, SDD §12), dirilis lewat PR `staging` → `main`; v2.1.0 (lapisan pointer, preview admin, tema gelap default, bidang titik, ikon v2, cache HTML lebih pendek) dirilis sebagai MINOR (task T-34..T-40).
+**v2.0.0:** assembled on `staging` (tasks T-23..T-33, SDD §12), released through a `staging` → `main` PR; v2.1.0 (pointer layer, admin preview, dark theme default, dot field, v2 icons, shorter HTML cache) released as a MINOR (tasks T-34..T-40).

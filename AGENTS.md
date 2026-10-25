@@ -2,45 +2,46 @@
 
 ## Specs (source of truth)
 
-- Current: docs/specs/ (cek `version` dan `status: current` di header tiap file). Live: v2.1.0 (tag git di `main`).
-- Active change: none (terakhir: docs/changes/archive/2026-10-22-v2.1.0-pointer-layer/)
+- Current: docs/specs/ (check `version` and `status: current` in each file's header). Live: v2.1.0 (git tag on `main`).
+- Active change: none (last: docs/changes/archive/2026-10-22-v2.1.0-pointer-layer/)
   → Implement ONLY what the active change describes. Where it conflicts with docs/specs, the change wins.
 - docs/changes/archive/ is history only — never use it as requirements.
 - Versions: PATCH = fix/tidy (builder directly) · MINOR = something new · MAJOR = direction/structure change. MINOR/MAJOR are planned as a CHANGE.md first (docs/changes/vX.Y.Z-name/CHANGE.md).
-- Alur branch: semua perubahan → PR ke `staging` → cek di devstaging → PR `staging` → `main` (SDD bagian 10). Jangan PR langsung ke `main`.
-- Riwayat rilis: docs/CHANGELOG.md. Log keputusan: docs/decisions/DECISIONS.md.
+- Branch flow: every change → PR to `staging` → check on devstaging → PR `staging` → `main` (SDD section 10). Never PR directly to `main`.
+- Release history: docs/CHANGELOG.md. Decision log: docs/decisions/DECISIONS.md.
 
-## Sumber kebenaran
+## Sources of truth
 
-1. docs/specs/APP_FLOW.md — layar, flow, state, edge case, kontrak API. Paling mengikat.
-2. docs/specs/SDD.md — arsitektur, stack, struktur repo, keamanan.
-3. docs/specs/PRD.md — alasan produk, copy, visual, tabel Motion.
-4. docs/design/v2/option-b.html (publik) dan docs/design/v2/admin.html (admin) — referensi visual & interaksi. Kalau mockup berbeda dengan docs, docs yang menang; kalau docs diam, ikuti mockup. Abaikan docs/design/archive/ (versi lama).
-   Kalau semuanya tidak menjawab: BERHENTI dan tanya. Jangan mengarang.
+1. docs/specs/APP_FLOW.md — screens, flows, states, edge cases, API contracts. Most binding.
+2. docs/specs/SDD.md — architecture, stack, repo structure, security.
+3. docs/specs/PRD.md — product reasoning, copy, visuals, Motion table.
+4. docs/design/v2/option-b.html (public) and docs/design/v2/admin.html (admin) — visual & interaction reference. If the mockup differs from the docs, the docs win; if the docs are silent, follow the mockup. Ignore docs/design/archive/ (old versions).
+   If none of them answers: STOP and ask. Do not make it up.
 
-## Aturan keras
+## Hard rules
 
-- Next.js 16 App Router, TypeScript strict, Tailwind v4 token dari styles/globals.css; `--calm`/`--faint` bukan untuk teks.
-- Pakai proxy.ts, bukan middleware.ts.
-- Tidak ada dependency baru tanpa izin; tidak ada dependency native.
-- Tidak ada auto-redirect bahasa; locale hanya dari URL.
-- Tidak ada GA4/cookie analytics sebelum consent=granted.
-- Tidak ada gambar di filesystem server; gambar project disimpan di MySQL (lib/images) dan disajikan lewat /media.
-- Tidak ada teks UI hardcode; semua dari i18n/en.json dan i18n/id.json.
-- Akses DB hanya di lib/projects, lib/images, dan lib/auth.
-- Jangan menambah layar, field, fitur, atau library di luar docs.
-- Motion scroll hanya CSS (`@supports` + fallback statis); JS klien hanya untuk komponen di PRD §10 dan `PointerLayer` (khusus mouse, dimuat terpisah; v2.1.0 D-31..D-35); tanpa fade-in pada H1.
-- String kamus dengan penanda (<em>, <s>, <strong>) dirender lewat richText(), jangan dangerouslySetInnerHTML.
-- Folder baru dibuat saat task yang membutuhkannya dikerjakan, mengikuti struktur SDD bagian 4 (tanpa file placeholder kosong).
+- Next.js 16 App Router, TypeScript strict, Tailwind v4 tokens from styles/globals.css; `--calm`/`--faint` are not for text.
+- Use proxy.ts, not middleware.ts.
+- No new dependency without permission; no native dependencies.
+- No language auto-redirect; locale only from the URL.
+- No GA4/analytics cookies before consent=granted.
+- No images on the server filesystem; project images are stored in MySQL (lib/images) and served through /media.
+- No hardcoded UI text; everything comes from i18n/en.json and i18n/id.json.
+- DB access only in lib/projects, lib/images and lib/auth.
+- Do not add screens, fields, features or libraries beyond the docs.
+- Scroll motion is CSS only (`@supports` + static fallback); client JS only for the components in PRD §10 and `PointerLayer` (mouse only, loaded separately; v2.1.0 D-31..D-35); no fade-in on the H1.
+- Dictionary strings with markers (<em>, <s>, <strong>) are rendered through richText(), never dangerouslySetInnerHTML.
+- New folders are created when the task that needs them is done, following the SDD section 4 structure (no empty placeholder files).
+- Docs are written in English.
 
-## Cara kerja per task
+## How to work per task
 
-1. Baca task (T-xx) dan bagian docs yang dirujuk.
-2. Tulis rencana singkat: file yang diubah + acceptance criteria yang dipenuhi.
-3. Implementasi kecil dan fokus.
-4. Jalankan: npm run lint, npm run typecheck, npm run format:check, npm test (+ test:e2e bila relevan), npm run build.
-5. Laporkan: apa yang dibuat, AC mana yang lolos, apa yang belum.
-6. Keputusan yang menyimpang dari docs dicatat di docs/decisions/DECISIONS.md, lalu docs diperbarui.
+1. Read the task (T-xx) and the docs sections it references.
+2. Write a short plan: files to change + acceptance criteria met.
+3. Implement small and focused.
+4. Run: npm run lint, npm run typecheck, npm run format:check, npm test (+ test:e2e when relevant), npm run build.
+5. Report: what was built, which ACs pass, what is not done.
+6. Decisions that depart from the docs are logged in docs/decisions/DECISIONS.md, then the docs are updated.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

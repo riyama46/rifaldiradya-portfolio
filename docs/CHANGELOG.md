@@ -1,110 +1,114 @@
 # Changelog
 
-Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versi memakai SemVer lewat tag git di `main`: MAJOR = arah, positioning, arsitektur informasi, atau perubahan yang memutus kompatibilitas; MINOR = fitur, section, atau halaman baru; PATCH = perbaikan, copy, styling kecil.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions use SemVer through git tags on `main`: MAJOR = direction, positioning, information architecture, or a compatibility-breaking change; MINOR = a new feature, section or page; PATCH = fixes, copy, small styling.
 
 ## [Unreleased]
+
+### Changed
+
+- Docs (`docs/specs/`, CHANGELOG, DECISIONS, AGENTS.md) translated to English for readers of the public repo; content unchanged.
 
 ## [2.1.1] - 2026-10-23
 
 ### Fixed
 
-- Preview proyek di samping kursor tidak muncul di halaman Work setelah pindah dari homepage lewat bar (navigasi sisi klien); baru muncul setelah ganti bahasa. Lapisan pointer kini dipasang ulang per halaman sehingga memakai `.peek` dan zona halaman yang aktif.
-- Snippet Google menempelkan link kontak jadi satu kata ("hello@rifaldiradya.comLinkedIn"): link di baris kontak sekarang dipisah spasi di HTML, tampilan tidak berubah.
+- The project preview beside the cursor did not show on the Work page after coming from the homepage through the bar (client-side navigation); it only showed after switching language. The pointer layer is now remounted per page, so it uses the active page's `.peek` and zones.
+- The Google snippet glued the contact links into one word ("hello@rifaldiradya.comLinkedIn"): links in the contact line are now separated by spaces in the HTML, with no visual change.
 
 ## [2.1.0] - 2026-10-22
 
-Lapisan pointer untuk desktop, preview di admin, tema gelap default, dan perapian visual. Detail: `docs/changes/archive/2026-10-22-v2.1.0-pointer-layer/CHANGE.md`, keputusan D-31..D-39 di `docs/decisions/DECISIONS.md`.
+Pointer layer for desktop, admin preview, dark theme default and visual tidy-ups. Details: `docs/changes/archive/2026-10-22-v2.1.0-pointer-layer/CHANGE.md`, decisions D-31..D-39 in `docs/decisions/DECISIONS.md`.
 
 ### Added
 
-- Lapisan pointer khusus mouse: kursor titik + cincin berlabel "Read"/"Visit", cahaya yang mengikuti kursor dengan warna per bab, preview proyek (screenshot atau kartu angka) di samping kursor di Selected work dan Work, tilt screenshot. Dimuat terpisah, tidak pernah di layar sentuh; menghormati reduced motion dan fokus keyboard.
-- Panel preview di form project admin (≥ 1024 px): tampilan di homepage dan preview di samping kursor, berubah saat mengetik, EN/ID.
+- Mouse-only pointer layer: a dot cursor + ring labeled "Read"/"Visit", a light that follows the cursor with a color per chapter, a project preview (screenshot or numbers card) beside the cursor in Selected work and Work, screenshot tilt. Loaded separately, never on touch screens; respects reduced motion and keyboard focus.
+- Preview panel in the admin project form (≥ 1024 px): the homepage view and the preview beside the cursor, updating while typing, EN/ID.
 
 ### Changed
 
-- Tema gelap jadi default untuk semua pengunjung yang belum memilih, juga tanpa JS; terang tetap lewat toggle dan `?theme=light`.
-- Titik latar menjadi satu bidang yang menyambung di seluruh halaman dengan parallax pelan.
-- Favicon dan ikon aplikasi v2 "cobalt RR".
-- Cache HTML publik dipersingkat (`s-maxage=60, stale-while-revalidate=60`), sehingga perubahan dari admin tampak dalam ±2 menit.
-- `check-deploy.mts` mengharapkan tautan GitHub (sejak v2.0.2).
-- Spesifikasi (`docs/specs/`) dinaikkan ke 2.1.0.
+- The dark theme is the default for every visitor who has not chosen, also without JS; light stays available through the toggle and `?theme=light`.
+- The background dots become one field that runs across the whole page with slow parallax.
+- v2 "cobalt RR" favicon and app icons.
+- Shorter public HTML cache (`s-maxage=60, stale-while-revalidate=60`), so admin changes show within ~2 minutes.
+- `check-deploy.mts` expects the GitHub link (since v2.0.2).
+- Specs (`docs/specs/`) bumped to 2.1.0.
 
 ## [2.0.2] - 2026-10-22
 
 ### Added
 
-- Tautan GitHub (profil publik) di Contact dan JSON-LD `sameAs` (D-19 terpenuhi: repo sudah publik).
+- GitHub link (public profile) in Contact and the JSON-LD `sameAs` (D-19 met: the repo is now public).
 
 ### Changed
 
-- README ditulis ulang untuk repo publik; email admin di spec dikoreksi ke hello@rifaldiradya.com.
+- README rewritten for the public repo; the admin email in the spec corrected to hello@rifaldiradya.com.
 
 ## [2.0.1] - 2026-10-22
 
 ### Fixed
 
-- Rate limit login (E-10) tidak lagi bisa dilewati dengan banyak request serentak.
-- Body JSON API admin, termasuk login, dibatasi 32 KB juga untuk request chunked tanpa `Content-Length`.
-- URL live yang tidak ditampilkan di halaman (tombol case bukan "site") tidak lagi ikut di JSON-LD halaman Work.
-- Gambar yang dihapus di satu tab tidak lagi bisa tersimpan di project/profil yang disimpan di tab lain.
+- The login rate limit (E-10) can no longer be bypassed with many simultaneous requests.
+- Admin API JSON bodies, login included, are limited to 32 KB also for chunked requests without `Content-Length`.
+- Live URLs that are not shown on the page (case button other than "site") no longer appear in the Work page JSON-LD.
+- An image deleted in one tab can no longer be saved into a project/profile saved in another tab.
 
 ### Changed
 
-- Bersih-bersih kode: helper yang hanya dipakai test dihapus, cek fase build di satu tempat.
+- Code cleanup: helpers used only by tests deleted, the build-phase check in one place.
 
 ## [2.0.0] - 2026-10-18
 
-Arah situs berubah: showcase software engineer full-stack .NET untuk recruiter dan klien proyek, dengan situs sebagai funnel ke email. Detail: `docs/changes/archive/2026-10-18-v2.0.0-showcase-redesign/CHANGE.md`, keputusan D-01..D-30 di `docs/decisions/DECISIONS.md`.
+The site's direction changes: a full-stack .NET software engineer showcase for recruiters and project clients, with the site as a funnel to email. Details: `docs/changes/archive/2026-10-18-v2.0.0-showcase-redesign/CHANGE.md`, decisions D-01..D-30 in `docs/decisions/DECISIONS.md`.
 
 ### Added
 
-- Home 5 bab dengan scroll snap: Hero, Selected work (dipin, maks. 5, penghitung + rail), About (Pendidikan, Sertifikasi, Download CV), Highlight SSO, Contact.
-- Halaman Work baru: filter grup (Panasonic, Websites, AI tools), baris case yang bisa dibuka (`/work#case-<slug>`), sub dihitung dari data.
-- Tema gelap/terang dengan toggle, tanpa flash saat load (`rr-theme`).
-- Funnel email: mailto dengan subject dan isi terisi untuk 4 jenis (umum, posisi, proyek, walkthrough), Copy email di Contact, Download CV (PDF web tanpa nomor HP).
-- Model data project v2 (grup, meta + side, isi case EN/ID, tombol case, visual screenshot/kartu angka, Show in Selected work maks. 5); migrasi `0004`.
-- Admin: form per bagian (What I did per baris dengan paste multi-baris, Stack maks. 6, tombol case, visual), daftar dengan filter grup, saklar availability di Profile.
-- Event GA4 `case_open`, `cv_download`, `theme_switch`; `contact_email_click` dengan `kind`.
+- 5-chapter Home with scroll snap: Hero, Selected work (pinned, max. 5, counter + rail), About (Education, Certifications, Download CV), SSO Highlight, Contact.
+- New Work page: group filter (Panasonic, Websites, AI tools), case rows that open (`/work#case-<slug>`), sub computed from data.
+- Dark/light theme with a toggle, no flash on load (`rr-theme`).
+- Email funnel: mailto with a filled subject and body for 4 kinds (general, role, project, walkthrough), Copy email in Contact, Download CV (web PDF without a phone number).
+- v2 project data model (group, meta + side, EN/ID case content, case button, screenshot/numbers card visual, Show in Selected work max. 5); migration `0004`.
+- Admin: form per section (What I did per line with multi-line paste, Stack max. 6, case button, visual), list with a group filter, availability switch in Profile.
+- GA4 events `case_open`, `cv_download`, `theme_switch`; `contact_email_click` with `kind`.
 
 ### Changed
 
-- Positioning, persona, copy EN/ID, meta SEO, JSON-LD `Person` (Software Engineer, `worksFor`, `knowsAbout`), gambar OG.
-- Visual "Opsi B": font Archivo, aksen cobalt, token dua lapis; motion CSS scroll-driven dengan fallback statis.
-- `live_url` opsional (proyek internal tanpa URL); rollback ke v1 butuh restore backup database (D-21).
-- Foto profil minimal 640 px (varian 320/640).
-- Spesifikasi (`docs/specs/`) dinaikkan ke 2.0.0.
+- Positioning, personas, EN/ID copy, SEO meta, JSON-LD `Person` (Software Engineer, `worksFor`, `knowsAbout`), OG images.
+- "Option B" visuals: Archivo font, cobalt accent, two-layer tokens; CSS scroll-driven motion with a static fallback.
+- `live_url` optional (internal projects without a URL); rolling back to v1 needs a database backup restore (D-21).
+- Profile photo at least 640 px (320/640 variants).
+- Specs (`docs/specs/`) bumped to 2.0.0.
 
 ### Removed
 
-- HeroProofPanel (rotasi), service block, alur Brief → Build → Live, label section bernomor, highlighter, status dot berdenyut, CTA akhir, ProjectCard.
-- Flag `availableForWork` (diganti saklar availability di admin).
+- HeroProofPanel (rotation), service block, the Brief → Build → Live flow, numbered section labels, highlighter, pulsing status dot, final CTA, ProjectCard.
+- The `availableForWork` flag (replaced by the availability switch in the admin).
 
 ### Fixed
 
-- Paste beberapa baris ke What I did tidak lagi tergabung jadi satu baris.
-- Foto profil dan availability disimpan dalam satu transaksi.
+- Pasting several lines into What I did no longer merges them into one line.
+- The profile photo and availability are saved in one transaction.
 
 ## [1.0.1] - 2026-10-17
 
 ### Fixed
 
-- URL LinkedIn diganti ke `https://www.linkedin.com/in/rifaldiradya` (footer dan `sameAs` JSON-LD Person).
+- LinkedIn URL changed to `https://www.linkedin.com/in/rifaldiradya` (footer and the JSON-LD Person `sameAs`).
 
 ### Changed
 
-- Dokumen dipindah ke layout `docs/specs/` (PRD, APP_FLOW, SDD) dan `docs/decisions/DECISIONS.md`, dengan header versi; CHANGELOG ini ditambahkan.
-- Alur kerja: semua perubahan masuk `staging` dulu, baru `staging` → `main` (SDD bagian 10, DECISIONS 2026-10-13).
+- Docs moved to the `docs/specs/` layout (PRD, APP_FLOW, SDD) and `docs/decisions/DECISIONS.md`, with version headers; this CHANGELOG added.
+- Workflow: every change goes into `staging` first, then `staging` → `main` (SDD section 10, DECISIONS 2026-10-13).
 
 ## [1.0.0] - 2026-10-02
 
 ### Added
 
-- Situs publik bilingual (EN di `/`, ID di `/id`, tanpa auto-redirect bahasa): homepage (hero dengan panel bukti bergantian, services, selected work, about, CTA), `/work`, `/privacy`, 404.
-- Admin `/admin`: login dengan rate limiting, CRUD project dengan draft/published, urutan ↑/↓, gambar dikompres di browser dan disimpan di MySQL (disajikan lewat `/media`), foto profil.
-- SEO: canonical + hreflang, JSON-LD (WebSite + Person), sitemap, robots, gambar OG; hanya `rifaldiradya.com` yang bisa diindeks.
-- GA4 dengan Consent Mode (tidak ada yang dimuat sebelum Accept); event `contact_email_click`, `project_link_click`, `language_switch`.
-- Keamanan: CSP, HSTS, X-Frame-Options, cek Origin pada penulisan admin.
-- Dua lingkungan: `main` → rifaldiradya.com, `staging` → devstaging.rifaldiradya.com, database terpisah; CI di keduanya.
+- Bilingual public site (EN at `/`, ID at `/id`, no language auto-redirect): homepage (hero with a rotating proof panel, services, selected work, about, CTA), `/work`, `/privacy`, 404.
+- Admin `/admin`: login with rate limiting, project CRUD with draft/published, ↑/↓ ordering, images compressed in the browser and stored in MySQL (served through `/media`), profile photo.
+- SEO: canonical + hreflang, JSON-LD (WebSite + Person), sitemap, robots, OG images; only `rifaldiradya.com` can be indexed.
+- GA4 with Consent Mode (nothing loads before Accept); events `contact_email_click`, `project_link_click`, `language_switch`.
+- Security: CSP, HSTS, X-Frame-Options, Origin check on admin writes.
+- Two environments: `main` → rifaldiradya.com, `staging` → devstaging.rifaldiradya.com, separate databases; CI on both.
 
 [Unreleased]: https://github.com/riyama46/rifaldiradya-portfolio/compare/v1.0.1...HEAD
 [1.0.1]: https://github.com/riyama46/rifaldiradya-portfolio/compare/v1.0.0...v1.0.1
