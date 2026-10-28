@@ -71,9 +71,9 @@ Pal is moving their freelance service to HR / people-ops workflow automation (n8
   | Page | Title | Description |
   | --- | --- | --- |
   | `/` | Rifaldi Radya Pratama, HR Automation Engineer (n8n + AI) | I build n8n and AI workflows that automate onboarding and HR admin, backed by four years on the HRMS of a 13-company manufacturing group. Based in Jakarta. |
-  | `/work` | Work: HR Automation, HR Systems, Websites \| Rifaldi Radya Pratama | HR automations built with n8n and AI, an enterprise HRMS, websites and AI tools by Rifaldi Radya Pratama. Open a row for what it is, what I did and the stack. |
+  | `/work` | Work: HR Automation and HR Systems \| Rifaldi Radya Pratama | HR automations with n8n and AI, an enterprise HRMS, websites and AI tools by Rifaldi Radya Pratama. Open a row for what it is, what I did and the stack. |
   | `/id` | Rifaldi Radya Pratama, HR Automation Engineer (n8n + AI) | Workflow n8n dan AI untuk otomasi onboarding dan administrasi HR, berbekal empat tahun di HRMS grup manufaktur 13 perusahaan. Berbasis di Jabodetabek. |
-  | `/id/work` | Karya: Otomasi HR, Sistem HR, Website \| Rifaldi Radya Pratama | Otomasi HR dengan n8n dan AI, HRMS enterprise, website, dan alat AI karya Rifaldi Radya Pratama. Buka satu baris untuk melihat detailnya. |
+  | `/id/work` | Karya: Otomasi HR dan Sistem HR \| Rifaldi Radya Pratama | Otomasi HR dengan n8n dan AI, HRMS enterprise, website, dan alat AI karya Rifaldi Radya Pratama. Buka satu baris untuk melihat detailnya. |
 
   OG alt: "Rifaldi Radya Pratama, HR automation engineer. I automate the HR work your team does by hand." / "Rifaldi Radya Pratama, HR automation engineer. Otomasi pekerjaan HR yang masih manual." **Keyword hypothesis:** "HR automation n8n", "n8n onboarding automation", "HR automation freelancer Indonesia" + personal name. **JSON-LD Person:** `jobTitle` "HR Automation Engineer"; no `worksFor`; `knowsAbout` HR automation, n8n, Google Gemini, Google Workspace, Power Automate, HRMS, C#, ASP.NET, SQL Server. Previously: "Software Engineer", `worksFor` PT Panasonic Manufacturing Indonesia, .NET-only `knowsAbout`.
 - **§12 Content dependencies:** ADDED items (Impact checklist, content tasks).

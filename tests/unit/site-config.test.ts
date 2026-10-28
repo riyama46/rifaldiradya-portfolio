@@ -21,20 +21,22 @@ describe("mailtoHref", () => {
 
   it("project: subject and body in the page language", () => {
     expect(mailtoHref(en, "project")).toContain(
-      "subject=Project%3A%20&body=What%20you%20need%20built%3A",
+      "subject=Project%3A%20&body=The%20HR%20process%20you%20want%20to%20automate%3A",
     );
     expect(mailtoHref(id, "project")).toContain(
-      "subject=Proyek%3A%20&body=Yang%20ingin%20dibangun%3A",
+      "subject=Proyek%3A%20&body=Proses%20HR%20yang%20ingin%20diotomasi%3A",
     );
   });
 
   it("walkthrough names the project in the subject (D-25)", () => {
     expect(mailtoHref(en, "walkthrough", "Single Sign-On")).toContain(
-      "subject=Walkthrough%3A%20Single%20Sign-On&body=Company%3A",
+      "subject=Walkthrough%3A%20Single%20Sign-On&body=Company%20and%20team%20size%3A",
     );
     expect(mailtoHref(id, "walkthrough", "HR System")).toContain(
-      "subject=Walkthrough%3A%20HR%20System&body=Perusahaan%3A",
+      "subject=Walkthrough%3A%20HR%20System&body=Perusahaan%20dan%20jumlah%20karyawan%3A",
     );
+    // The walkthrough body asks automation clients about their process, not a hiring role.
+    expect(decodeURIComponent(mailtoHref(en, "walkthrough", "x"))).not.toContain("hiring");
   });
 
   it("encodes characters that would break the query", () => {
@@ -55,5 +57,29 @@ describe("siteConfig", () => {
 
   it("serves the CV from public/cv", () => {
     expect(siteConfig.cvPath).toMatch(/^\/cv\/[a-z-]+\.pdf$/);
+  });
+});
+
+// D-41: the employer is track record in About (and the CV), never headline copy, meta or schema.
+describe("employer name", () => {
+  const paths = (value: unknown, prefix = ""): [string, string][] =>
+    typeof value === "string"
+      ? [[prefix, value]]
+      : Object.entries(value as object).flatMap(([key, child]) =>
+          paths(child, prefix ? `${prefix}.${key}` : key),
+        );
+
+  it.each([
+    ["en", en],
+    ["id", id],
+  ] as const)("%s dictionary names it only in about.p1", (_, dict) => {
+    const hits = paths(dict)
+      .filter(([, text]) => /panasonic/i.test(text))
+      .map(([path]) => path);
+    expect(hits).toEqual(["about.p1"]);
+  });
+
+  it("is not in the site config (hero stack, JSON-LD)", () => {
+    expect(JSON.stringify(siteConfig)).not.toMatch(/panasonic/i);
   });
 });
