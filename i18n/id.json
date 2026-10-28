@@ -45,6 +45,7 @@
     "all": "Lihat semua karya →",
     "rail": "Proyek",
     "open": "Buka situsnya ↗",
+    "demo": "Tonton demonya ↗",
     "empty": "Karya baru sedang disiapkan. Sementara itu, ini cara menghubungi saya."
   },
   "cur": {
@@ -95,7 +96,8 @@
     "did": "Yang saya kerjakan",
     "stack": "Stack",
     "status": "Status",
-    "walk": "Email untuk minta walkthrough"
+    "walk": "Email untuk minta walkthrough",
+    "code": "Lihat kodenya ↗"
   },
   "group": {
     "automation": "Otomasi HR",

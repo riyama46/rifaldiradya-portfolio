@@ -16,7 +16,13 @@ export function CaseRow({ dict, project }: CaseRowProps) {
   const intro = project.caseIs ?? project.summary;
   const site = project.liveUrl;
   const walkthrough = project.caseAction === "walkthrough";
-  const hasDetails = project.stack.length > 0 || project.status !== null || site || walkthrough;
+  // D-42: optional links after the case button, demo first.
+  const links = [
+    { url: project.demoUrl, link: "demo", label: dict.work.demo },
+    { url: project.repoUrl, link: "code", label: c.code },
+  ].filter((item): item is typeof item & { url: string } => item.url !== null);
+  const hasActions = Boolean(site) || walkthrough || links.length > 0;
+  const hasDetails = project.stack.length > 0 || project.status !== null || hasActions;
 
   return (
     <li className="row" data-group={project.group}>
@@ -64,31 +70,51 @@ export function CaseRow({ dict, project }: CaseRowProps) {
                   <p className="val">{project.status}</p>
                 </>
               )}
-              {site && (
-                <a
-                  className="line-link case-act"
-                  href={site}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-track="project_link_click"
-                  data-slug={project.slug}
-                  data-placement="case"
-                  data-cursor="visit"
-                >
-                  {dict.work.open}
-                </a>
-              )}
-              {walkthrough && (
-                <MailtoLink
-                  dict={dict}
-                  kind="walkthrough"
-                  location="case"
-                  project={{ title: project.title, slug: project.slug }}
-                  variant="soft"
-                  className="case-act"
-                >
-                  {c.walk}
-                </MailtoLink>
+              {hasActions && (
+                <div className="case-acts">
+                  {site && (
+                    <a
+                      className="line-link case-act"
+                      href={site}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-track="project_link_click"
+                      data-slug={project.slug}
+                      data-placement="case"
+                      data-cursor="visit"
+                    >
+                      {dict.work.open}
+                    </a>
+                  )}
+                  {walkthrough && (
+                    <MailtoLink
+                      dict={dict}
+                      kind="walkthrough"
+                      location="case"
+                      project={{ title: project.title, slug: project.slug }}
+                      variant="soft"
+                      className="case-act"
+                    >
+                      {c.walk}
+                    </MailtoLink>
+                  )}
+                  {links.map(({ url, link, label }) => (
+                    <a
+                      key={link}
+                      className="line-link case-act"
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-track="project_link_click"
+                      data-slug={project.slug}
+                      data-placement="case"
+                      data-link={link}
+                      data-cursor="visit"
+                    >
+                      {label}
+                    </a>
+                  ))}
+                </div>
               )}
             </div>
           )}

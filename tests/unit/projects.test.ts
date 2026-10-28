@@ -87,6 +87,8 @@ describe("toPublicProject (v2 DTO)", () => {
       status: "Live, 2025",
       caseAction: "site",
       liveUrl: "https://staging0.rifaldiradya.com",
+      demoUrl: null,
+      repoUrl: null,
       visual: {
         type: "screenshot",
         url: "/media/01JIMAGE000000000000000000.webp",
@@ -158,6 +160,20 @@ describe("toPublicProject (v2 DTO)", () => {
       );
       expect(dto.liveUrl).toBeNull();
     }
+  });
+
+  it("D-42: keeps https demo and code links beside any case action, drops the rest", () => {
+    const demoUrl = "https://drive.google.com/file/d/abc/view";
+    const repoUrl = "https://github.com/riyama46/hr-onboarding-automation";
+    for (const caseAction of ["site", "walkthrough", "none"] as const) {
+      expect(toPublicProject(project({ caseAction, demoUrl, repoUrl }), "id")).toMatchObject({
+        demoUrl,
+        repoUrl,
+      });
+    }
+    const unsafe = project({ demoUrl: "http://example.com", repoUrl: "javascript:alert(1)" });
+    expect(toPublicProject(unsafe, "en")).toMatchObject({ demoUrl: null, repoUrl: null });
+    expect(toPublicProject(project(), "en")).toMatchObject({ demoUrl: null, repoUrl: null });
   });
 
   it("E-28: site without a usable URL becomes no button, with a server warning", () => {

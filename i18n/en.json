@@ -45,6 +45,7 @@
     "all": "See all work →",
     "rail": "Projects",
     "open": "Open the live site ↗",
+    "demo": "Watch the demo ↗",
     "empty": "New work is on the way. Meanwhile, here's how to reach me."
   },
   "cur": {
@@ -83,7 +84,8 @@
     "did": "What I did",
     "stack": "Stack",
     "status": "Status",
-    "walk": "Email to ask for a walkthrough"
+    "walk": "Email to ask for a walkthrough",
+    "code": "View the code ↗"
   },
   "group": {
     "automation": "HR automation",

@@ -23,7 +23,10 @@ async function expectUnderBar(page: Page, project: Created) {
   }).toPass({ timeout: 5_000 });
 }
 
-/** Two Panasonic walkthrough cases and one website with a live link; only the first is on home. */
+/**
+ * Two HR systems walkthrough cases and one website with a live link, a demo and code (D-42); only
+ * the first is on home.
+ */
 const payloads = (run: string) => [
   published(`E2E HR ${run}`, { group: "panasonic", case_action: "walkthrough" }),
   published(`E2E SSO ${run}`, {
@@ -38,6 +41,8 @@ const payloads = (run: string) => [
     group: "web",
     case_action: "site",
     live_url: "https://example.com/",
+    demo_url: "https://example.com/demo",
+    repo_url: "https://example.com/code",
     show_on_home: false,
   }),
 ];
@@ -66,11 +71,11 @@ test.describe("Work page", () => {
       await expect(row(page, sso).locator(".row-m")).toHaveText("E2E client");
       await expect(row(page, sso)).not.toHaveAttribute("open");
 
-      // AC-4: Panasonic shows only Panasonic rows, the button is pressed.
+      // AC-4: HR systems shows only HR systems rows, the button is pressed.
       const filters = page.getByRole("group", { name: "Filter projects" });
-      const panasonic = filters.getByRole("button", { name: /^Panasonic \d+$/ });
-      await panasonic.click();
-      await expect(panasonic).toHaveAttribute("aria-pressed", "true");
+      const hrSystems = filters.getByRole("button", { name: /^HR systems \d+$/ });
+      await hrSystems.click();
+      await expect(hrSystems).toHaveAttribute("aria-pressed", "true");
       await expect(filters.getByRole("button", { name: /^All \d+$/ })).toHaveAttribute(
         "aria-pressed",
         "false",
@@ -96,7 +101,7 @@ test.describe("Work page", () => {
       const walk = body.getByRole("link", { name: "Email to ask for a walkthrough" });
       const href = decodeURIComponent((await walk.getAttribute("href"))!);
       expect(href).toContain(`subject=Walkthrough: E2E SSO ${run}`);
-      expect(href).toContain("Role you're hiring for:");
+      expect(href).toContain("The HR process you want to automate:");
       await expect(walk).toHaveAttribute("data-location", "case");
 
       await row(page, site).locator("summary").click();
@@ -104,6 +109,21 @@ test.describe("Work page", () => {
       await expect(live).toHaveAttribute("href", "https://example.com/");
       await expect(live).toHaveAttribute("target", "_blank");
       await expect(row(page, site).locator("a[href^='mailto:']")).toHaveCount(0);
+      // D-42: demo, then code, after the case button; same new-tab rules.
+      await expect(row(page, site).locator(".case-acts a")).toHaveText([
+        "Open the live site ↗",
+        "Watch the demo ↗",
+        "View the code ↗",
+      ]);
+      for (const [name, href, link] of [
+        ["Watch the demo ↗", "https://example.com/demo", "demo"],
+        ["View the code ↗", "https://example.com/code", "code"],
+      ]) {
+        const anchor = row(page, site).getByRole("link", { name });
+        await expect(anchor).toHaveAttribute("href", href);
+        await expect(anchor).toHaveAttribute("rel", "noopener noreferrer");
+        await expect(anchor).toHaveAttribute("data-link", link);
+      }
 
       // No horizontal scroll with rows open.
       for (const width of [320, 375, 1280, 1440]) {
@@ -148,7 +168,7 @@ test.describe("Work page", () => {
       // A filter that hides the target goes back to All.
       await page
         .getByRole("group", { name: "Filter projects" })
-        .getByRole("button", { name: /^Panasonic \d+$/ })
+        .getByRole("button", { name: /^HR systems \d+$/ })
         .click();
       await expect(row(page, site)).toBeHidden();
       await page.evaluate((slug) => (location.hash = `#case-${slug}`), site.slug);
