@@ -109,7 +109,7 @@ describe("JSON-LD", () => {
       knowsAbout: [
         "HR automation",
         "n8n",
-        "Google Gemini",
+        "LLM integration",
         "Google Workspace",
         "Power Automate",
         "HRMS",
