@@ -54,9 +54,13 @@
   "wp": {
     "label": "All work",
     "sub": {
+      "automation": {
+        "one": "{n} HR automation built with n8n and AI",
+        "other": "{n} HR automations built with n8n and AI"
+      },
       "panasonic": {
-        "one": "{n} project inside the Panasonic HR system",
-        "other": "{n} projects inside the Panasonic HR system"
+        "one": "{n} project inside an enterprise HR system",
+        "other": "{n} projects inside an enterprise HR system"
       },
       "web": {
         "one": "{n} website",
@@ -82,7 +86,8 @@
     "walk": "Email to ask for a walkthrough"
   },
   "group": {
-    "panasonic": "Panasonic",
+    "automation": "HR automation",
+    "panasonic": "HR systems",
     "web": "Websites",
     "ai": "AI tools"
   },

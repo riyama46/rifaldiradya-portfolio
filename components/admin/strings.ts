@@ -119,7 +119,12 @@ export const adminStrings = {
     editTitle: "Edit project",
     intro: "Every text has an English and an Indonesian field side by side.",
     back: "Back to projects",
-    groups: { panasonic: "Panasonic", web: "Websites", ai: "AI tools" },
+    groups: {
+      automation: "HR automation",
+      panasonic: "HR systems",
+      web: "Websites",
+      ai: "AI tools",
+    },
     sections: {
       basics: { title: "Basics" },
       homepage: { title: "Homepage", help: "How the project appears in Selected work." },

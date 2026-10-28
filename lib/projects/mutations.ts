@@ -41,6 +41,8 @@ export function toProjectInput(project: Project): ProjectInputRaw {
     status_id: project.statusId,
     case_action: project.caseAction,
     live_url: project.liveUrl,
+    demo_url: project.demoUrl,
+    repo_url: project.repoUrl,
     visual_type: project.visualType,
     thumbnail: hasThumbnail
       ? {
@@ -92,6 +94,8 @@ function toColumns(input: ProjectInput) {
     statusId: input.status_id,
     caseAction: input.case_action,
     liveUrl: input.live_url,
+    demoUrl: input.demo_url,
+    repoUrl: input.repo_url,
     visualType: input.visual_type,
     thumbnailPublicId: input.thumbnail?.public_id ?? null,
     thumbnailUrl: input.thumbnail?.url ?? null,

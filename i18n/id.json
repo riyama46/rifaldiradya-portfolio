@@ -54,9 +54,13 @@
   "wp": {
     "label": "Semua karya",
     "sub": {
+      "automation": {
+        "one": "{n} otomasi HR dengan n8n dan AI",
+        "other": "{n} otomasi HR dengan n8n dan AI"
+      },
       "panasonic": {
-        "one": "{n} proyek di sistem HR Panasonic",
-        "other": "{n} proyek di sistem HR Panasonic"
+        "one": "{n} proyek di sistem HR enterprise",
+        "other": "{n} proyek di sistem HR enterprise"
       },
       "web": {
         "one": "{n} website",
@@ -94,7 +98,8 @@
     "walk": "Email untuk minta walkthrough"
   },
   "group": {
-    "panasonic": "Panasonic",
+    "automation": "Otomasi HR",
+    "panasonic": "Sistem HR",
     "web": "Website",
     "ai": "Alat AI"
   },
