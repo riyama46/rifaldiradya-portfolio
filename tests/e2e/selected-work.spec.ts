@@ -33,7 +33,11 @@ test.describe("Selected work", () => {
           thumbnail_alt_en: "E2E landing page",
           thumbnail_alt_id: "Halaman E2E",
         }),
-        published(`E2E Five ${run}`),
+        published(`E2E Five ${run}`, {
+          case_action: "walkthrough",
+          demo_url: "https://example.com/demo",
+          repo_url: "https://example.com/code",
+        }),
       ];
     };
 
@@ -75,11 +79,16 @@ test.describe("Selected work", () => {
       }
       await expect(work.locator(".wt-a[data-cursor=read]")).toHaveCount(5);
 
-      // Only the site project has the live link and the (lazy) screenshot.
+      // Only the site project has the live link and the (lazy) screenshot; the demo project shows
+      // "Watch the demo" and keeps its code link for the case row (D-42).
       const site = work.locator(".proj").nth(3);
       await expect(site.locator(".proj-links a")).toHaveAttribute("href", "https://example.com/");
       await expect(site.locator(".shot[data-cursor=visit] img")).toHaveAttribute("loading", "lazy");
-      await expect(work.locator(".proj-links a")).toHaveCount(1);
+      const demo = work.locator(".proj").nth(4).locator(".proj-links a");
+      await expect(demo).toHaveText("Watch the demo ↗");
+      await expect(demo).toHaveAttribute("href", "https://example.com/demo");
+      await expect(demo).toHaveAttribute("data-link", "demo");
+      await expect(work.locator(".proj-links a")).toHaveCount(2);
       await expect(work.locator(".shot")).toHaveCount(1);
 
       // No horizontal scroll from the large titles.

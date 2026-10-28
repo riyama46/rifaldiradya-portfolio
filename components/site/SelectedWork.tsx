@@ -88,20 +88,37 @@ export function SelectedWork({ lang, dict, projects }: SelectedWorkProps) {
                       </a>
                     </h3>
                     <p className="wd">{project.summary}</p>
-                    {site && (
+                    {(site || project.demoUrl) && (
                       <div className="proj-links">
-                        <a
-                          className="line-link"
-                          href={site}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          data-track="project_link_click"
-                          data-slug={project.slug}
-                          data-placement="home"
-                          data-cursor="visit"
-                        >
-                          {dict.work.open}
-                        </a>
+                        {site && (
+                          <a
+                            className="line-link"
+                            href={site}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-track="project_link_click"
+                            data-slug={project.slug}
+                            data-placement="home"
+                            data-cursor="visit"
+                          >
+                            {dict.work.open}
+                          </a>
+                        )}
+                        {project.demoUrl && (
+                          <a
+                            className="line-link"
+                            href={project.demoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-track="project_link_click"
+                            data-slug={project.slug}
+                            data-placement="home"
+                            data-link="demo"
+                            data-cursor="visit"
+                          >
+                            {dict.work.demo}
+                          </a>
+                        )}
                       </div>
                     )}
                   </div>

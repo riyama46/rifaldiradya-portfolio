@@ -119,7 +119,12 @@ export const adminStrings = {
     editTitle: "Edit project",
     intro: "Every text has an English and an Indonesian field side by side.",
     back: "Back to projects",
-    groups: { panasonic: "Panasonic", web: "Websites", ai: "AI tools" },
+    groups: {
+      automation: "HR automation",
+      panasonic: "HR systems",
+      web: "Websites",
+      ai: "AI tools",
+    },
     sections: {
       basics: { title: "Basics" },
       homepage: { title: "Homepage", help: "How the project appears in Selected work." },
@@ -129,7 +134,7 @@ export const adminStrings = {
       },
       button: {
         title: "Button on the case",
-        help: "A live URL is optional, so internal systems can be shown too.",
+        help: "Every link is optional, so internal systems can be shown too.",
       },
       visual: {
         title: "Visual",
@@ -148,13 +153,16 @@ export const adminStrings = {
     visualTypes: { screenshot: "Screenshot", number: "Number card" },
     help: {
       group: "Sets the filter on the Work page.",
-      meta_en: "e.g. Panasonic · 13 companies",
+      meta_en: "e.g. HRMS · 13 companies",
       side_en: "Right column on the Work page, and the end of the homepage label.",
       summary_en: "Shown under the title in Selected work.",
       show_on_home: "The homepage shows up to 5 projects, in the order of the list.",
       tags: "Press Enter or comma to add. Up to 6, e.g. C#, ASP.NET.",
       status_en: "e.g. Live, 2022–now",
       live_url: "Opens in a new tab. Needed when the button opens the live site.",
+      demo_url:
+        'Adds "Watch the demo" to the case and the homepage. A video of it running, e.g. YouTube or Google Drive.',
+      repo_url: 'Adds "View the code" to the case. A public repository, e.g. GitHub.',
       thumbnail_alt_en: "Describe what the image shows",
       card_number: "A short real figure, e.g. 13 or 5 → 1.",
       published: "Off keeps it as a draft. Drafts never appear on the site.",

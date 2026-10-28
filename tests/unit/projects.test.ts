@@ -20,6 +20,8 @@ function project(overrides: Partial<Project> = {}): Project {
     summaryEn: "One-page site with menu and WhatsApp order button.",
     summaryId: "Situs satu halaman dengan menu dan tombol pesan WhatsApp.",
     liveUrl: "https://staging0.rifaldiradya.com",
+    demoUrl: null,
+    repoUrl: null,
     tags: ["Next.js", "Tailwind CSS"],
     thumbnailPublicId: "01JIMAGE000000000000000000",
     thumbnailUrl: "/media/01JIMAGE000000000000000000.webp",
@@ -85,6 +87,8 @@ describe("toPublicProject (v2 DTO)", () => {
       status: "Live, 2025",
       caseAction: "site",
       liveUrl: "https://staging0.rifaldiradya.com",
+      demoUrl: null,
+      repoUrl: null,
       visual: {
         type: "screenshot",
         url: "/media/01JIMAGE000000000000000000.webp",
@@ -156,6 +160,20 @@ describe("toPublicProject (v2 DTO)", () => {
       );
       expect(dto.liveUrl).toBeNull();
     }
+  });
+
+  it("D-42: keeps https demo and code links beside any case action, drops the rest", () => {
+    const demoUrl = "https://drive.google.com/file/d/abc/view";
+    const repoUrl = "https://github.com/riyama46/hr-onboarding-automation";
+    for (const caseAction of ["site", "walkthrough", "none"] as const) {
+      expect(toPublicProject(project({ caseAction, demoUrl, repoUrl }), "id")).toMatchObject({
+        demoUrl,
+        repoUrl,
+      });
+    }
+    const unsafe = project({ demoUrl: "http://example.com", repoUrl: "javascript:alert(1)" });
+    expect(toPublicProject(unsafe, "en")).toMatchObject({ demoUrl: null, repoUrl: null });
+    expect(toPublicProject(project(), "en")).toMatchObject({ demoUrl: null, repoUrl: null });
   });
 
   it("E-28: site without a usable URL becomes no button, with a server warning", () => {
@@ -241,6 +259,15 @@ describe("groupCounts", () => {
     ]);
   });
 
+  it("puts HR automation first (D-43)", () => {
+    const projects = [{ group: "web" }, { group: "automation" }, { group: "panasonic" }] as const;
+    expect(groupCounts(projects).map(({ group }) => group)).toEqual([
+      "automation",
+      "panasonic",
+      "web",
+    ]);
+  });
+
   it("returns nothing for no projects", () => {
     expect(groupCounts([])).toEqual([]);
   });
@@ -257,10 +284,10 @@ describe("workSub", () => {
 
   it("matches the mockup copy for the full set (the AI row is one set of tools)", () => {
     expect(workSub(all, en, "en")).toBe(
-      "Three projects inside the Panasonic HR system, three websites and a set of AI tools I use every day. Open a row for the details.",
+      "Three projects inside an enterprise HR system, three websites and a set of AI tools I use every day. Open a row for the details.",
     );
     expect(workSub(all, id, "id")).toBe(
-      "Tiga proyek di sistem HR Panasonic, tiga website, dan alat AI yang saya pakai setiap hari. Buka satu baris untuk melihat detailnya.",
+      "Tiga proyek di sistem HR enterprise, tiga website, dan alat AI yang saya pakai setiap hari. Buka satu baris untuk melihat detailnya.",
     );
   });
 
@@ -278,7 +305,7 @@ describe("workSub", () => {
         "en",
       ),
     ).toBe(
-      "One project inside the Panasonic HR system and two websites. Open a row for the details.",
+      "One project inside an enterprise HR system and two websites. Open a row for the details.",
     );
     expect(
       workSub(
@@ -290,7 +317,20 @@ describe("workSub", () => {
         "id",
       ),
     ).toBe(
-      "Satu proyek di sistem HR Panasonic dan dua website. Buka satu baris untuk melihat detailnya.",
+      "Satu proyek di sistem HR enterprise dan dua website. Buka satu baris untuk melihat detailnya.",
+    );
+  });
+
+  it("leads with HR automation when there is one (D-43)", () => {
+    const groups = [
+      { group: "automation", count: 1 },
+      { group: "panasonic", count: 3 },
+    ] as const;
+    expect(workSub(groups, en, "en")).toBe(
+      "One HR automation built with n8n and AI and three projects inside an enterprise HR system. Open a row for the details.",
+    );
+    expect(workSub(groups, id, "id")).toBe(
+      "Satu otomasi HR dengan n8n dan AI dan tiga proyek di sistem HR enterprise. Buka satu baris untuk melihat detailnya.",
     );
   });
 

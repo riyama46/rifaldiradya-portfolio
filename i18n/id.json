@@ -14,26 +14,26 @@
   },
   "cta": "Kirim email",
   "hero": {
-    "role": "Software engineer · Full-stack .NET",
+    "role": "HR automation engineer · n8n + AI",
     "loc": "Jabodetabek",
-    "open": "Terbuka untuk posisi full-time dan proyek",
-    "l1": "Membangun software HR",
-    "l2": "untuk <em>ribuan karyawan.</em>",
-    "sub": "Empat tahun membangun dan menjaga sistem HR 13 perusahaan grup Panasonic: ratusan pengguna HR, ribuan data karyawan.",
+    "open": "Terbuka untuk proyek otomasi HR",
+    "l1": "Otomasi pekerjaan HR",
+    "l2": "yang <em>manual.</em>",
+    "sub": "Empat tahun membangun dan menjaga sistem HR grup manufaktur 13 perusahaan. Sekarang saya membangun otomasi HR dengan n8n dan AI.",
     "stack": "Stack",
     "scroll": "Gulir ↓",
     "avatarAlt": "Rifaldi Radya Pratama"
   },
   "seo": {
     "siteName": "Rifaldi Radya Pratama",
-    "ogAlt": "Rifaldi Radya Pratama, software engineer. Membangun software HR untuk ribuan karyawan.",
+    "ogAlt": "Rifaldi Radya Pratama, HR automation engineer. Otomasi pekerjaan HR yang manual.",
     "home": {
-      "title": "Rifaldi Radya Pratama, Software Engineer (Full-Stack .NET)",
-      "description": "Software engineer yang membangun sistem HR 13 perusahaan grup Panasonic. C#, ASP.NET, SQL Server, dan Azure. Berbasis di Jabodetabek."
+      "title": "Rifaldi Radya Pratama, HR Automation Engineer (n8n + AI)",
+      "description": "Workflow n8n dan AI untuk otomasi onboarding dan administrasi HR, berbekal empat tahun di HRMS grup manufaktur 13 perusahaan. Berbasis di Jabodetabek."
     },
     "work": {
-      "title": "Karya: Sistem HR, Website, Alat AI | Rifaldi Radya Pratama",
-      "description": "Sistem HR di Panasonic, website, dan alat AI karya Rifaldi Radya Pratama. Buka satu baris untuk melihat apa itu, yang saya kerjakan, dan stack-nya."
+      "title": "Karya: Otomasi HR dan Sistem HR | Rifaldi Radya Pratama",
+      "description": "Otomasi HR dengan n8n dan AI, HRMS enterprise, website, dan alat AI karya Rifaldi Radya Pratama. Buka satu baris untuk melihat detailnya."
     },
     "privacy": {
       "title": "Privasi | Rifaldi Radya Pratama",
@@ -45,6 +45,7 @@
     "all": "Lihat semua karya →",
     "rail": "Proyek",
     "open": "Buka situsnya ↗",
+    "demo": "Tonton demonya ↗",
     "empty": "Karya baru sedang disiapkan. Sementara itu, ini cara menghubungi saya."
   },
   "cur": {
@@ -54,9 +55,13 @@
   "wp": {
     "label": "Semua karya",
     "sub": {
+      "automation": {
+        "one": "{n} otomasi HR dengan n8n dan AI",
+        "other": "{n} otomasi HR dengan n8n dan AI"
+      },
       "panasonic": {
-        "one": "{n} proyek di sistem HR Panasonic",
-        "other": "{n} proyek di sistem HR Panasonic"
+        "one": "{n} proyek di sistem HR enterprise",
+        "other": "{n} proyek di sistem HR enterprise"
       },
       "web": {
         "one": "{n} website",
@@ -91,10 +96,12 @@
     "did": "Yang saya kerjakan",
     "stack": "Stack",
     "status": "Status",
-    "walk": "Email untuk minta walkthrough"
+    "walk": "Email untuk minta walkthrough",
+    "code": "Lihat kodenya ↗"
   },
   "group": {
-    "panasonic": "Panasonic",
+    "automation": "Otomasi HR",
+    "panasonic": "Sistem HR",
     "web": "Website",
     "ai": "Alat AI"
   },
@@ -102,7 +109,7 @@
     "h": "Tentang",
     "s": "Saya membangun sistem yang menjalankan perusahaan: absensi, lembur, payroll.",
     "p1": "Saya satu dari tiga developer di sistem HR yang dipakai 13 perusahaan grup Panasonic. Enam di antaranya saya pegang sendiri, mulai dari analisis kebutuhan, estimasi, pengembangan, sampai instalasi di server mereka. Saya juga melatih pengguna di setiap rollout, menyiapkan dokumen audit SOX, dan membimbing anak magang.",
-    "p2": "Sebelum coding, saya editor video. Saya kuliah informatika di IPB dan Telkom University, dan sekarang menempuh Magister Manajemen SDM dengan tesis tentang presenteeism, work-life balance, dan burnout.",
+    "p2": "Sebelum coding, saya editor video. Saya kuliah informatika di IPB dan Telkom University, dan sekarang menempuh Magister Manajemen SDM dengan tesis tentang presenteeism, work-life balance, dan burnout. Di luar pekerjaan itu, saya membangun otomasi HR dengan n8n dan AI.",
     "edu": "Pendidikan",
     "education": [
       "<strong>S1 Informatika</strong>, Telkom University, 2022",
@@ -116,7 +123,7 @@
     ]
   },
   "case": {
-    "meta": "Sorotan · Panasonic · Berjalan sejak awal 2023",
+    "meta": "Sorotan · HRMS · Berjalan sejak awal 2023",
     "t": "<s>Lima password</s> jadi satu login.",
     "st1": "password per orang",
     "st2p": "±",
@@ -131,9 +138,9 @@
   },
   "ct": {
     "label": "Kontak",
-    "h": "Ada posisi atau <em>proyek?</em>",
+    "h": "Ada proses HR yang mau <em>diotomasi?</em>",
     "hMore": "Punya proyek seperti <em>ini?</em>",
-    "pitch": "Sedang mencari developer full-time, atau perlu sistem HR dan aplikasi internal dibangun? Ceritakan singkat kebutuhannya, saya balas lewat email.",
+    "pitch": "Perlu proses HR diotomasi, atau developer untuk tim Anda? Ceritakan singkat kebutuhannya, saya balas lewat email.",
     "role": "Email soal posisi full-time",
     "project": "Email soal proyek",
     "linkedin": "LinkedIn ↗",
@@ -152,11 +159,11 @@
     },
     "project": {
       "s": "Proyek: ",
-      "b": "Yang ingin dibangun:\nTarget waktu:\nKisaran anggaran:\n"
+      "b": "Proses HR yang ingin diotomasi:\nTools yang dipakai sekarang (HRIS, Google Workspace, Slack…):\nTarget waktu:\nKisaran anggaran:\n"
     },
     "walk": {
       "s": "Walkthrough: {title}",
-      "b": "Perusahaan:\nPosisi yang dibuka:\nWaktu yang cocok untuk ngobrol:\n"
+      "b": "Perusahaan dan jumlah karyawan:\nProses HR yang ingin diotomasi:\nTools yang dipakai sekarang:\nWaktu yang cocok untuk ngobrol:\n"
     }
   },
   "email": {

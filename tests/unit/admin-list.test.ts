@@ -86,7 +86,7 @@ describe("S-11 rows and counts", () => {
       total: 3,
       published: 2,
       drafts: 1,
-      groups: { panasonic: 1, web: 2, ai: 0 },
+      groups: { automation: 0, panasonic: 1, web: 2, ai: 0 },
     });
   });
 });

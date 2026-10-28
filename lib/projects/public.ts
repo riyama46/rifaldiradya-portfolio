@@ -34,6 +34,9 @@ export type PublicProject = {
    * doesn't show must not reach the JSON-LD either.
    */
   liveUrl: string | null;
+  /** D-42: optional links shown beside the case button, https only (never in the JSON-LD). */
+  demoUrl: string | null;
+  repoUrl: string | null;
   visual: ScreenshotVisual | NumberVisual | null;
   showOnHome: boolean;
 };
@@ -98,6 +101,8 @@ export function toPublicProject(project: Project, lang: Locale): PublicProject {
     status: (id ? project.statusId : project.statusEn) || null,
     caseAction,
     liveUrl: caseAction === "site" ? liveUrl : null,
+    demoUrl: httpsUrl(project.demoUrl),
+    repoUrl: httpsUrl(project.repoUrl),
     visual: visualOf(project, lang),
     showOnHome: project.showOnHome,
   };
@@ -132,7 +137,7 @@ export function selectedWorkRanges(n: number): { r0: string; r1: string }[] {
 
 /**
  * Filter buttons of the Work page (Delta APP_FLOW S-02 step 2): one per group that has projects,
- * in the fixed order Panasonic, Websites, AI tools. An empty group gets no button.
+ * in the fixed order HR automation, HR systems, Websites, AI tools (D-43). An empty group gets no button.
  */
 export function groupCounts(
   projects: readonly Pick<PublicProject, "group">[],

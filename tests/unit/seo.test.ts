@@ -104,14 +104,25 @@ describe("JSON-LD", () => {
     expect(person).toMatchObject({
       "@type": "Person",
       name: "Rifaldi Radya Pratama",
-      jobTitle: "Software Engineer",
+      jobTitle: "HR Automation Engineer",
       url: "https://rifaldiradya.com/id",
-      worksFor: { "@type": "Organization", name: "PT Panasonic Manufacturing Indonesia" },
-      knowsAbout: ["C#", "ASP.NET", "SQL Server", "Microsoft Azure", "Next.js", "TypeScript"],
+      knowsAbout: [
+        "HR automation",
+        "n8n",
+        "Google Gemini",
+        "Google Workspace",
+        "Power Automate",
+        "HRMS",
+        "C#",
+        "ASP.NET",
+        "SQL Server",
+      ],
       // GitHub is empty, so only LinkedIn (D-19, AC-13).
       sameAs: ["https://www.linkedin.com/in/rifaldiradya", "https://github.com/riyama46"],
     });
     expect(website).toMatchObject({ "@type": "WebSite", inLanguage: "id-ID" });
+    // D-41: the employer is named only in About and the CV, never in structured data.
+    expect(person).not.toHaveProperty("worksFor");
   });
 
   it("work page: an ItemList of the projects in page order", () => {

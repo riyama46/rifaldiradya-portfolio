@@ -247,6 +247,50 @@ describe("projectInputSchema: case action and live URL", () => {
   });
 });
 
+describe("projectInputSchema: demo and code links (D-42)", () => {
+  it("are optional, published or draft, and empty becomes null", () => {
+    for (const published of [true, false]) {
+      for (const link of [null, "", "   ", undefined]) {
+        const parsed = projectInputSchema.parse({
+          ...valid,
+          published,
+          demo_url: link,
+          repo_url: link,
+        });
+        expect(parsed).toMatchObject({ demo_url: null, repo_url: null });
+      }
+    }
+  });
+
+  it("keep valid https links, beside any case action", () => {
+    const demo_url = "https://drive.google.com/file/d/abc/view";
+    const repo_url = "https://github.com/riyama46/hr-onboarding-automation";
+    for (const case_action of ["site", "walkthrough", "none"]) {
+      expect(projectInputSchema.parse({ ...valid, case_action, demo_url, repo_url })).toMatchObject(
+        { demo_url, repo_url },
+      );
+    }
+  });
+
+  it.each(["demo_url", "repo_url"])("%s follows the live URL rules", (field) => {
+    for (const bad of ["http://example.com", "example.com", "https://user:pass@example.com"]) {
+      expect(errorsFor({ ...valid, [field]: bad })[field as "demo_url"]).toBe(
+        "URL must start with https:// and be a full address.",
+      );
+    }
+    const long = `https://example.com/${"a".repeat(290)}`;
+    expect(errorsFor({ ...valid, [field]: long })[field as "demo_url"]).toMatch(
+      /^Keep it under 300/,
+    );
+  });
+});
+
+describe("projectInputSchema: groups (D-43)", () => {
+  it("accepts the automation group", () => {
+    expect(projectInputSchema.parse({ ...valid, group: "automation" }).group).toBe("automation");
+  });
+});
+
 describe("projectInputSchema: publish rules", () => {
   const emptyCase = {
     meta_en: null,

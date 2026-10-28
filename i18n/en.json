@@ -14,26 +14,26 @@
   },
   "cta": "Email me",
   "hero": {
-    "role": "Software engineer · Full-stack .NET",
+    "role": "HR automation engineer · n8n + AI",
     "loc": "Jakarta, Indonesia",
-    "open": "Open to full-time roles and projects",
-    "l1": "Building HR software",
-    "l2": "for <em>thousands.</em>",
-    "sub": "Four years building and running the HR system of 13 Panasonic group companies: hundreds of HR users, thousands of employee records.",
+    "open": "Open to HR automation projects",
+    "l1": "I automate the HR work",
+    "l2": "done <em>by hand.</em>",
+    "sub": "Four years building and running the HR system of a 13-company manufacturing group. Now I build HR automations with n8n and AI.",
     "stack": "Stack",
     "scroll": "Scroll ↓",
     "avatarAlt": "Rifaldi Radya Pratama"
   },
   "seo": {
     "siteName": "Rifaldi Radya Pratama",
-    "ogAlt": "Rifaldi Radya Pratama, software engineer. Building HR software for thousands.",
+    "ogAlt": "Rifaldi Radya Pratama, HR automation engineer. I automate the HR work done by hand.",
     "home": {
-      "title": "Rifaldi Radya Pratama, Software Engineer (Full-Stack .NET)",
-      "description": "Software engineer building the HR system 13 Panasonic group companies run on. C#, ASP.NET, SQL Server and Azure. Based in Jakarta, Indonesia."
+      "title": "Rifaldi Radya Pratama, HR Automation Engineer (n8n + AI)",
+      "description": "I build n8n and AI workflows that automate onboarding and HR admin, backed by four years on the HRMS of a 13-company manufacturing group. Based in Jakarta."
     },
     "work": {
-      "title": "Work: HR Systems, Websites, AI Tools | Rifaldi Radya Pratama",
-      "description": "HR systems inside Panasonic, websites and AI tools by Rifaldi Radya Pratama. Open a row for what it is, what I did and the stack."
+      "title": "Work: HR Automation and HR Systems | Rifaldi Radya Pratama",
+      "description": "HR automations with n8n and AI, an enterprise HRMS, websites and AI tools by Rifaldi Radya Pratama. Open a row for what it is, what I did and the stack."
     },
     "privacy": {
       "title": "Privacy | Rifaldi Radya Pratama",
@@ -45,6 +45,7 @@
     "all": "See all work →",
     "rail": "Projects",
     "open": "Open the live site ↗",
+    "demo": "Watch the demo ↗",
     "empty": "New work is on the way. Meanwhile, here's how to reach me."
   },
   "cur": {
@@ -54,9 +55,13 @@
   "wp": {
     "label": "All work",
     "sub": {
+      "automation": {
+        "one": "{n} HR automation built with n8n and AI",
+        "other": "{n} HR automations built with n8n and AI"
+      },
       "panasonic": {
-        "one": "{n} project inside the Panasonic HR system",
-        "other": "{n} projects inside the Panasonic HR system"
+        "one": "{n} project inside an enterprise HR system",
+        "other": "{n} projects inside an enterprise HR system"
       },
       "web": {
         "one": "{n} website",
@@ -79,10 +84,12 @@
     "did": "What I did",
     "stack": "Stack",
     "status": "Status",
-    "walk": "Email to ask for a walkthrough"
+    "walk": "Email to ask for a walkthrough",
+    "code": "View the code ↗"
   },
   "group": {
-    "panasonic": "Panasonic",
+    "automation": "HR automation",
+    "panasonic": "HR systems",
     "web": "Websites",
     "ai": "AI tools"
   },
@@ -90,7 +97,7 @@
     "h": "About",
     "s": "I build the systems a company runs on: attendance, overtime, payroll.",
     "p1": "I'm one of three developers on the HR system that 13 Panasonic group companies use. I own delivery for six of them: requirements, estimates, development and installation on their servers. I also train users at every rollout, prepare SOX audit documents and mentor interns.",
-    "p2": "Before code I edited video. I studied informatics at IPB and Telkom University, and I'm now doing a Master of Management in HR, with a thesis on presenteeism, work-life balance and burnout.",
+    "p2": "Before code I edited video. I studied informatics at IPB and Telkom University, and I'm now doing a Master of Management in HR, with a thesis on presenteeism, work-life balance and burnout. Outside that job I build HR automations with n8n and AI.",
     "edu": "Education",
     "education": [
       "<strong>Bachelor of Informatics</strong>, Telkom University, 2022",
@@ -104,7 +111,7 @@
     ]
   },
   "case": {
-    "meta": "Highlight · Panasonic · Live since early 2023",
+    "meta": "Highlight · HRMS · Live since early 2023",
     "t": "One login instead of <s>five passwords.</s>",
     "st1": "passwords per person",
     "st2p": "~",
@@ -119,9 +126,9 @@
   },
   "ct": {
     "label": "Contact",
-    "h": "Tell me what you're <em>building.</em>",
+    "h": "Tell me what you'd like to <em>automate.</em>",
     "hMore": "Have a project like <em>these?</em>",
-    "pitch": "Hiring a full-time developer, or need an HR or internal system built? Send a few lines about it and I'll reply by email.",
+    "pitch": "Need an HR process automated, or a developer on your team? Send a few lines about it and I'll reply by email.",
     "role": "Email about a full-time role",
     "project": "Email about a project",
     "linkedin": "LinkedIn ↗",
@@ -140,11 +147,11 @@
     },
     "project": {
       "s": "Project: ",
-      "b": "What you need built:\nTimeline:\nBudget range:\n"
+      "b": "The HR process you want to automate:\nTools you use today (HRIS, Google Workspace, Slack…):\nTimeline:\nBudget range:\n"
     },
     "walk": {
       "s": "Walkthrough: {title}",
-      "b": "Company:\nRole you're hiring for:\nA good time to talk:\n"
+      "b": "Company and team size:\nThe HR process you want to automate:\nTools you use today:\nA good time to talk:\n"
     }
   },
   "email": {

@@ -7,7 +7,7 @@ import type { Dictionary } from "@/i18n";
 import { richText } from "@/i18n/rich";
 import { siteConfig } from "@/lib/site-config";
 
-// Delta APP_FLOW S-01 bab 5: two mailto actions (role, project), then the ways to reach me.
+// Delta APP_FLOW S-01 bab 5: two mailto actions (project, role; D-44), then the ways to reach me.
 // Copy email lives only here (D-17); GitHub only once it is filled in (D-19).
 // `more` is the closing chapter of the Work page (S-02 step 5, option-b.html #more): its own
 // heading and only the two mailto actions.
@@ -34,11 +34,12 @@ export function ContactChapter({
         <p className="pitch">{ct.pitch}</p>
 
         <div className="acts">
-          <MailtoLink dict={dict} kind="role" location={location} variant="primary">
-            {ct.role}
-          </MailtoLink>
-          <MailtoLink dict={dict} kind="project" location={location} variant="soft">
+          {/* D-44: automation clients first, the full-time role path second. */}
+          <MailtoLink dict={dict} kind="project" location={location} variant="primary">
             {ct.project}
+          </MailtoLink>
+          <MailtoLink dict={dict} kind="role" location={location} variant="soft">
+            {ct.role}
           </MailtoLink>
         </div>
 
