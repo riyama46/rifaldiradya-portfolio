@@ -8,7 +8,7 @@ export const siteConfig = {
   knowsAbout: [
     "HR automation",
     "n8n",
-    "Google Gemini",
+    "LLM integration",
     "Google Workspace",
     "Power Automate",
     "HRMS",
@@ -26,7 +26,7 @@ export const siteConfig = {
   privacyUpdated: "2026-10-17",
   /** Hero stack line (CHANGE v2.2.0, Delta PRD section 4); scripts/og-images.mts reads the same list. */
   // Six short items so the hero still fits a 375 × 667 screen with the cookie banner (AC-1).
-  stack: ["n8n", "Gemini", "Google Workspace", "C#", "ASP.NET", "SQL Server"],
+  stack: ["n8n", "LLM APIs", "Google Workspace", "C#", "ASP.NET", "SQL Server"],
   social: {
     linkedin: "https://www.linkedin.com/in/rifaldiradya",
     /** Empty = not rendered anywhere (D-19). */
