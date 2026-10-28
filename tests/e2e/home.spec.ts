@@ -23,7 +23,7 @@ test("chapters in order: Hero, Selected work, About, Highlight, Contact", async 
   expect(ids.filter((id) => id !== "work")).toEqual(["top", "about", "highlight", "contact"]);
   expect(ids.indexOf("work")).toBeLessThan(2);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "I automate the HR work your team does by hand.",
+    "I automate the HR work done by hand.",
   );
 });
 
@@ -64,7 +64,7 @@ test("mailto: subject and body per kind and page language (F5)", async ({ page }
 
   await page.goto("/id");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Otomasi pekerjaan HR yang masih manual.",
+    "Otomasi pekerjaan HR yang manual.",
   );
   await expect(
     contact(page).getByRole("link", { name: "Email soal posisi full-time" }),

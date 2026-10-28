@@ -18,15 +18,15 @@
     "loc": "Jabodetabek",
     "open": "Terbuka untuk proyek otomasi HR",
     "l1": "Otomasi pekerjaan HR",
-    "l2": "yang masih <em>manual.</em>",
-    "sub": "Empat tahun membangun dan menjaga sistem HR grup manufaktur 13 perusahaan. Sekarang saya membangun otomasi HR dengan n8n dan AI, dimulai dari onboarding karyawan baru.",
+    "l2": "yang <em>manual.</em>",
+    "sub": "Empat tahun membangun dan menjaga sistem HR grup manufaktur 13 perusahaan. Sekarang saya membangun otomasi HR dengan n8n dan AI.",
     "stack": "Stack",
     "scroll": "Gulir ↓",
     "avatarAlt": "Rifaldi Radya Pratama"
   },
   "seo": {
     "siteName": "Rifaldi Radya Pratama",
-    "ogAlt": "Rifaldi Radya Pratama, HR automation engineer. Otomasi pekerjaan HR yang masih manual.",
+    "ogAlt": "Rifaldi Radya Pratama, HR automation engineer. Otomasi pekerjaan HR yang manual.",
     "home": {
       "title": "Rifaldi Radya Pratama, HR Automation Engineer (n8n + AI)",
       "description": "Workflow n8n dan AI untuk otomasi onboarding dan administrasi HR, berbekal empat tahun di HRMS grup manufaktur 13 perusahaan. Berbasis di Jabodetabek."

@@ -25,15 +25,8 @@ export const siteConfig = {
   /** Matches "Last updated" on S-03; the privacy pages' sitemap lastmod. */
   privacyUpdated: "2026-10-17",
   /** Hero stack line (CHANGE v2.2.0, Delta PRD section 4); scripts/og-images.mts reads the same list. */
-  stack: [
-    "n8n",
-    "Google Gemini",
-    "Google Workspace",
-    "Power Automate",
-    "C#",
-    "ASP.NET",
-    "SQL Server",
-  ],
+  // Six short items so the hero still fits a 375 × 667 screen with the cookie banner (AC-1).
+  stack: ["n8n", "Gemini", "Google Workspace", "C#", "ASP.NET", "SQL Server"],
   social: {
     linkedin: "https://www.linkedin.com/in/rifaldiradya",
     /** Empty = not rendered anywhere (D-19). */

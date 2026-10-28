@@ -18,15 +18,15 @@
     "loc": "Jakarta, Indonesia",
     "open": "Open to HR automation projects",
     "l1": "I automate the HR work",
-    "l2": "your team does <em>by hand.</em>",
-    "sub": "Four years building and running the HR system of a 13-company manufacturing group. Now I build HR automations with n8n and AI, starting with new-hire onboarding.",
+    "l2": "done <em>by hand.</em>",
+    "sub": "Four years building and running the HR system of a 13-company manufacturing group. Now I build HR automations with n8n and AI.",
     "stack": "Stack",
     "scroll": "Scroll ↓",
     "avatarAlt": "Rifaldi Radya Pratama"
   },
   "seo": {
     "siteName": "Rifaldi Radya Pratama",
-    "ogAlt": "Rifaldi Radya Pratama, HR automation engineer. I automate the HR work your team does by hand.",
+    "ogAlt": "Rifaldi Radya Pratama, HR automation engineer. I automate the HR work done by hand.",
     "home": {
       "title": "Rifaldi Radya Pratama, HR Automation Engineer (n8n + AI)",
       "description": "I build n8n and AI workflows that automate onboarding and HR admin, backed by four years on the HRMS of a 13-company manufacturing group. Based in Jakarta."

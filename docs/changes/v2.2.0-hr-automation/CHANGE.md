@@ -54,9 +54,9 @@ Pal is moving their freelance service to HR / people-ops workflow automation (n8
   | --- | --- | --- |
   | Hero label | HR automation engineer · n8n + AI · Jakarta, Indonesia | HR automation engineer · n8n + AI · Jabodetabek |
   | Availability | Open to HR automation projects | Terbuka untuk proyek otomasi HR |
-  | H1 | I automate the HR work / your team does *by hand.* | Otomasi pekerjaan HR / yang masih *manual.* |
-  | Sub | Four years building and running the HR system of a 13-company manufacturing group. Now I build HR automations with n8n and AI, starting with new-hire onboarding. | Empat tahun membangun dan menjaga sistem HR grup manufaktur 13 perusahaan. Sekarang saya membangun otomasi HR dengan n8n dan AI, dimulai dari onboarding karyawan baru. |
-  | Stack | n8n · Google Gemini · Google Workspace · Power Automate · C# · ASP.NET · SQL Server | same |
+  | H1 | I automate the HR work / done *by hand.* | Otomasi pekerjaan HR / yang *manual.* |
+  | Sub | Four years building and running the HR system of a 13-company manufacturing group. Now I build HR automations with n8n and AI. | Empat tahun membangun dan menjaga sistem HR grup manufaktur 13 perusahaan. Sekarang saya membangun otomasi HR dengan n8n dan AI. |
+  | Stack | n8n · Gemini · Google Workspace · C# · ASP.NET · SQL Server | same |
   | Highlight meta | Highlight · HRMS · Live since early 2023 | Sorotan · HRMS · Berjalan sejak awal 2023 |
   | Contact H2 | Tell me what you'd like to *automate.* | Ada proses HR yang mau *diotomasi?* |
   | Contact pitch | Need an HR process automated, or a developer on your team? Send a few lines about it and I'll reply by email. | Perlu proses HR diotomasi, atau developer untuk tim Anda? Ceritakan singkat kebutuhannya, saya balas lewat email. |
@@ -75,7 +75,7 @@ Pal is moving their freelance service to HR / people-ops workflow automation (n8
   | `/id` | Rifaldi Radya Pratama, HR Automation Engineer (n8n + AI) | Workflow n8n dan AI untuk otomasi onboarding dan administrasi HR, berbekal empat tahun di HRMS grup manufaktur 13 perusahaan. Berbasis di Jabodetabek. |
   | `/id/work` | Karya: Otomasi HR dan Sistem HR \| Rifaldi Radya Pratama | Otomasi HR dengan n8n dan AI, HRMS enterprise, website, dan alat AI karya Rifaldi Radya Pratama. Buka satu baris untuk melihat detailnya. |
 
-  OG alt: "Rifaldi Radya Pratama, HR automation engineer. I automate the HR work your team does by hand." / "Rifaldi Radya Pratama, HR automation engineer. Otomasi pekerjaan HR yang masih manual." **Keyword hypothesis:** "HR automation n8n", "n8n onboarding automation", "HR automation freelancer Indonesia" + personal name. **JSON-LD Person:** `jobTitle` "HR Automation Engineer"; no `worksFor`; `knowsAbout` HR automation, n8n, Google Gemini, Google Workspace, Power Automate, HRMS, C#, ASP.NET, SQL Server. Previously: "Software Engineer", `worksFor` PT Panasonic Manufacturing Indonesia, .NET-only `knowsAbout`.
+  OG alt: "Rifaldi Radya Pratama, HR automation engineer. I automate the HR work done by hand." / "Rifaldi Radya Pratama, HR automation engineer. Otomasi pekerjaan HR yang manual." **Keyword hypothesis:** "HR automation n8n", "n8n onboarding automation", "HR automation freelancer Indonesia" + personal name. **JSON-LD Person:** `jobTitle` "HR Automation Engineer"; no `worksFor`; `knowsAbout` HR automation, n8n, Google Gemini, Google Workspace, Power Automate, HRMS, C#, ASP.NET, SQL Server. Previously: "Software Engineer", `worksFor` PT Panasonic Manufacturing Indonesia, .NET-only `knowsAbout`.
 - **§12 Content dependencies:** ADDED items (Impact checklist, content tasks).
 - **§13 Risks:** "Coworkers see 'Open to full-time roles'" → "Coworkers see the freelance pitch" (mitigation: availability switch, employer only in About). Assumption "Panasonic work may be named" → "Panasonic is named once, as track record in About and the CV (D-41)".
 

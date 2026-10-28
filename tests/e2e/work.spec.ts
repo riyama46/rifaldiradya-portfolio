@@ -141,7 +141,7 @@ test.describe("Work page", () => {
       const walkId = row(page, sso).getByRole("link", { name: "Email untuk minta walkthrough" });
       const hrefId = decodeURIComponent((await walkId.getAttribute("href"))!);
       expect(hrefId).toContain(`subject=Walkthrough: E2E SSO ${run} ID`);
-      expect(hrefId).toContain("Posisi yang dibuka:");
+      expect(hrefId).toContain("Proses HR yang ingin diotomasi:");
     });
   });
 
