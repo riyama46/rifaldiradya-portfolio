@@ -66,13 +66,13 @@ test("UF-07 + UF-08 + UF-09 v2: walkthrough case with a number card, edit, delet
 
   await page.getByLabel("Title (EN)").fill(title);
   await page.getByLabel("Title (ID)").fill(`${title} ID`);
-  await page.getByRole("button", { name: "Panasonic" }).click();
-  await expect(page.getByRole("button", { name: "Panasonic" })).toHaveAttribute(
+  await page.getByRole("button", { name: "HR systems" }).click();
+  await expect(page.getByRole("button", { name: "HR systems" })).toHaveAttribute(
     "aria-pressed",
     "true",
   );
-  await page.getByLabel("Meta line (EN)").fill("Panasonic · E2E");
-  await page.getByLabel("Meta line (ID)").fill("Panasonic · E2E");
+  await page.getByLabel("Meta line (EN)").fill("HRMS · E2E");
+  await page.getByLabel("Meta line (ID)").fill("HRMS · E2E");
   await page.getByLabel("Side (EN)").fill("2026");
   await page.getByLabel("Short description (EN)").fill("Created by the end-to-end test.");
   await page.getByLabel("Short description (ID)").fill("Dibuat oleh tes end-to-end.");
@@ -107,6 +107,14 @@ test("UF-07 + UF-08 + UF-09 v2: walkthrough case with a number card, edit, delet
   await page.getByLabel("Status (ID)").fill("Berjalan, 2026");
 
   await page.getByRole("radio", { name: /Email to ask for a walkthrough/ }).check();
+  // D-42: optional links beside the case button; a bad one is flagged on blur.
+  await page.getByLabel("Demo video URL").fill("http://example.com/demo");
+  await page.getByLabel("Demo video URL").blur();
+  await expect(page.locator("#demo_url-error")).toHaveText(
+    "URL must start with https:// and be a full address.",
+  );
+  await page.getByLabel("Demo video URL").fill("https://example.com/demo");
+  await page.getByLabel("Code repository URL").fill("https://github.com/example/e2e");
   await page.getByRole("button", { name: "Number card" }).click();
   await page.getByLabel("Number", { exact: true }).fill("13");
   await page.getByLabel("Caption (EN)").fill("companies in the test");
@@ -122,8 +130,8 @@ test("UF-07 + UF-08 + UF-09 v2: walkthrough case with a number card, edit, delet
   // S-11: the group filter hides other groups, never reorders.
   await page.getByRole("button", { name: /^Websites/ }).click();
   await expect(page.getByRole("link", { name: title, exact: true })).toHaveCount(0);
-  await page.getByRole("button", { name: /^Panasonic/ }).click();
-  await expect(page.getByRole("button", { name: /^Panasonic/ })).toHaveAttribute(
+  await page.getByRole("button", { name: /^HR systems/ }).click();
+  await expect(page.getByRole("button", { name: /^HR systems/ })).toHaveAttribute(
     "aria-pressed",
     "true",
   );
@@ -180,9 +188,9 @@ test("v2.1 AC-7: the preview panel follows the fields without saving (1024 px an
   await expect(preview).toBeVisible();
   await page.getByLabel("Title (EN)").fill("HR System");
   await page.getByLabel("Title (ID)").fill("Sistem HR");
-  await page.getByLabel("Meta line (EN)").fill("Panasonic · 13 companies");
+  await page.getByLabel("Meta line (EN)").fill("HRMS · 13 companies");
   await page.getByLabel("Short description (EN)").fill("The HR system 13 companies run on.");
-  await expect(preview).toContainText("Panasonic · 13 companies");
+  await expect(preview).toContainText("HRMS · 13 companies");
   await expect(preview).toContainText("HR System");
   await expect(preview).toContainText("The HR system 13 companies run on.");
   await expect(preview).toContainText("Nothing shows next to the cursor");

@@ -451,6 +451,24 @@ export function ProjectForm(props: ProjectFormProps) {
               {...text("live_url", true)}
             />
           </Field>
+          {(["demo_url", "repo_url"] as const).map((field) => (
+            <Field
+              key={field}
+              field={field}
+              label={fieldLabels[field]}
+              errors={errors}
+              help={t.help[field]}
+              aside={t.optional}
+            >
+              <input
+                type="url"
+                inputMode="url"
+                autoComplete="url"
+                placeholder="https://"
+                {...text(field, true)}
+              />
+            </Field>
+          ))}
         </FormSection>
 
         <FormSection id="visual" title={t.sections.visual.title} help={t.sections.visual.help}>
