@@ -77,15 +77,17 @@ export class MissingImageError extends Error {
 }
 
 /**
- * Inside a save that will point at this image: share-locks its row until the commit, so
+ * Inside a save that will point at this image: locks its row until the commit, so
  * deleteImageIfUnused can't remove it in between, and throws MissingImageError when it's gone.
+ * FOR UPDATE, not FOR SHARE: Hostinger runs MariaDB, which rejects FOR SHARE as a syntax error
+ * (every save with a screenshot failed with a 500). With one admin, the stronger lock costs nothing.
  */
 export async function lockImageForUse(tx: Transaction, id: string): Promise<void> {
   const [image] = await tx
     .select({ id: images.id })
     .from(images)
     .where(eq(images.id, id))
-    .for("share");
+    .for("update");
   if (!image) throw new MissingImageError();
 }
 
