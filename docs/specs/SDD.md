@@ -2,10 +2,10 @@
 doc: SDD
 app: rifaldiradya.com
 tier: full
-version: 2.1.0
+version: 2.2.0
 status: current
-last_updated: 2026-10-22
-last_change: changes/archive/2026-10-22-v2.1.0-pointer-layer
+last_updated: 2026-10-29
+last_change: changes/archive/2026-10-29-v2.2.0-hr-automation
 ---
 
 # SDD — rifaldiradya.com v2
@@ -13,6 +13,8 @@ last_change: changes/archive/2026-10-22-v2.1.0-pointer-layer
 Sep 27, 2026 · @Pal
 
 > **v2.0.0 (Oct 18, 2026).** Updated: Archivo font (section 2), v2 project schema + migration `0004` and the 640 avatar (3), v2 components (4), `<em>`/`<s>` rich text and Selected work rendering (5), mailto + https `live_url` (6), v2 SEO/analytics (7), two-layer tokens + theme + scroll-driven motion (8), v2 `site-config` (9), v2 release & rollback with DB restore (10), v2 testing (11), tasks T-23..T-33 (12), AGENTS.md (13). Architecture, database, auth and deploy do not change. Decisions D-01..D-30 in `docs/decisions/DECISIONS.md`.
+
+> **v2.2.0 (Oct 29, 2026).** Updated: `demo_url` / `repo_url` columns + migration `0005` and the `automation` group (3), the https rule for the new links (6), JSON-LD without `worksFor` and the new `knowsAbout` (7), `site-config` role/stack (9), MariaDB note for SQL (2, 3), tasks T-41..T-45 (12). Decisions D-40..D-44.
 
 ## 1. Architecture summary
 
@@ -45,7 +47,7 @@ The stack was picked with one main criterion: **few moving parts, no native buil
 | Language | TypeScript strict | 5.x | Stable; TypeScript 7 not used in v1 |
 | Styling | Tailwind CSS v4 + CSS variables | 4.x | The PRD section 8 theme tokens become CSS variables (two layers, section 8) |
 | Font | `next/font/google` (self-hosted at build): Archivo (`subsets: ['latin','latin-ext']`, `display: 'swap'`, `variable: '--font-archivo'`, normal + italic variable files) | — | woff2, no runtime request to Google; one family (D-03) |
-| Database | Hostinger MySQL | version from hPanel | See section 3 |
+| Database | Hostinger MySQL (the server is **MariaDB**) | version from hPanel | See section 3; SQL must run on both MariaDB and MySQL 8.4 (e.g. no `SELECT … FOR SHARE`, which MariaDB rejects; use `FOR UPDATE`) |
 | ORM & migrations | Drizzle ORM + `mysql2` + drizzle-kit | latest stable | Light, typed, migrations are SQL files that can be run by hand in phpMyAdmin if needed |
 | Validation | Zod | stable 3.x/4.x | One schema used by client and server |
 | Password | `bcryptjs` | latest | Pure JS, needs no native compilation during the Hostinger build |
@@ -76,7 +78,7 @@ Hostinger states that it only offers MySQL on shared/managed plans, and a Node.j
 
 | Table | Columns | Notes |
 | --- | --- | --- |
-| `projects` | `id` varchar(26) PK (cuid2/ulid) · `slug` varchar(100) unique · `title_en`, `title_id` varchar(80) · `group` varchar(12) default `'web'` · `meta_en`, `meta_id` varchar(40) null · `side_en`, `side_id` varchar(20) null · `summary_en`, `summary_id` varchar(160) · `show_on_home` boolean default false · `case_is_en`, `case_is_id` varchar(220) null · `case_did_en`, `case_did_id` JSON null · `tags` JSON (string array, max. 6) · `status_en`, `status_id` varchar(40) null · `case_action` varchar(12) default `'site'` · `live_url` varchar(300) **null** (D-21) · `visual_type` varchar(10) default `'screenshot'` · `thumbnail_public_id` varchar(255) null · `thumbnail_url` varchar(500) null · `thumbnail_width`, `thumbnail_height` int null · `thumbnail_alt_en`, `thumbnail_alt_id` varchar(140) null · `card_number` varchar(12) null · `card_caption_en`, `card_caption_id` varchar(60) null · `sort_order` smallint default 1 (position 1…n, unique, kept by `lib/projects/mutations.ts`) · `featured` boolean (**deprecated in v2.0.0, not read/written**, D-22) · `published` boolean default false · `created_at`, `updated_at` datetime(3) UTC | Indexes: (`published`, `sort_order`, `created_at`) and (`published`, `show_on_home`, `sort_order`). Charset `utf8mb4`, collation `utf8mb4_unicode_ci`. |
+| `projects` | `id` varchar(26) PK (cuid2/ulid) · `slug` varchar(100) unique · `title_en`, `title_id` varchar(80) · `group` varchar(12) default `'web'` (`automation` \| `panasonic` \| `web` \| `ai`, TypeScript enum only; D-43) · `meta_en`, `meta_id` varchar(40) null · `side_en`, `side_id` varchar(20) null · `summary_en`, `summary_id` varchar(160) · `show_on_home` boolean default false · `case_is_en`, `case_is_id` varchar(220) null · `case_did_en`, `case_did_id` JSON null · `tags` JSON (string array, max. 6) · `status_en`, `status_id` varchar(40) null · `case_action` varchar(12) default `'site'` · `live_url` varchar(300) **null** (D-21) · `demo_url`, `repo_url` varchar(300) null (v2.2.0, D-42) · `visual_type` varchar(10) default `'screenshot'` · `thumbnail_public_id` varchar(255) null · `thumbnail_url` varchar(500) null · `thumbnail_width`, `thumbnail_height` int null · `thumbnail_alt_en`, `thumbnail_alt_id` varchar(140) null · `card_number` varchar(12) null · `card_caption_en`, `card_caption_id` varchar(60) null · `sort_order` smallint default 1 (position 1…n, unique, kept by `lib/projects/mutations.ts`) · `featured` boolean (**deprecated in v2.0.0, not read/written**, D-22) · `published` boolean default false · `created_at`, `updated_at` datetime(3) UTC | Indexes: (`published`, `sort_order`, `created_at`) and (`published`, `show_on_home`, `sort_order`). Charset `utf8mb4`, collation `utf8mb4_unicode_ci`. |
 | `admin_sessions` | `id` varchar(26) PK · `token_hash` char(64) unique (SHA-256 of the token) · `created_at` · `expires_at` · `last_seen_at` · `user_agent` varchar(255) | The real token only lives in the cookie; the DB stores the hash. Expired sessions are cleaned up at login. |
 | `site_settings` | `key` varchar(50) PK · `value` varchar(255) null · `updated_at` | Small settings from the admin (key-value table, no migration per key): `profile_photo` = image id (S-14), `availability_on` = `'1'`/`'0'` (default on when missing). Both are saved in one transaction by API-09 (`saveProfileSettings()`). |
 | `images` / `image_variants` | see "Images (MySQL)" below | Project images (16:10) and the profile photo (1:1). |
@@ -92,6 +94,8 @@ Migrations: drizzle-kit generates SQL files in `/drizzle` (`npm run db:generate`
 - Last resort: run the SQL in `/drizzle` by hand through phpMyAdmin (then fill `__drizzle_migrations` to match), only if every way above fails.
 
 **Migration `0004_v2_showcase.sql` (v2.0.0):** one `ALTER TABLE projects` that adds the v2 columns and makes `live_url` NULL-able (the only exception to the "migrations only add" rule, D-21), the `projects_home_order_idx` index, and the starting value `UPDATE projects SET show_on_home = featured WHERE published = 1` (Pal tidies it up in the admin). Tested in CI on a v1 dump and run twice (idempotent, AC-14).
+
+**Migration `0005_demo_repo_links.sql` (v2.2.0):** one `ALTER TABLE projects` that adds the nullable `demo_url` and `repo_url` (explicit utf8mb4). Adds only, so v2.1.0 code keeps working after a rollback; the `automation` group needs no migration (a rollback sets those rows to `ai`, D-43).
 
 There is no seed; the first project is filled in through the admin.
 
@@ -253,7 +257,7 @@ One admin, sessions stored in the database, and every check runs on the server. 
 | CSRF | `sameSite=lax` cookie + check that the `Origin` header = `SITE_URL` on every write request (`403 FORBIDDEN_ORIGIN`) |
 | XSS | React escaping; no `dangerouslySetInnerHTML` except JSON-LD built from an object (`JSON.stringify` + `<` escaped) and the inline theme script built from our own code; admin input is stored as plain text; mailto is built with `encodeURIComponent` for subject/body (the project title in the walkthrough subject is encoded too) |
 | Malicious upload | Client: JPG/PNG/WebP type, max. 5 MB, width ≥ 1200 px, redrawn through canvas. Server: format + dimensions from magic bytes (WebP/JPEG only; SVG/HTML/PNG rejected), the width set and the 16:10 ratio must match, max. 1 MB per variant; file name and MIME from the client are ignored; served with the `Content-Type` from the DB + `X-Content-Type-Options: nosniff` |
-| Malicious URL | `live_url` is validated as `https:` on the server and only rendered (JSON-LD included) when it is `https:` and the case button = `site`; rendered with `rel="noopener noreferrer"` |
+| Malicious URL | `live_url`, `demo_url` and `repo_url` are validated as `https:` on the server (`isValidLiveUrl`); `live_url` is only rendered (JSON-LD included) when it is `https:` and the case button = `site`, `demo_url` / `repo_url` only when `https:` (never in JSON-LD); all rendered with `rel="noopener noreferrer"`, as links only (no embed, CSP unchanged) |
 | Brute force | Login rate limit + bcrypt cost 12. An attempt is recorded as failed *before* the password check, so parallel requests are counted too; attempts rejected with 429 are not counted (DECISIONS 2026-10-22) |
 | Large request body | Admin API JSON bodies, login included, max. 32 KB (`readJsonBody`, counted while reading, so a chunked body without `Content-Length` is cut off too); anything larger is treated like a broken body (`400`/`422`) |
 | Secret leaks | Every secret in the Hostinger env; `.env*` in `.gitignore`; `.env.example` without values; no secret with the `NEXT_PUBLIC_` prefix |
@@ -269,12 +273,12 @@ The CSP stays the same for v2 (self-hosted font, no new hosts; the inline theme 
 
 - `lib/seo/metadata.ts` → `buildMetadata({ lang, path, page, dict })` (v2 meta in the `seo.*` dictionary, PRD section 9) used by every `generateMetadata`. It produces: `title`, `description`, `alternates.canonical` (absolute URL of the page itself), `alternates.languages` (`en`, `id`, `x-default` → EN), `openGraph` (title, description, url, `locale` en\_US/id\_ID, `alternateLocale`, an OG image per language 1200 × 630 in `/public/og/`), `twitter` (summary\_large\_image).
 - `metadataBase = new URL(SITE_URL)`; `SITE_URL` = `https://rifaldiradya.com` (canonical non-www, approved Sep 28, 2026). The www → non-www redirect is handled by `proxy.ts` rule 1 (section 5); DNS still needs a `www` record pointing to the same app so www requests reach the proxy. Every canonical, hreflang, sitemap, OG `url` and JSON-LD uses the non-www version.
-- `lib/seo/jsonld.ts` → `homeJsonLd(lang, origin)` (Person: `jobTitle` Software Engineer, `worksFor`, `knowsAbout`, `sameAs` LinkedIn + GitHub when filled in; WebSite) and `workJsonLd(...)` (CollectionPage + ItemList; projects without `live_url` use the case URL `…/work#case-<slug>`); rendered as `<script type="application/ld+json">` in a Server Component (not added via client JS), so it is visible in the initial HTML.
+- `lib/seo/jsonld.ts` → `homeJsonLd(lang, origin)` (Person: `jobTitle` HR Automation Engineer, no `worksFor` (D-41), `knowsAbout`, `sameAs` LinkedIn + GitHub when filled in; WebSite) and `workJsonLd(...)` (CollectionPage + ItemList; projects without `live_url` use the case URL `…/work#case-<slug>`); rendered as `<script type="application/ld+json">` in a Server Component (not added via client JS), so it is visible in the initial HTML.
 - `app/sitemap.ts`: 6 URLs (home, work, privacy × 2 languages), each with `alternates.languages`, `lastModified`.
 - `app/robots.ts`: allow `/`, disallow `/admin` and `/api`, `sitemap: SITE_URL/sitemap.xml`. No special block for AI crawlers (allowed). **Only when `SITE_URL` = `https://rifaldiradya.com`**; other deployments (devstaging, local) get `Disallow: /` and every page `noindex` (`isIndexable()` in `lib/seo/metadata.ts`).
 - Static pages, the sitemap and robots use `SITE_URL` **at build time** (then updated by revalidation within ≤ 5 minutes). That is why the Phase 4 step "change `SITE_URL`, then redeploy" is required: the redeploy rebuilds with the main domain.
 - Admin: `metadata.robots = { index: false, follow: false }` + the header from the proxy.
-- OG images are regenerated with `scripts/og-images.mts` using the v2 tokens (dark theme) and Archivo → `public/og/{en,id}.png`.
+- OG images are regenerated with `scripts/og-images.mts` using the v2 tokens (dark theme) and Archivo → `public/og/{en,id}.png`; the card's stack line is read from `siteConfig.stack`, and the hero copy from the dictionaries.
 - Images: `next/image` + the `/media` loader. No priority images in S-01 and S-02 (no thumbnail above the fold; LCP = the H1 text); Selected work screenshots use `loading="lazy"`, `sizes="(min-width: 768px) 55vw, 100vw"`.
 
 ### Analytics & consent (implementation of F8)
@@ -332,7 +336,7 @@ Every variable is validated by `lib/env.ts` (Zod) in 4 groups: site, database, a
 
 - On Hostinger: fill them in through the Node.js app environment variable settings, then **restart the app** (env is not reloaded automatically). `NEXT_PUBLIC_*` variables are read at **build** time, so changing one needs a redeploy, not just a restart.
 - Local: `.env.local` (not committed). `.env.example` holds every variable name without values.
-- Non-secret config in `lib/site-config.ts` (committed, not env): `role: 'Software Engineer'`, `employer`, `knowsAbout` (JSON-LD), `contactEmail: 'hello@rifaldiradya.com'`, `cvPath: '/cv/rifaldi-radya-pratama-cv.pdf'`, `timezoneLabel: 'GMT+7'` + `timezone: 'Asia/Jakarta'` (Contact clock), `stack` (hero Stack line), `social: { linkedin: 'https://www.linkedin.com/in/rifaldiradya', github: '' }` (empty GitHub = not rendered, D-19). The v1 `availableForWork` flag is deleted, replaced by `availability_on` in the admin (D-16). Changing it = commit + deploy. No new env in v2.
+- Non-secret config in `lib/site-config.ts` (committed, not env): `role: 'HR Automation Engineer'`, `knowsAbout` (JSON-LD; no `employer` since v2.2.0, D-41), `contactEmail: 'hello@rifaldiradya.com'`, `cvPath: '/cv/rifaldi-radya-pratama-cv.pdf'`, `timezoneLabel: 'GMT+7'` + `timezone: 'Asia/Jakarta'` (Contact clock), `stack` (hero Stack line and OG card: `n8n`, `LLM APIs`, `Google Workspace`, `C#`, `ASP.NET`, `SQL Server`; six short items so the hero fits 375 × 667 with the cookie banner), `social: { linkedin: 'https://www.linkedin.com/in/rifaldiradya', github: '' }` (empty GitHub = not rendered, D-19). The v1 `availableForWork` flag is deleted, replaced by `availability_on` in the admin (D-16). Changing it = commit + deploy. No new env in v2.
 - `next.config.ts`: `images.loader: 'custom'`, `images.loaderFile: './lib/images/loader.ts'`, `deviceSizes` = stored widths, security `headers()` (section 6), `poweredByHeader: false`, `reactStrictMode: true`.
 - `package.json` (`"type": "module"`) scripts: `dev`, `build`, `start` (`next start`; migrations run automatically in `instrumentation.ts`; Next.js reads `PORT` from the Hostinger env), `lint`, `typecheck`, `test`, `test:e2e`, `db:generate`, `db:migrate`, `hash-password`.
 
@@ -504,6 +508,14 @@ v1: 22 tasks in 4 phases (T-01..T-22). v2.0.0: 11 tasks (T-23..T-33), below. One
 - [x] **T-38** v2 "cobalt RR" icons (D-38, PR #76).
 - [x] **T-39** O-05 pointer layer (D-31..D-35, PR #77).
 - [x] **T-40** S-12/S-13 admin preview panel (PR #78).
+
+### v2.2.0 — HR automation positioning (T-41..T-45)
+
+- [x] **T-41** Migration `0005` (`demo_url`, `repo_url`), schema, validation, `automation` group (D-42, D-43, PR #86).
+- [x] **T-42** Admin: Demo video URL and Code repository URL fields, four-option group control (PR #86).
+- [x] **T-43** Public: demo and code links in the case row and Selected work, `project_link_click` `link` (PR #86); `automation` filter hide rule (PR #89).
+- [x] **T-44** Positioning copy EN/ID, JSON-LD, OG images (D-41, D-44, PR #86, #87); client copy for the Highlight note and bridge (PR #89).
+- [x] **T-45** Release: specs merged, change archived, CHANGELOG 2.2.0, `package.json` 2.2.0. Also in this release: image row lock `FOR UPDATE` for MariaDB (PR #88).
 
 ## 13. Rules for working with AI coding
 

@@ -2,41 +2,43 @@
 doc: PRD
 app: rifaldiradya.com
 tier: full
-version: 2.1.0
+version: 2.2.0
 status: current
-last_updated: 2026-10-22
-last_change: changes/archive/2026-10-22-v2.1.0-pointer-layer
+last_updated: 2026-10-29
+last_change: changes/archive/2026-10-29-v2.2.0-hr-automation
 ---
 
 # PRD — rifaldiradya.com Portfolio v2
 
-Sep 27, 2026 · @Pal · v2.0.0: Oct 18, 2026
+Sep 27, 2026 · @Pal · v2.0.0: Oct 18, 2026 · v2.2.0: Oct 29, 2026
 
 > **v2.0.0 (software engineer showcase).** The site's direction changes from selling landing pages to Upwork clients into a showcase of a full-stack .NET software engineer for recruiters and hiring managers, with project clients as the second audience. Visual and interaction reference: `docs/design/v2/option-b.html` (public) and `docs/design/v2/admin.html` (admin). If the mockup differs from this document, this document wins; if this document is silent, follow the mockup. The v2 decisions (D-01..D-30) are in `docs/decisions/DECISIONS.md`; the change history is in `docs/changes/archive/2026-10-18-v2.0.0-showcase-redesign/CHANGE.md`.
 
+> **v2.2.0 (HR automation positioning).** The site now presents Pal as an HR automation engineer (n8n + AI) for HR and people-ops clients, with recruiters as the second audience and the HRMS work as the supporting proof. Projects can link a demo video and a code repository. Decisions D-40..D-44; change history in `docs/changes/archive/2026-10-29-v2.2.0-hr-automation/CHANGE.md`.
+
 ## 1. Product summary
 
-rifaldiradya.com is a bilingual portfolio (EN default, ID secondary) that presents Pal as a **full-stack .NET software engineer**, with the HRMS used by 13 PT Panasonic Manufacturing Indonesia group companies as the main proof. The site is a **funnel to email** (full-time role or project) plus Download CV; a single-user admin stays for managing projects.
+rifaldiradya.com is a bilingual portfolio (EN default, ID secondary) that presents Pal as an **HR automation engineer**: n8n and AI workflows for HR and people-ops teams, built on four years building and running the HRMS of a 13-company manufacturing group (C#, ASP.NET, SQL Server). The site is a **funnel to email** (project, or full-time role) plus Download CV; a single-user admin stays for managing projects.
 
-**Problem.** Recruiters and hiring managers compare many candidates in a few seconds, mostly on a phone. Pal's main work is internal and cannot be clicked, so the site must explain it with real numbers, case content, a CV and a walkthrough offer.
+**Problem.** HR teams lose hours to manual onboarding and admin, and cannot tell a generic automation freelancer from one who knows HR systems. The site shows a working automation (demo and code) and the HRMS track record behind it; the internal HRMS work, which cannot be clicked, is explained with real numbers, case content, a CV and a walkthrough offer.
 
-**Owner context.** Pal is actively applying; visitors come from LinkedIn, Upwork and Fiverr, mostly on a phone. Panasonic may be named; the HRMS screens are internal and are not shown.
+**Owner context.** Pal is still employed and sells freelance HR automation; visitors come from Upwork and LinkedIn, mostly on a phone. Panasonic is named once, as track record in About and the CV, never in headline copy or meta (D-41): the site also serves recruiters, while freelance profiles stay anonymized. The HRMS screens are internal and are not shown.
 
 ## 2. Target users & personas
 
 | Persona | Who | Looking for | Language | Expected action |
 | --- | --- | --- | --- | --- |
-| P1 — Recruiter / hiring manager (primary) | Comes from LinkedIn, Upwork or Fiverr, mostly on a phone | Role, stack, system scale, proof, how to get in touch | EN or ID | Read hero → Selected work/Work → Download CV or "Email about a full-time role" |
-| P2 — Project client (secondary) | A company that needs an HR system or an internal app | Proof of similar systems and how to get in touch | EN or ID | "Email about a project" |
+| P1 — Automation client (primary) | HR / people-ops lead or founder of a small to mid-size company, from Upwork or LinkedIn, mostly on a phone | Proof the automation works (demo, code), understanding of HR, how to start | EN or ID | Hero → Selected work/Work → "View the code ↗" or "Watch the demo ↗" → "Email about a project" |
+| P2 — Recruiter / hiring manager (secondary) | Comes from LinkedIn, mostly on a phone | Role, stack, system scale, proof, how to get in touch | EN or ID | Read hero → Selected work/Work → Download CV or "Email about a full-time role" |
 | P3 — Admin (Pal) | Site owner, the only admin user | Add/edit a project in < 5 minutes, from a laptop or a phone | EN admin UI | Login → project CRUD |
 
 ## 3. Goals, non-goals & success metrics
 
 **Goals**
 
-1. A recruiter understands Pal's role, stack and scale of work from the first screen on a phone.
+1. An HR or people-ops lead understands what Pal automates, and why Pal's HRMS background matters, from the first screen on a phone.
 2. Every chapter leads to email or the CV.
-3. Internal work can be judged without its screens (real numbers, case content, walkthrough).
+3. Automation work can be judged by its demo and code; internal HRMS work by real numbers, case content and a walkthrough.
 4. Pal can add and arrange projects, including projects without a URL, without touching code.
 5. SEO in both languages does not drop.
 
@@ -57,12 +59,14 @@ rifaldiradya.com is a bilingual portfolio (EN default, ID secondary) that presen
 | Indexed pages | 4 public pages (/, /work, /id, /id/work) | Google Search Console |
 | Time to add 1 project via admin | < 5 minutes | Manual test |
 | Full-time role emails that lead to an interview | ≥ 1 within 60 days after the v2.0.0 release | Logged manually by Pal |
+| Project emails (`contact_email_click` kind `project` or `walkthrough`) | ≥ 1 within 60 days after the v2.2.0 release | GA4 + Pal's inbox |
+| `project_link_click` with `link = demo` or `code` | Baseline for the first 30 days after v2.2.0 | GA4 |
 | `contact_email_click` per `kind` | Baseline for the first 30 days | GA4 |
 | `cv_download` | Baseline for the first 30 days (early signal of recruiter interest) | GA4 |
 
 ## 4. Positioning, promise & copy
 
-**Positioning:** full-stack .NET software engineer (C#, ASP.NET, SQL Server, Azure). Since Nov 2022 has built and maintained the HRMS used by 13 PT Panasonic Manufacturing Indonesia group companies. The site is a showcase for recruiters and project clients, and a funnel to email.
+**Positioning:** HR automation engineer: n8n and AI (LLM) workflows for onboarding and HR admin, on Google Workspace. Since Nov 2022 has built and run the HRMS of a 13-company manufacturing group (C#, ASP.NET, SQL Server, Azure), which is the supporting proof. The site is a showcase for automation clients and recruiters, and a funnel to email. No AI vendor is named in the copy: the model changes per client.
 
 The source of the final EN/ID copy = the `T` object in `option-b.html`, moved into `i18n/en.json` and `i18n/id.json` (keys in App Flow §11). Exceptions to `T`: the availability text stays in i18n (D-16), the Copy email label (D-17), the walkthrough subject (D-25), the Work page sub computed from data (D-30), and new copy that is not in the mockup: Download CV, Copy email, SEO meta (§9).
 
@@ -71,18 +75,22 @@ Copy rules: no em dash, no "Not X. Y." pattern, no cliché words, buttons say ex
 | Element | EN | ID |
 | --- | --- | --- |
 | Bar | Rifaldi Radya Pratama · Work · About · EN/ID · theme · Email me | … · Karya · Tentang · … · Kirim email |
-| Hero label | Software engineer · Full-stack .NET · Jakarta, Indonesia | … · Jabodetabek |
-| Availability (only when the switch is on) | Open to full-time roles and projects | Terbuka untuk posisi full-time dan proyek |
-| H1 | Building HR software / for *thousands.* | Membangun software HR / untuk *ribuan karyawan.* |
-| Sub | Four years building and running the HR system of 13 Panasonic group companies: hundreds of HR users, thousands of employee records. | Empat tahun membangun dan menjaga sistem HR 13 perusahaan grup Panasonic: ratusan pengguna HR, ribuan data karyawan. |
-| Stack | C# · ASP.NET · SQL Server · Azure · Power Automate · Next.js · TypeScript | same |
-| Highlight | One login instead of ~~five passwords.~~ · 5 → 1 · ~200 · 13 | ~~Lima password~~ jadi satu login. · ±200 |
-| Contact H2 | Tell me what you're *building.* | Ada posisi atau *proyek?* |
-| Contact buttons | Email about a full-time role · Email about a project | Email soal posisi full-time · Email soal proyek |
+| Hero label | HR automation engineer · n8n + AI · Jakarta, Indonesia | … · Jabodetabek |
+| Availability (only when the switch is on) | Open to HR automation projects | Terbuka untuk proyek otomasi HR |
+| H1 | I automate the HR work / done *by hand.* | Otomasi pekerjaan HR / yang *manual.* |
+| Sub | Four years building and running the HR system of a 13-company manufacturing group. Now I build HR automations with n8n and AI. | Empat tahun membangun dan menjaga sistem HR grup manufaktur 13 perusahaan. Sekarang saya membangun otomasi HR dengan n8n dan AI. |
+| Stack | n8n · LLM APIs · Google Workspace · C# · ASP.NET · SQL Server (six short items so the hero fits 375 × 667 with the cookie banner) | same |
+| Highlight | Highlight · HRMS · Live since early 2023 · One login instead of ~~five passwords.~~ · 5 → 1 · ~200 · 13 | Sorotan · HRMS · Berjalan sejak awal 2023 · ~~Lima password~~ jadi satu login. · ±200 |
+| Highlight note | Screens of the HRMS are internal; I can walk you through them on a call. | … lewat video call. |
+| Bridge | Does your HR team still do this kind of work by hand? | Tim HR Anda masih mengerjakan hal seperti ini secara manual? |
+| Contact H2 | Tell me what you'd like to *automate.* | Ada proses HR yang mau *diotomasi?* |
+| Contact pitch | Need an HR process automated, or a developer on your team? Send a few lines about it and I'll reply by email. | Perlu proses HR diotomasi, atau developer untuk tim Anda? Ceritakan singkat kebutuhannya, saya balas lewat email. |
+| Contact buttons | Email about a project (primary) · Email about a full-time role | Email soal proyek (utama) · Email soal posisi full-time |
+| Case links | Open the live site ↗ · Watch the demo ↗ · View the code ↗ | Buka situsnya ↗ · Tonton demonya ↗ · Lihat kodenya ↗ |
 | Download CV | Download CV (PDF) | Unduh CV (PDF) |
 | Copy email | Copy email → Copied | Salin email → Tersalin |
 
-Numbers and their sources (CV v1.0, Drive `01_Personal Docs/Current/Career`, rechecked Oct 17, 2026): 13 group companies, Pal handles 6; hundreds of HR/admin staff, thousands of employee records, ~2,000 at the main site; SSO 4–5 passwords → 1 for ~200 staff, live since early 2023; Teams approval ~57 → 4 minutes **projected** (proposal stage); team of 3.
+Outside About, the employer appears as "a 13-company manufacturing group" / "grup manufaktur 13 perusahaan" (D-41). Numbers and their sources (CV v1.0, Drive `01_Personal Docs/Current/Career`, rechecked Oct 17, 2026): 13 group companies, Pal handles 6; hundreds of HR/admin staff, thousands of employee records, ~2,000 at the main site; SSO 4–5 passwords → 1 for ~200 staff, live since early 2023; Teams approval ~57 → 4 minutes **projected** (proposal stage); team of 3.
 
 ## 5. Information architecture & site map
 
@@ -118,19 +126,19 @@ No numbered section labels.
 - [ ] The first screen at 390 × 844 and 375 × 667 holds the role label, the H1 and the "Email me" button, including while the consent banner shows.
 - [ ] The availability line shows only when `availability_on` (S-14) is on.
 - [ ] Selected work shows `published AND show_on_home` projects, ordered by `sort_order`, max. 5, with a "0n / 0N" counter and a rail of project names; the project title links to `/work#case-<slug>` (active locale).
-- [ ] A project with `case_action = site` shows an "Open the live site ↗" link; a project with a screenshot visual shows the screenshot linking to `live_url` when present, otherwise to the case.
+- [ ] A project with `case_action = site` shows an "Open the live site ↗" link, and a project with `demo_url` a "Watch the demo ↗" link (D-42); a project with a screenshot visual shows the screenshot linking to `live_url` when present, otherwise to the case.
 - [ ] About: statement, two paragraphs, Education, Certifications, Download CV link.
 - [ ] SSO Highlight: statement with "five passwords" struck through, three numbers (5 → 1, ~200, 13), an internal-HRMS note, a bridge sentence to Contact.
-- [ ] Contact: two mailto buttons (role, project), the email as a link + a Copy email button, LinkedIn, Download CV, GMT+7 clock; GitHub only when filled in (D-19).
+- [ ] Contact: two mailto buttons (project first, then role; D-44), the email as a link + a Copy email button, LinkedIn, Download CV, GMT+7 clock; GitHub only when filled in (D-19).
 
 ### F2 — Work page
 
 **Story:** As a recruiter, I want to see all projects and open the details of one project without leaving the page.
 
 - [ ] H1 "Work" with the number of published projects; the sub is computed from the number of projects per group (D-30).
-- [ ] Filter All / Panasonic / Websites / AI tools (with a count per group); the filter is client-only, and without JS all rows show.
+- [ ] Filter All / HR automation / HR systems / Websites / AI tools (with a count per group; D-43); the filter is client-only, and without JS all rows show.
 - [ ] All published projects as rows (title · meta · side), ordered by `sort_order`.
-- [ ] A row opens to show What it is, What I did (1–8 points), Stack, Status and the button for its `case_action`.
+- [ ] A row opens to show What it is, What I did (1–8 points), Stack, Status, the button for its `case_action`, then "Watch the demo ↗" and "View the code ↗" when `demo_url` / `repo_url` are set (D-42).
 - [ ] `/work#case-<slug>` opens and scrolls to that row.
 - [ ] Closing Contact chapter "Have a project like *these?*".
 - [ ] Empty state when there are 0 projects: a short message + email CTA (never an empty page).
@@ -139,9 +147,9 @@ No numbered section labels.
 
 The v1 card is replaced by the case row (F2) and the Selected work item (F1); the tech stack tags become "Stack" (max. 6).
 
-- [ ] Outbound links to a live site open a new tab with `rel="noopener noreferrer"`; `live_url` is rendered only when it is `https:`.
+- [ ] Outbound links (live site, demo, code) open a new tab with `rel="noopener noreferrer"`; `live_url`, `demo_url` and `repo_url` are rendered only when they are `https:`.
 - [ ] All row text follows the active page language; screenshot alt text is per language too.
-- [ ] A click on a site link is logged as `project_link_click` (placement `home` or `case`), opening a row is logged as `case_open`, only when analytics consent is given.
+- [ ] A click on a site, demo or code link is logged as `project_link_click` (placement `home` or `case`, `link` `site`/`demo`/`code`), opening a row is logged as `case_open`, only when analytics consent is given.
 
 ### F4 — Bilingual EN/ID
 
@@ -179,7 +187,7 @@ The v1 card is replaced by the case row (F2) and the Selected work item (F1); th
 
 **Story:** As Pal, I want to add a new project in under 5 minutes so the portfolio is always up to date.
 
-- [ ] Fields and publish rules follow App Flow S-12/S-13: title, group, meta + side, short description, Show in Selected work, What it is, What I did, Stack, Status, case button (site / walkthrough / no button) + Live URL, visual (screenshot + alt or numbers card), Published.
+- [ ] Fields and publish rules follow App Flow S-12/S-13: title, group (HR automation / HR systems / Websites / AI tools), meta + side, short description, Show in Selected work, What it is, What I did, Stack, Status, case button (site / walkthrough / no button) + Live URL, Demo video URL and Code repository URL (optional, https), visual (screenshot + alt or numbers card), Published.
 - [ ] "Show in Selected work" max. 5 (the UI disables the 6th switch, the API rejects it with 422); ↑/↓ ordering stays.
 - [ ] Live URL is required only when the case button = site; it must be `https://`.
 - [ ] Image upload: JPG/PNG/WebP, compressed in the browser, stored in MySQL (not the server filesystem).
@@ -221,7 +229,8 @@ Every item below is deliberately deferred. Trigger = the condition that makes th
 | Upwork/Fiverr profile links | Not decided yet | The profiles are active and should be linked |
 | Testimonials | No written testimonials yet | A written testimonial exists that may be used |
 | Blog/articles | Heavy content load, not a funnel need | The portfolio is stable and there is time for regular content |
-| Non-engineering services | Outside the positioning | Not planned |
+| Services outside HR automation and HR systems | Outside the positioning | Not planned |
+| Embedded demo video | A link is enough and needs no CSP change | Demo views matter enough to keep visitors on the page |
 
 ## 8. UI/UX direction & visual identity
 
@@ -265,14 +274,14 @@ SEO = **standard** level: a correct technical foundation for 2 languages, on-pag
 
 | Page | Title | Description |
 | --- | --- | --- |
-| `/` | Rifaldi Radya Pratama, Software Engineer (Full-Stack .NET) | Software engineer building the HR system 13 Panasonic group companies run on. C#, ASP.NET, SQL Server and Azure. Based in Jakarta, Indonesia. |
-| `/work` | Work: HR Systems, Websites, AI Tools \| Rifaldi Radya Pratama | HR systems inside Panasonic, websites and AI tools by Rifaldi Radya Pratama. Open a row for what it is, what I did and the stack. |
-| `/id` | Rifaldi Radya Pratama, Software Engineer (Full-Stack .NET) | Software engineer yang membangun sistem HR 13 perusahaan grup Panasonic. C#, ASP.NET, SQL Server, dan Azure. Berbasis di Jabodetabek. |
-| `/id/work` | Karya: Sistem HR, Website, Alat AI \| Rifaldi Radya Pratama | Sistem HR di Panasonic, website, dan alat AI karya Rifaldi Radya Pratama. Buka satu baris untuk melihat apa itu, yang saya kerjakan, dan stack-nya. |
+| `/` | Rifaldi Radya Pratama, HR Automation Engineer (n8n + AI) | I build n8n and AI workflows that automate onboarding and HR admin, backed by four years on the HRMS of a 13-company manufacturing group. Based in Jakarta. |
+| `/work` | Work: HR Automation and HR Systems \| Rifaldi Radya Pratama | HR automations with n8n and AI, an enterprise HRMS, websites and AI tools by Rifaldi Radya Pratama. Open a row for what it is, what I did and the stack. |
+| `/id` | Rifaldi Radya Pratama, HR Automation Engineer (n8n + AI) | Workflow n8n dan AI untuk otomasi onboarding dan administrasi HR, berbekal empat tahun di HRMS grup manufaktur 13 perusahaan. Berbasis di Jabodetabek. |
+| `/id/work` | Karya: Otomasi HR dan Sistem HR \| Rifaldi Radya Pratama | Otomasi HR dengan n8n dan AI, HRMS enterprise, website, dan alat AI karya Rifaldi Radya Pratama. Buka satu baris untuk melihat detailnya. |
 
 Meta does not mention availability (D-26).
 
-**Keyword hypothesis:** "software engineer .NET Jakarta", "full-stack .NET developer", "ASP.NET developer Indonesia" + personal name. Realistic target: ranking for **his own name** (branded search).
+**Keyword hypothesis:** "HR automation n8n", "n8n onboarding automation", "HR automation freelancer Indonesia" + personal name. Realistic target: ranking for **his own name** (branded search).
 
 **On-page**
 
@@ -283,7 +292,7 @@ Meta does not mention availability (D-26).
 
 **Structured data (JSON-LD)**
 
-- Homepage: `Person` (name, url, `jobTitle` "Software Engineer", email, `worksFor` PT Panasonic Manufacturing Indonesia, `knowsAbout` C#, ASP.NET, SQL Server, Microsoft Azure, Next.js, TypeScript; `sameAs` `https://www.linkedin.com/in/rifaldiradya` + GitHub when filled in) + `WebSite` (name, url, inLanguage).
+- Homepage: `Person` (name, url, `jobTitle` "HR Automation Engineer", email, no `worksFor` (D-41), `knowsAbout` HR automation, n8n, LLM integration, Google Workspace, Power Automate, HRMS, C#, ASP.NET, SQL Server; `sameAs` `https://www.linkedin.com/in/rifaldiradya` + GitHub when filled in) + `WebSite` (name, url, inLanguage).
 - Work page: `CollectionPage` with an `ItemList` of projects (name, `live_url` when present, otherwise the case URL `…/work#case-<slug>`).
 - Schema content must match the content visible on the page.
 
@@ -340,6 +349,8 @@ GitHub → automatic build flow and supported plans: [Hostinger GitHub integrati
 - [x] Web version of the CV PDF: Software Engineer variant without a phone number, cleaned of generator metadata, `public/cv/rifaldi-radya-pratama-cv.pdf`.
 - [ ] Profile photo ≥ 640 × 640 px re-uploaded in S-14.
 - [ ] Final confirmation of the hero and About text.
+- [x] v2.2.0: HR Onboarding Automation project (group HR automation, repo link, workflow screenshot) filled in on devstaging (Oct 29, 2026); production follows after the release.
+- [ ] v2.2.0 optional: a demo video link (the repo README says "available on request" for now); the CV title "Software Engineer (Full-Stack .NET)" can be refreshed later through a PATCH.
 - [ ] Optional: blurred HRMS screenshots.
 
 ## 13. Risks, assumptions & open questions
@@ -348,7 +359,7 @@ GitHub → automatic build flow and supported plans: [Hostinger GitHub integrati
 
 | Risk | Impact | Mitigation |
 | --- | --- | --- |
-| Coworkers see "Open to full-time roles" | Awkward situation at the office | Availability switch in S-14 (D-16); meta without availability (D-26) |
+| Coworkers see the freelance pitch | Awkward situation at the office | Availability switch in S-14 (D-16); meta without availability (D-26); employer named only in About (D-41) |
 | Scroll-driven animation behaves differently in Safari/Firefox | Chapters are unreadable | Static stack fallback + required QA |
 | Rollback after projects without a URL exist | v1 code breaks | Revert the merge **and** restore the pre-release DB backup (D-21) |
 | Blur/filters and fonts lower the mobile score | Lighthouse < 90 | Lighthouse gate tested on staging before release |
@@ -363,7 +374,7 @@ GitHub → automatic build flow and supported plans: [Hostinger GitHub integrati
 
 - The Hostinger Business plan shows the Node.js Apps menu in Pal's hPanel account.
 - Pal manages his own GitHub account and the repo can be private.
-- Panasonic work may be named (confirmed by Pal); internal screens are not shown.
+- Panasonic is named once, as track record in About and the CV (D-41); internal screens are not shown.
 - Early traffic is small (< 1,000 visits/month), so the free tier of every service is enough.
 
 **Open questions**
@@ -384,4 +395,4 @@ The deploy pipeline is tested in the first week with an empty page, so Hostinger
 
 **Planning document order:** PRD (this document) → App Flow Document (screens, navigation, step-by-step flows, states, edge cases, data/API contracts) → SDD (architecture, final DB/storage choice, repo structure, rules for working with AI coding). Code execution happens separately with the vibe-coding-builder setup.
 
-**v2.0.0:** assembled on `staging` (tasks T-23..T-33, SDD §12), released through a `staging` → `main` PR; v2.1.0 (pointer layer, admin preview, dark theme default, dot field, v2 icons, shorter HTML cache) released as a MINOR (tasks T-34..T-40).
+**v2.0.0:** assembled on `staging` (tasks T-23..T-33, SDD §12), released through a `staging` → `main` PR; v2.1.0 (pointer layer, admin preview, dark theme default, dot field, v2 icons, shorter HTML cache) released as a MINOR (tasks T-34..T-40); v2.2.0 (HR automation positioning, demo and code links, HR automation group) released as a MINOR (tasks T-41..T-45, D-40).

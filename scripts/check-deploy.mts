@@ -81,8 +81,8 @@ check("JSON-LD in the HTML", html.includes('<script type="application/ld+json">'
 // v2 content (Delta SDD section 10): new meta, LinkedIn, and GitHub since the repo is public (v2.0.2, D-19)
 const title = /<title>([^<]+)<\/title>/.exec(html)?.[1]?.replaceAll("&amp;", "&");
 check(
-  "v2 title on /",
-  title === "Rifaldi Radya Pratama, Software Engineer (Full-Stack .NET)",
+  "v2.2.0 title on /",
+  title === "Rifaldi Radya Pratama, HR Automation Engineer (n8n + AI)",
   `got ${title}`,
 );
 check(

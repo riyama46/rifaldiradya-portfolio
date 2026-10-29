@@ -2,10 +2,10 @@
 doc: APP_FLOW
 app: rifaldiradya.com
 tier: full
-version: 2.1.0
+version: 2.2.0
 status: current
-last_updated: 2026-10-22
-last_change: changes/archive/2026-10-22-v2.1.0-pointer-layer
+last_updated: 2026-10-29
+last_change: changes/archive/2026-10-29-v2.2.0-hr-automation
 ---
 
 # App Flow Document — rifaldiradya.com v2
@@ -107,16 +107,16 @@ The chapter order is fixed; no extra chapters are allowed. Each chapter is one s
 | # | Chapter | Elements (in order) | Rules |
 | --- | --- | --- | --- |
 | 1 | Hero `#top` | round photo (S-14 avatar, no photo → initials "RR") → label `[hero.role]` + `[hero.loc]` → availability line (dot + `[hero.open]`) when `availability_on` → two-line H1 `[hero.l1]` / `[hero.l2]` (one `<em>` accent word) → `[hero.sub]` → Stack line → "Email me" button (`general`) → "Scroll ↓" link to `#work` | The H1 rises in over 900 ms without fade (D-10); no priority image other than the small avatar with explicit `width`/`height`; LCP = H1. |
-| 2 | Selected work `#work` | H2 `[work.h]` + "0n / 0N" counter → project items: label `0n / 0N · {meta} · {side}`, H3 title (link to the case, arrow →), description (`summary`), "Open the live site ↗" link when `case_action = site`, screenshot when `visual_type = screenshot` → rail of project names (anchors `#w1..#wN`) → "See all work →" to S-02 | Data: `published AND show_on_home`, ordered by `sort_order`, max. 5. Pinned: each item is one scroll step (sticky + snap); without scroll-driven support or under reduced motion → a plain stacked list. 0 items → E-25. Links and screenshots carry the `data-cursor` attribute (`read`/`visit`); the title also has `data-preview="<slug>"` (O-05). |
+| 2 | Selected work `#work` | H2 `[work.h]` + "0n / 0N" counter → project items: label `0n / 0N · {meta} · {side}`, H3 title (link to the case, arrow →), description (`summary`), "Open the live site ↗" link when `case_action = site`, "Watch the demo ↗" link when `demo_url` is set (D-42; new tab, `data-link="demo"`), screenshot (linking only to `live_url`) when `visual_type = screenshot` → rail of project names (anchors `#w1..#wN`) → "See all work →" to S-02 | Data: `published AND show_on_home`, ordered by `sort_order`, max. 5. Pinned: each item is one scroll step (sticky + snap); without scroll-driven support or under reduced motion → a plain stacked list. 0 items → E-25. Links and screenshots carry the `data-cursor` attribute (`read`/`visit`); the title also has `data-preview="<slug>"` (O-05). |
 | 3 | About `#about` | H2 `[about.h]` → statement `[about.s]` (fills line by line on scroll) → `[about.p1]`, `[about.p2]` → Education (`e1..e3`) → Certifications → Download CV link | Without scroll-driven support the statement shows in full. |
 | 4 | Highlight `#highlight` | label `[case.meta]` → statement `[case.t]` (the `<s>` part is struck through on entry) → 3 numbers (5 → 1, ~200, 13; numbers count up via CSS) + labels → note `[case.blur]` → bridge sentence `[bridge.q]` + link `[bridge.go]` to `#contact` | The real numbers are always in the DOM (`sr` text), so screen readers and browsers without support read the final value. |
-| 5 | Contact `#contact` | label `[ct.label]` → H2 `[ct.h]` → `[ct.pitch]` → `role` button (primary) + `project` (secondary) → reach line: email (mailto `general`) + Copy email, LinkedIn ↗, Download CV, GitHub ↗ (when filled in), `HH:mm GMT+7` clock → footer | Clock: static text "GMT+7" before JS; after mount `HH:mm` in the `Asia/Jakarta` zone, `tabular-nums`, no layout shift. |
+| 5 | Contact `#contact` | label `[ct.label]` → H2 `[ct.h]` → `[ct.pitch]` → `project` button (primary) + `role` (secondary) (D-44) → reach line: email (mailto `general`) + Copy email, LinkedIn ↗, Download CV, GitHub ↗ (when filled in), `HH:mm GMT+7` clock → footer | Clock: static text "GMT+7" before JS; after mount `HH:mm` in the `Asia/Jakarta` zone, `tabular-nums`, no layout shift. |
 
 ### S-02 Work (`/work`, `/id/work`)
 
 1. Label `[wp.label]` → H1 `[nav.work]` + number of published projects (`<sup>`) → sub `[wp.sub]`, built from the number of projects per group (D-30): empty groups are not mentioned, numbers up to ten are words, singular/plural follows the number; with no projects the sub is not rendered.
-2. Filter `[wp.filter]` (group `role="group"`): All / Panasonic / Websites / AI tools buttons with counts; the active one is marked with `aria-pressed`. Without JS the filter is not rendered and all rows show. An empty group has no button.
-3. An `<ol>` list of rows: `<details id="case-<slug>">` with `<summary data-preview="<slug>">` (O-05) holding title · meta · side · +/− icon; content: What it is (`case_is`), What I did (`<ul>` from `case_did`), Stack (`tags` joined with " · "), Status, then the button for `case_action`: `site` → "Open the live site ↗" (`live_url`, new tab); `walkthrough` → "Email to ask for a walkthrough" (mailto `walkthrough` with the project title); `none` → no button.
+2. Filter `[wp.filter]` (group `role="group"`): All / HR automation / HR systems / Websites / AI tools buttons with counts (D-43); the active one is marked with `aria-pressed`. Without JS the filter is not rendered and all rows show. An empty group has no button.
+3. An `<ol>` list of rows: `<details id="case-<slug>">` with `<summary data-preview="<slug>">` (O-05) holding title · meta · side · +/− icon; content: What it is (`case_is`), What I did (`<ul>` from `case_did`), Stack (`tags` joined with " · "), Status, then the button for `case_action`: `site` → "Open the live site ↗" (`live_url`, new tab); `walkthrough` → "Email to ask for a walkthrough" (mailto `walkthrough` with the project title); `none` → no button. After it, "Watch the demo ↗" (`demo_url`) and "View the code ↗" (`repo_url`) when set, in that order, new tab, `rel="noopener noreferrer"` (D-42). The details column shows when any of stack, status, a case button, demo or code exists.
 4. Hash `#case-<slug>` on load or on hash change → open that row, scroll to it, focus the `<summary>`, send `case_open` (`source: hash`). Opening a row by click → `case_open` (`source: row`). A filter that hides the target row is reset to All.
 5. Closing Contact chapter `#more` with H2 `[ct.h.more]` "Have a project like *these?*" and two mailto buttons; footer with "Back to home ↑".
 6. Data: `published=true`, ordered by `sort_order`, no limit. 0 projects → E-01.
@@ -209,8 +209,8 @@ The same form. S-13 is filled with data and has a delete zone.
 | # | Section | Field | UI type | Validation | Required to publish |
 | --- | --- | --- | --- | --- | --- |
 | 1 | Basics | Title EN / ID | text + counter | 1–80 | yes |
-| 2 | Basics | Group | segmented: Panasonic / Websites / AI tools | enum `panasonic`\|`web`\|`ai` | yes (default `web`) |
-| 3 | Basics | Meta line EN / ID | text + counter | 1–40, e.g. "Panasonic · 13 companies" | yes |
+| 2 | Basics | Group | segmented: HR automation / HR systems / Websites / AI tools | enum `automation`\|`panasonic`\|`web`\|`ai` | yes (default `web`) |
+| 3 | Basics | Meta line EN / ID | text + counter | 1–40, e.g. "HRMS · 13 companies" | yes |
 | 4 | Basics | Side EN / ID | text + counter | 0–20, e.g. "2022–now", "WordPress"; help: "Right column on the Work page, and the end of the homepage label." | no |
 | 5 | Homepage | Short description EN / ID | textarea + counter | 1–160 (`summary` column) | yes |
 | 6 | Homepage | Show in Selected work | switch | max. 5 projects with the switch on (drafts included); the 6th → E-26 | no |
@@ -220,6 +220,8 @@ The same form. S-13 is filled with data and has a delete zone.
 | 10 | Case | Status EN / ID | text | 1–40, e.g. "Live, 2022–now" | yes |
 | 11 | Button on the case | Case action | radio: Open the live site / Email to ask for a walkthrough / No button | enum `site`\|`walkthrough`\|`none` | yes (default `site`) |
 | 12 | Button on the case | Live URL | url, "optional" | empty or a valid `https://` max. 300; **required when case action = site** | conditional |
+| 12a | Button on the case | Demo video URL | url, "optional" | empty or a valid `https://` max. 300, e.g. YouTube or Google Drive | no |
+| 12b | Button on the case | Code repository URL | url, "optional" | empty or a valid `https://` max. 300, e.g. GitHub | no |
 | 13 | Visual | Visual type | segmented: Screenshot / Number card | enum `screenshot`\|`number` | yes (default `screenshot`) |
 | 14 | Visual | Screenshot + alt EN/ID | ImageUploader (16:10) + text | JPG/PNG/WebP, ≤ 5 MB, min 1200 px wide, cropped 16:10; alt 1–140; required when type = screenshot | conditional |
 | 15 | Visual | Number + Caption EN/ID | text + counter | number 1–12 (e.g. "13", "5 → 1"); caption 1–60; required when type = number | conditional |
@@ -246,7 +248,14 @@ The same form. S-13 is filled with data and has a delete zone.
 
 The 10 flows below are every path that must work. Each step names the screen and the expected result.
 
-### UF-01 A recruiter evaluates Pal (EN) — main flow
+### UF-01 An HR lead evaluates Pal (EN) — main flow
+
+1. An HR or people-ops lead opens a link from Upwork or LinkedIn on a phone → S-01; O-03 shows.
+2. Reads the role label, H1, sub, stack.
+3. Scrolls to Selected work; on "HR Onboarding Automation" taps "Watch the demo ↗" when set (`project_link_click` placement `home`, link `demo`), or the title → S-02 `#case-hr-onboarding-automation` → "View the code ↗" (link `code`).
+4. Back to home → Contact → "Email about a project" (kind `project`), with the automation body (section 11).
+
+### UF-01b A recruiter evaluates Pal (EN)
 
 1. The recruiter opens a link from LinkedIn on a phone → S-01; O-03 shows.
 2. Reads the role label, H1, sub, stack.
@@ -346,6 +355,8 @@ Every edge case below must be handled exactly as in the "Behavior" column; there
 | E-32 | S-01, S-14 | Avatar not replaced yet (320 px) | Still shows; no public warning; S-14 shows "Current file is 320 px. A larger one is recommended." |
 | E-33 | O-05 | A project without a valid visual (missing screenshot or empty numbers card) | No preview is shown for that project; the cursor label stays. |
 | E-34 | O-05 | The page is opened with a mouse and then switches to touch | The layer is turned off on the first `pointerType` that is not a mouse, and turned on again on the next mouse `pointermove`. |
+| E-35 | S-01, S-02 | `demo_url` / `repo_url` stored but not `https:` (old or edited data) | The link is not rendered; no warning needed. |
+| E-36 | S-02 | Only projects in group `automation` (or one group) are published | The filter shows All + that group (existing empty-group rule). |
 
 ## 9. Data model
 
@@ -358,7 +369,7 @@ One business entity: **Project**, plus site settings. Admin credentials and sess
 | `id` | string (UUID/cuid) | yes | created by the server, cannot be changed | S-13 route, API |
 | `slug` | string | yes | created automatically from `title_en` (kebab-case, unique, `-2` added on a clash); not shown in the v1 UI | analytics events, schema, future (case study) |
 | `title_en` / `title_id` | string | yes | 1–80 characters, trimmed | Selected work, case row, admin, schema |
-| `group` | enum `panasonic`\|`web`\|`ai` | yes | default `web` | S-02 filter, S-11 |
+| `group` | enum `automation`\|`panasonic`\|`web`\|`ai` (labels HR automation / HR systems / Websites / AI tools; D-43) | yes | default `web` | S-02 filter, S-11 |
 | `meta_en` / `meta_id` | string or null | publish | 1–40 | case row, Selected work label |
 | `side_en` / `side_id` | string or null | no | 0–20 | right column of the case row, end of the Selected work label |
 | `summary_en` / `summary_id` | string | yes | 1–160 characters, trimmed, plain text (no HTML/markdown) | short description in Selected work; stands in for `case_is` when empty (E-27) |
@@ -368,6 +379,8 @@ One business entity: **Project**, plus site settings. Admin credentials and sess
 | `status_en` / `status_id` | string or null | publish | 1–40 | case row |
 | `case_action` | enum `site`\|`walkthrough`\|`none` | yes | default `site` | case row button, Selected work link |
 | `live_url` | string or null | when `case_action = site` | valid URL, `https` scheme, max. 300 | site link, schema |
+| `demo_url` | string or null | no | valid URL, `https` scheme, max. 300 | "Watch the demo ↗" in Selected work and the case row (D-42) |
+| `repo_url` | string or null | no | valid URL, `https` scheme, max. 300 | "View the code ↗" in the case row (D-42) |
 | `visual_type` | enum `screenshot`\|`number` | yes | default `screenshot` | Selected work, S-11 |
 | `thumbnail` | object or null | when `visual_type = screenshot` and published | `{ public_id, url, width, height }` from image storage | Selected work, admin |
 | `thumbnail_alt_en` / `thumbnail_alt_id` | string or null | required when there is a thumbnail | 1–140 characters | image alt |
@@ -396,15 +409,17 @@ One business entity: **Project**, plus site settings. Admin credentials and sess
   "slug": "hr-system",
   "group": "panasonic",
   "title": "HR System",
-  "meta": "Panasonic · 13 companies",
+  "meta": "HRMS · 13 companies",
   "side": "2022–now",
-  "summary": "The HR system 13 Panasonic group companies run on.",
-  "caseIs": "A legacy HRMS that 13 Panasonic group companies in Indonesia run on.",
+  "summary": "The HR system a 13-company manufacturing group runs on.",
+  "caseIs": "A legacy HRMS that a 13-company manufacturing group in Indonesia runs on.",
   "caseDid": ["One of three developers on the system since November 2022."],
   "stack": ["ASP.NET Web Forms", "C#", "SQL Server", "Azure"],
   "status": "Live, 2022–now",
   "caseAction": "walkthrough",
   "liveUrl": null,
+  "demoUrl": null,
+  "repoUrl": null,
   "visual": { "type": "number", "number": "13", "caption": "group companies on one HR system" },
   "showOnHome": true
 }
@@ -457,7 +472,7 @@ Only the admin writes data; public pages read directly on the server during rend
 ```json
 {
   "title_en": "string", "title_id": "string",
-  "group": "panasonic | web | ai",
+  "group": "automation | panasonic | web | ai",
   "meta_en": "string", "meta_id": "string",
   "side_en": "string", "side_id": "string",
   "summary_en": "string", "summary_id": "string",
@@ -468,6 +483,8 @@ Only the admin writes data; public pages read directly on the server during rend
   "status_en": "string", "status_id": "string",
   "case_action": "site | walkthrough | none",
   "live_url": "https://... | null",
+  "demo_url": "https://... | null",
+  "repo_url": "https://... | null",
   "visual_type": "screenshot | number",
   "thumbnail": { "public_id": "string", "url": "string", "width": 1600, "height": 1000 },
   "thumbnail_alt_en": "string", "thumbnail_alt_id": "string",
@@ -476,7 +493,7 @@ Only the admin writes data; public pages read directly on the server during rend
 }
 ```
 
-- `featured` is ignored when sent; `tags` max. 6; `live_url` may be `null` except when `case_action = site`.
+- `featured` is ignored when sent; `tags` max. 6; `live_url` may be `null` except when `case_action = site`; `demo_url` and `repo_url` are always optional and follow the `live_url` URL rules (same error message).
 - `thumbnail` may be `null` when `published = false`. The server only uses `thumbnail.public_id`; `url`, `width`, `height` are taken from image storage. A `public_id` that no longer exists → `422` with a message on the `thumbnail` field.
 - `revalidated: false` → the UI shows E-19.
 - API-07 is called when the user clicks Remove/Replace on an image that was never saved, or Cancels a form with a new upload. Saved images are only deleted through API-04/05.
@@ -496,7 +513,7 @@ Only these events are sent, all of them only after `consent=granted`. Event name
 | `contact_email_click` | Click on mailto or Copy email | `kind`: `general`\|`role`\|`project`\|`walkthrough`; `location`: `bar`\|`hero`\|`contact`\|`work_contact`\|`case`; `method`: `mailto`\|`copy`; `language`; `project_slug` (kind walkthrough only) |
 | `cv_download` | Click on Download CV | `location`: `about`\|`contact`; `language` |
 | `case_open` | A case row is opened | `project_slug`; `source`: `home_title`\|`row`\|`hash`; `language` |
-| `project_link_click` | Click on a live site | `project_slug`; `page`: `home`\|`work`; `placement`: `home`\|`case`; `language` |
+| `project_link_click` | Click on a live site, demo or code link | `project_slug`; `page`: `home`\|`work`; `placement`: `home`\|`case`; `link`: `site`\|`demo`\|`code` (from `data-link`, default `site`; D-42); `language` |
 | `theme_switch` | Click on O-04 | `to`: `dark`\|`light` |
 | `language_switch` | Click on O-01 or an O-02 action | `from`, `to`, `source`: `toggle` \| `banner` |
 
@@ -514,8 +531,11 @@ Every UI label lives in two dictionary files (`i18n/en.json`, `i18n/id.json`) wi
 | `mail.walk.s` | Walkthrough: {title} | Walkthrough: {title} |
 | `work.empty` | New work is on the way. Meanwhile, here's how to reach me. | Karya baru sedang disiapkan. Sementara itu, ini cara menghubungi saya. |
 | `theme.toDark` / `theme.toLight` | Switch to dark mode / Switch to light mode | Ganti ke mode gelap / Ganti ke mode terang |
-| `group.panasonic` / `group.web` / `group.ai` | Panasonic / Websites / AI tools | Panasonic / Website / Alat AI |
-| `wp.sub.*` | Pieces per group (`one`/`other`), connector, closer, number words 1–10 (D-30) | same |
+| `group.automation` / `group.panasonic` / `group.web` / `group.ai` | HR automation / HR systems / Websites / AI tools | Otomasi HR / Sistem HR / Website / Alat AI |
+| `work.demo` / `c.code` | Watch the demo ↗ / View the code ↗ | Tonton demonya ↗ / Lihat kodenya ↗ |
+| `mail.walk.b` | Company and team size: · The HR process you want to automate: · Tools you use today: · A good time to talk: (one per line) | Perusahaan dan jumlah karyawan: · Proses HR yang ingin diotomasi: · Tools yang dipakai sekarang: · Waktu yang cocok untuk ngobrol: |
+| `mail.project.b` | The HR process you want to automate: · Tools you use today (HRIS, Google Workspace, Slack…): · Timeline: · Budget range: (one per line) | Proses HR yang ingin diotomasi: · Tools yang dipakai sekarang (HRIS, Google Workspace, Slack…): · Target waktu: · Kisaran anggaran: |
+| `wp.sub.*` | Pieces per group (`one`/`other`), connector, closer, number words 1–10 (D-30); `automation`: "{n} HR automation(s) built with n8n and AI", `panasonic`: "{n} project(s) inside an enterprise HR system" | `automation`: "{n} otomasi HR dengan n8n dan AI", `panasonic`: "{n} proyek di sistem HR enterprise" |
 | `langBanner.text` | Also available in Indonesian. | (not used, the banner is EN only) |
 | `consent.body` | I use Google Analytics to see which pages are useful. It only runs if you allow it. | Saya memakai Google Analytics untuk melihat halaman mana yang berguna. Hanya aktif jika kamu izinkan. |
 | `notFound.title` | This page doesn't exist | Halaman ini tidak ada |
@@ -550,8 +570,8 @@ Every PRD feature has screens, flows and edge cases that can be tested. A featur
 | PRD feature | Screen / overlay | Flow | Edge case | API / contract |
 | --- | --- | --- | --- | --- |
 | F1 Homepage | S-01, O-04, O-05 | UF-01 | E-01, E-03, E-05, E-07, E-20, E-25, E-30, E-31, E-32, E-33, E-34 | Public DTO |
-| F2 Work | S-02, O-05 | UF-01 | E-01, E-27, E-29, E-33 | Public DTO |
-| F3 Case row | S-01, S-02 | UF-01 | E-06, E-27, E-28 | `case_open`, `project_link_click` |
+| F2 Work | S-02, O-05 | UF-01 | E-01, E-27, E-29, E-33, E-36 | Public DTO |
+| F3 Case row | S-01, S-02 | UF-01 | E-06, E-27, E-28, E-35 | `case_open`, `project_link_click` |
 | F4 Bilingual | O-01, O-02, all public | UF-02, UF-04 | E-07, E-18, E-20 | G1, G4, `language_switch` |
 | F5 Contact | Bar, S-01, S-02 | UF-03 | E-09 | `contact_email_click`, `cv_download` |
 | F6 Admin login | S-10, G3 | UF-06, UF-10 | E-10, E-11 | API-01, API-02 |
