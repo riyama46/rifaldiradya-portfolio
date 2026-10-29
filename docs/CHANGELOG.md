@@ -4,6 +4,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 ## [Unreleased]
 
+### Changed
+
+- The code is now MIT-licensed (`LICENSE`); site content (copy, CV, project texts and images) stays all rights reserved.
+
 ## [2.2.0] - 2026-10-29
 
 HR automation positioning, demo and code links, HR automation project group. Details: `docs/changes/archive/2026-10-29-v2.2.0-hr-automation/CHANGE.md`, decisions D-40..D-44 in `docs/decisions/DECISIONS.md`.
