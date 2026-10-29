@@ -7,9 +7,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 ### Changed
 
 - Docs (`docs/specs/`, CHANGELOG, DECISIONS, AGENTS.md) translated to English for readers of the public repo; content unchanged.
+- Highlight copy written for clients instead of recruiters: the HRMS screens are walked through "on a call" (not "in an interview"), and the bridge to contact asks whether the HR team still does this work by hand.
 
 ### Fixed
 
+- The "HR automation" filter on Work showed every project: the stylesheet had no hide rule for the `automation` group. Added it, plus a unit test that every project group has its rule.
 - Saving a project that has a screenshot failed with "Couldn't save" (HTTP 500) on Hostinger since v2.0.1: the image row lock used `FOR SHARE`, which MariaDB rejects as a syntax error. It now uses `FOR UPDATE`, which MySQL and MariaDB both accept.
 
 ## [2.1.1] - 2026-10-23

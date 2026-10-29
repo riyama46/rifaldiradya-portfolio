@@ -118,10 +118,10 @@
     "st2n": "~200",
     "st2": "staff on one login",
     "st3": "group companies on the HRMS",
-    "blur": "Screens of the HRMS are internal; I can walk you through them in an interview."
+    "blur": "Screens of the HRMS are internal; I can walk you through them on a call."
   },
   "bridge": {
-    "q": "Need a system like this at your company?",
+    "q": "Does your HR team still do this kind of work by hand?",
     "go": "Go to contact ↓"
   },
   "ct": {
