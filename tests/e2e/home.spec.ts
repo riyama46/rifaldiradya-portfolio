@@ -23,7 +23,7 @@ test("chapters in order: Hero, Selected work, About, Highlight, Contact", async 
   expect(ids.filter((id) => id !== "work")).toEqual(["top", "about", "highlight", "contact"]);
   expect(ids.indexOf("work")).toBeLessThan(2);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Building HR software for thousands.",
+    "I automate the HR work done by hand.",
   );
 });
 
@@ -53,12 +53,18 @@ test("mailto: subject and body per kind and page language (F5)", async ({ page }
   await expect(role).toHaveAttribute("data-kind", "role");
   await expect(contact(page).getByRole("link", { name: "Email about a project" })).toHaveAttribute(
     "href",
-    /subject=Project%3A%20&body=What%20you%20need%20built%3A/,
+    /subject=Project%3A%20&body=The%20HR%20process%20you%20want%20to%20automate%3A/,
   );
+
+  // D-44: the project email is the primary Contact action, the role email second.
+  await expect(contact(page).locator(".acts a")).toHaveText([
+    "Email about a project",
+    "Email about a full-time role",
+  ]);
 
   await page.goto("/id");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Membangun software HR untuk ribuan karyawan.",
+    "Otomasi pekerjaan HR yang manual.",
   );
   await expect(
     contact(page).getByRole("link", { name: "Email soal posisi full-time" }),
@@ -112,7 +118,7 @@ test.describe("phone with the cookie banner (AC-1)", () => {
     const cover = (await banner.boundingBox())!;
 
     for (const target of [
-      hero(page).getByText("Software engineer · Full-stack .NET"),
+      hero(page).getByText("HR automation engineer · n8n + AI"),
       page.getByRole("heading", { level: 1 }),
       hero(page).getByRole("link", { name: "Email me" }),
     ]) {

@@ -4,9 +4,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-10-29
+
+HR automation positioning, demo and code links, HR automation project group. Details: `docs/changes/archive/2026-10-29-v2.2.0-hr-automation/CHANGE.md`, decisions D-40..D-44 in `docs/decisions/DECISIONS.md`.
+
+### Added
+
+- Projects can link a demo video and a code repository (`demo_url`, `repo_url`, optional, https only; migration `0005`): "Watch the demo ↗" and "View the code ↗" in the Work case row, and "Watch the demo ↗" in Selected work. Clicks send `project_link_click` with `link` `site`/`demo`/`code` (#86).
+- New project group "HR automation" / "Otomasi HR", first in the Work filter and sub (#86).
+- Admin: Demo video URL and Code repository URL fields; four-option group control (#86).
+
 ### Changed
 
+- The site presents Pal as an HR automation engineer (n8n + AI) for HR and people-ops clients, with the HRMS work as supporting proof: hero, availability, SEO titles and descriptions, OG images, Highlight meta and Contact copy in EN and ID. JSON-LD `jobTitle` is "HR Automation Engineer" without `worksFor`; Panasonic is named only in About (and the CV) (#86).
+- Contact puts "Email about a project" first; the walkthrough and project emails ask about the HR process and tools (#86).
+- The "Panasonic" group is labelled "HR systems" / "Sistem HR" (#86).
+- The stack line names no AI vendor: n8n · LLM APIs · Google Workspace · C# · ASP.NET · SQL Server (#87).
+- `check-deploy.mts` expects the v2.2.0 homepage title.
+- Specs (`docs/specs/`) bumped to 2.2.0.
 - Docs (`docs/specs/`, CHANGELOG, DECISIONS, AGENTS.md) translated to English for readers of the public repo; content unchanged.
+- Highlight copy written for clients instead of recruiters: the HRMS screens are walked through "on a call" (not "in an interview"), and the bridge to contact asks whether the HR team still does this work by hand (#89).
+
+### Fixed
+
+- The "HR automation" filter on Work showed every project: the stylesheet had no hide rule for the `automation` group. Added it, plus a unit test that every project group has its rule (#89).
+- Saving a project that has a screenshot failed with "Couldn't save" (HTTP 500) on Hostinger since v2.0.1: the image row lock used `FOR SHARE`, which MariaDB rejects as a syntax error. It now uses `FOR UPDATE`, which MySQL and MariaDB both accept (#88).
 
 ## [2.1.1] - 2026-10-23
 

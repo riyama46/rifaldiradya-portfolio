@@ -33,7 +33,8 @@ export const CARD_NUMBER_MAX = 12;
 export const CARD_CAPTION_MAX = 60;
 export const SHOW_ON_HOME_MAX = 5;
 
-export const PROJECT_GROUPS = ["panasonic", "web", "ai"] as const;
+// Filter and Work sub order (D-43): HR automation first. `panasonic` is labelled "HR systems".
+export const PROJECT_GROUPS = ["automation", "panasonic", "web", "ai"] as const;
 export const CASE_ACTIONS = ["site", "walkthrough", "none"] as const;
 export const VISUAL_TYPES = ["screenshot", "number"] as const;
 
@@ -62,6 +63,8 @@ export const fieldLabels = {
   status_id: "Status (ID)",
   case_action: "Case action",
   live_url: "Live URL",
+  demo_url: "Demo video URL",
+  repo_url: "Code repository URL",
   visual_type: "Visual type",
   thumbnail: "Screenshot",
   thumbnail_alt_en: "Screenshot alt (EN)",
@@ -188,13 +191,15 @@ const tagsSchema = z
     }
   });
 
-const liveUrlSchema = z
-  .string({ error: messages.invalid("live_url") })
-  .trim()
-  .max(LIVE_URL_MAX, tooLong(LIVE_URL_MAX))
-  .refine((value) => value === "" || isValidLiveUrl(value), messages.url)
-  .nullish()
-  .transform((value) => value || null);
+/** An optional https link (live site, demo video, code repository): "" and missing are null. */
+const linkSchema = (field: ProjectField) =>
+  z
+    .string({ error: messages.invalid(field) })
+    .trim()
+    .max(LIVE_URL_MAX, tooLong(LIVE_URL_MAX))
+    .refine((value) => value === "" || isValidLiveUrl(value), messages.url)
+    .nullish()
+    .transform((value) => value || null);
 
 const projectShape = {
   title_en: requiredText("title_en", TITLE_MAX),
@@ -215,7 +220,9 @@ const projectShape = {
   status_en: optionalText("status_en", STATUS_MAX),
   status_id: optionalText("status_id", STATUS_MAX),
   case_action: enumField(CASE_ACTIONS, "case_action", "site"),
-  live_url: liveUrlSchema,
+  live_url: linkSchema("live_url"),
+  demo_url: linkSchema("demo_url"),
+  repo_url: linkSchema("repo_url"),
   visual_type: enumField(VISUAL_TYPES, "visual_type", "screenshot"),
   thumbnail: thumbnailSchema.nullish().transform((value) => value ?? null),
   thumbnail_alt_en: optionalText("thumbnail_alt_en", ALT_MAX),

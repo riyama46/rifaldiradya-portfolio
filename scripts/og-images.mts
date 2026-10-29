@@ -6,6 +6,7 @@
 // access for Google Fonts.
 import { mkdirSync, readFileSync } from "node:fs";
 import { chromium } from "@playwright/test";
+import { siteConfig } from "../lib/site-config.ts";
 
 type Hero = { role: string; loc: string; l1: string; l2: string };
 const hero = (lang: "en" | "id"): Hero =>
@@ -14,7 +15,8 @@ const hero = (lang: "en" | "id"): Hero =>
 // Dark theme tokens of Delta PRD section 8 (the site's default theme).
 const TOKENS =
   "--bg: #0b0b0b; --ink: #f1f1ef; --soft: rgba(241, 241, 239, 0.62); --accent: #7b93ff;";
-const STACK = ["C#", "ASP.NET", "SQL Server", "Azure", "Next.js", "TypeScript"];
+// Same stack line as the hero (CHANGE v2.2.0).
+const STACK = siteConfig.stack;
 
 // The dictionary marks the accent word with <em>; the card renders it like em.ac on the site.
 const accent = (line: string) => line.replace(/<em>(.*?)<\/em>/g, '<em class="ac">$1</em>');

@@ -56,7 +56,7 @@ export const projects = mysqlTable(
     featured: boolean("featured").notNull().default(false),
     // v2.0.0 (CHANGE v2.0.0, Delta SDD section 3). Text fields are null until filled in the admin;
     // the publish rules live in lib/projects/validation.ts.
-    group: varchar("group", { length: 12, enum: ["panasonic", "web", "ai"] })
+    group: varchar("group", { length: 12, enum: ["automation", "panasonic", "web", "ai"] })
       .notNull()
       .default("web"),
     metaEn: varchar("meta_en", { length: 40 }),
@@ -72,6 +72,10 @@ export const projects = mysqlTable(
     caseAction: varchar("case_action", { length: 12, enum: ["site", "walkthrough", "none"] })
       .notNull()
       .default("site"),
+    // v2.2.0 (D-42): optional demo video and code repository links, https only, shown beside the
+    // case button. Independent of case_action, so one project can show both.
+    demoUrl: varchar("demo_url", { length: 300 }),
+    repoUrl: varchar("repo_url", { length: 300 }),
     visualType: varchar("visual_type", { length: 10, enum: ["screenshot", "number"] })
       .notNull()
       .default("screenshot"),

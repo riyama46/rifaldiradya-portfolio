@@ -164,7 +164,7 @@ test("events: email kinds, CV, and project clicks are tracked after consent", as
       const sent = await events(page);
       expect(sent).toContainEqual([
         "project_link_click",
-        { project_slug: site.slug, page: "work", placement: "case", language: "en" },
+        { project_slug: site.slug, page: "work", placement: "case", link: "site", language: "en" },
       ]);
       expect(sent.filter(([name]) => name === "case_open")).toHaveLength(2);
       expect(sent).toContainEqual([

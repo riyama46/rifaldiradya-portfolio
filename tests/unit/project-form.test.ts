@@ -96,6 +96,16 @@ describe("project form model", () => {
     expect(validate({ ...complete, live_url: "", case_action: "none" })).toEqual({});
   });
 
+  it("demo and code links are optional but must be https (D-42)", () => {
+    expect(validate({ ...complete, demo_url: "", repo_url: "" })).toEqual({});
+    expect(
+      validate({ ...complete, demo_url: "http://youtu.be/x", repo_url: "github.com/x" }),
+    ).toEqual({
+      demo_url: "URL must start with https:// and be a full address.",
+      repo_url: "URL must start with https:// and be a full address.",
+    });
+  });
+
   it("reports the first error in on-screen order", () => {
     const errors = validate(emptyValues);
     expect(firstErrorField(errors)).toBe("title_en");

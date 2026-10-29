@@ -132,9 +132,21 @@ describe("track() and data-track attributes (App Flow section 11)", () => {
       [
         "event",
         "project_link_click",
-        { project_slug: "coffee", page: "work", placement: "case", language: "id" },
+        { project_slug: "coffee", page: "work", placement: "case", link: "site", language: "id" },
       ],
     ]);
+  });
+
+  it("project_link_click names the demo and code links (D-42)", async () => {
+    const { gtag, trackFromElement } = await setup("consent=granted");
+    for (const link of ["demo", "code", "bogus"]) {
+      trackFromElement(
+        element({ track: "project_link_click", slug: "onboarding", placement: "case", link }),
+        "/work",
+        "en",
+      );
+    }
+    expect(gtag.mock.calls.map((call) => call[2].link)).toEqual(["demo", "code", "site"]);
   });
 
   it("only a walkthrough email carries a project slug", async () => {

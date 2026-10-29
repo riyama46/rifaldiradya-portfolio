@@ -1370,6 +1370,7 @@
     font-variant-numeric: tabular-nums;
   }
 
+  .rows[data-filter="automation"] .row:not([data-group="automation"]),
   .rows[data-filter="panasonic"] .row:not([data-group="panasonic"]),
   .rows[data-filter="web"] .row:not([data-group="web"]),
   .rows[data-filter="ai"] .row:not([data-group="ai"]) {
@@ -1506,6 +1507,19 @@
 
   .case-act {
     margin-top: 20px;
+  }
+
+  /* D-42: the case button, then the demo and code links, wrapping like .proj-links. */
+  .case-acts {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 32px;
+  }
+
+  .case-acts > .case-act {
+    margin-top: 0;
   }
 
   .work-empty {

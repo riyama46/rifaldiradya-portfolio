@@ -38,6 +38,8 @@ export type FormValues = {
   status_id: string;
   case_action: CaseAction;
   live_url: string;
+  demo_url: string;
+  repo_url: string;
   visual_type: VisualType;
   thumbnail: UploadedImage | null;
   thumbnail_alt_en: string;
@@ -71,6 +73,8 @@ export const emptyValues: FormValues = {
   status_id: "",
   case_action: "site",
   live_url: "",
+  demo_url: "",
+  repo_url: "",
   visual_type: "screenshot",
   thumbnail: null,
   thumbnail_alt_en: "",
@@ -105,6 +109,8 @@ export function valuesFromInput(input: ProjectInputRaw): FormValues {
     status_id: input.status_id ?? "",
     case_action: input.case_action ?? "site",
     live_url: input.live_url ?? "",
+    demo_url: input.demo_url ?? "",
+    repo_url: input.repo_url ?? "",
     visual_type: input.visual_type ?? "screenshot",
     thumbnail: input.thumbnail ?? null,
     thumbnail_alt_en: input.thumbnail_alt_en ?? "",

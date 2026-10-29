@@ -10,6 +10,7 @@ const KINDS = ["general", "role", "project", "walkthrough"] as const;
 const LOCATIONS = ["bar", "hero", "contact", "work_contact", "case"] as const;
 const CV_LOCATIONS = ["about", "contact"] as const;
 const PLACEMENTS = ["home", "case"] as const;
+const LINKS = ["site", "demo", "code"] as const;
 
 export type AnalyticsEvents = {
   contact_email_click: {
@@ -27,6 +28,8 @@ export type AnalyticsEvents = {
     page: "home" | "work";
     /** v2 placements (Delta APP_FLOW section 11): Selected work item or Work case row. */
     placement: "home" | "case";
+    /** D-42: which link was clicked; `site` when the element names none. */
+    link: (typeof LINKS)[number];
     language: Language;
   };
   /** A Work case row opened (Delta APP_FLOW section 11). */
@@ -80,12 +83,12 @@ const includes = <T extends string>(list: readonly T[], value: string | undefine
  * Server-rendered links declare their event with data attributes, so they stay Server Components:
  *   data-track="contact_email_click" data-kind="role" data-location="contact" data-method="mailto"
  *   data-track="cv_download" data-location="about"
- *   data-track="project_link_click" data-slug="…" data-placement="case"
+ *   data-track="project_link_click" data-slug="…" data-placement="case" data-link="demo"
  * One delegated listener (AnalyticsEvents) turns a click into track(). Returns false when the
  * attributes don't describe a valid event (never sends half-filled events).
  */
 export function trackFromElement(element: HTMLElement, pathname: string, language: Language) {
-  const { track: name, kind, location, method, slug, placement, source } = element.dataset;
+  const { track: name, kind, location, method, slug, placement, source, link } = element.dataset;
   const page = pathname === "/work" || pathname === "/id/work" ? "work" : "home";
   if (name === "contact_email_click" && includes(KINDS, kind) && includes(LOCATIONS, location)) {
     // A walkthrough email names its project; the other kinds never carry a slug.
@@ -104,7 +107,13 @@ export function trackFromElement(element: HTMLElement, pathname: string, languag
     return true;
   }
   if (name === "project_link_click" && slug && includes(PLACEMENTS, placement)) {
-    track(name, { project_slug: slug, page, placement, language });
+    track(name, {
+      project_slug: slug,
+      page,
+      placement,
+      link: includes(LINKS, link) ? link : "site",
+      language,
+    });
     return true;
   }
   if (name === "case_open" && slug && (source === "home_title" || source === "row")) {
