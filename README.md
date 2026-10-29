@@ -83,4 +83,6 @@ docs/         specs, changes, decisions, design mockups
 
 ## License
 
-All rights reserved. The code is public for review only. Copying or reuse requires written permission.
+The code is released under the [MIT License](LICENSE).
+
+The content is not: the copy in `i18n/`, the CV, project texts and screenshots, the OG images and the personal name and likeness stay all rights reserved.
