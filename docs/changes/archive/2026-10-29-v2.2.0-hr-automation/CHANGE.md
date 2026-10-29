@@ -4,7 +4,7 @@ app: rifaldiradya.com
 tier: full
 bump: minor
 base_version: 2.1.0
-status: in-progress
+status: done
 date: 2026-10-28
 ---
 
@@ -89,7 +89,7 @@ Pal is moving their freelance service to HR / people-ops workflow automation (n8
 - **S-02 step 3:** after the `case_action` button: "Watch the demo ↗" (`demo_url`) and "View the code ↗" (`repo_url`) when set, in that order, same link rules. The details column shows when any of stack, status, a case button, demo or code exists.
 - **S-12/S-13 table:** row 2 Group → segmented HR automation / HR systems / Websites / AI tools, enum `automation`\|`panasonic`\|`web`\|`ai`, default `web`; row 3 example → "HRMS · 13 companies". ADDED rows in section "Button on the case", after Live URL: "Demo video URL | text (url) | https, max. 300, e.g. YouTube or Google Drive | no" and "Code repository URL | text (url) | https, max. 300, e.g. GitHub | no".
 - **UF-01:** becomes "An HR lead evaluates Pal (EN) — main flow": hero → Selected work → "Watch the demo ↗" (video in a new tab) → back → Contact → "Email about a project". The recruiter path moves to UF-01b (previous UF-01 steps, unchanged).
-- **§8 Edge cases:** ADDED E-32: `demo_url`/`repo_url` stored but not https (old or edited data) → not rendered, no warning needed. E-33: a project in group `automation` while the filter has no other group → filter shows All + HR automation (existing empty-group rule).
+- **§8 Edge cases:** (merged into the specs as E-35 and E-36, because E-32..E-34 were already taken) ADDED E-32: `demo_url`/`repo_url` stored but not https (old or edited data) → not rendered, no warning needed. E-33: a project in group `automation` while the filter has no other group → filter shows All + HR automation (existing empty-group rule).
 - **§9 Data model, Project:** ADDED `demo_url` (string or null, https, max. 300; Selected work + case row) and `repo_url` (string or null, https, max. 300; case row). `group` enum adds `automation`. Example DTO: "meta": "HRMS · 13 companies", "summary": "The HR system a 13-company manufacturing group runs on." (no employer name in the example).
 - **§10 API contract:** ProjectInput adds `"demo_url": "https://... | null"`, `"repo_url": "https://... | null"`, `group` adds `automation`. Errors reuse "URL must start with https:// and be a full address."
 - **§11 GA4:** `project_link_click` adds `link`: `site`\|`demo`\|`code` (from `data-link`, default `site`).

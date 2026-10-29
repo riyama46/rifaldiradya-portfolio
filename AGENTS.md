@@ -2,8 +2,8 @@
 
 ## Specs (source of truth)
 
-- Current: docs/specs/ (check `version` and `status: current` in each file's header). Live: v2.1.0 (git tag on `main`).
-- Active change: docs/changes/v2.2.0-hr-automation/CHANGE.md (tasks.md alongside)
+- Current: docs/specs/ (check `version` and `status: current` in each file's header). Live: v2.2.0 (git tag on `main`).
+- Active change: none (last: docs/changes/archive/2026-10-29-v2.2.0-hr-automation/)
   → Implement ONLY what the active change describes. Where it conflicts with docs/specs, the change wins.
 - docs/changes/archive/ is history only — never use it as requirements.
 - Versions: PATCH = fix/tidy (builder directly) · MINOR = something new · MAJOR = direction/structure change. MINOR/MAJOR are planned as a CHANGE.md first (docs/changes/vX.Y.Z-name/CHANGE.md).
