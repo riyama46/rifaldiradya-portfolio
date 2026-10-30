@@ -1,8 +1,14 @@
 # rifaldiradya.com
 
-Source code of [rifaldiradya.com](https://rifaldiradya.com), the bilingual (EN/ID) portfolio of Rifaldi Radya Pratama, a full-stack .NET software engineer. The site shows selected work, an About chapter and a CV download. Every call to action leads to email.
+Source code of [rifaldiradya.com](https://rifaldiradya.com), the bilingual (EN/ID) portfolio of Rifaldi Radya Pratama, an **HR automation engineer**.
 
-The site has a small admin panel where projects, images and profile content are edited without a redeploy.
+I build n8n and AI workflows that take manual work off HR and people-ops teams: onboarding, candidate screening, approvals and HR admin. Behind that are four years building and running the HRMS of a 13-company manufacturing group (C#, ASP.NET, SQL Server). Working demos with their code: [hr-onboarding-automation](https://github.com/riyama46/hr-onboarding-automation).
+
+Have an HR process to automate? Email me from [rifaldiradya.com](https://rifaldiradya.com).
+
+## About this repo
+
+The site shows selected work, an About chapter and a CV download. Every call to action leads to email. It has a small admin panel where projects, images and profile content are edited without a redeploy.
 
 ## Stack
 
